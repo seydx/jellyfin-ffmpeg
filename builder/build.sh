@@ -101,7 +101,8 @@ else
 fi
 cd -
 
-rm -rf ffbuild
+# Keep ffbuild/prefix for node-av builds
+# rm -rf ffbuild
 
 if [[ -n "$GITHUB_ACTIONS" ]]; then
     echo "build_name=${BUILD_NAME}" >> "$GITHUB_OUTPUT"
