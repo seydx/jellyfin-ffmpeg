@@ -8,7 +8,8 @@ ffbuild_macbase() {
   # Pin nasm to 2.16.03 to avoid dav1d AVX512 assembly issues with nasm 3.0.0
   # https://code.videolan.org/videolan/dav1d/-/issues/457
   brew unlink nasm 2>/dev/null || true
-  brew install --formula --build-from-source https://raw.githubusercontent.com/Homebrew/homebrew-core/8197abd5ad0f893bbc7b99f20cd09b50a4b8f446/Formula/n/nasm.rb
+  wget -O /tmp/nasm.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/8197abd5ad0f893bbc7b99f20cd09b50a4b8f446/Formula/n/nasm.rb
+  brew install --build-from-source /tmp/nasm.rb
   mkdir /opt/ffbuild/bin
   cp "$BUILDER_ROOT"/images/base/git-mini-clone.sh /opt/ffbuild/bin/git-mini-clone
   chmod +x /opt/ffbuild/bin/git-mini-clone
