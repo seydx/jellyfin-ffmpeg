@@ -13,7 +13,6 @@ ffbuild_macbase() {
   brew tap-new --no-git local/nasm
   brew extract --version=2.16.03 nasm local/nasm
   brew install --build-from-source local/nasm/nasm@2.16.03
-  brew untap local/nasm
   unset HOMEBREW_NO_INSTALL_FROM_API
   mkdir /opt/ffbuild/bin
   cp "$BUILDER_ROOT"/images/base/git-mini-clone.sh /opt/ffbuild/bin/git-mini-clone
