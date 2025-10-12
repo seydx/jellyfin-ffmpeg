@@ -1,0 +1,4 @@
+[submodule "projects/ffmpeg-rockchip"]
+	path = projects/ffmpeg-rockchip
+	url = https://github.com/nyanmisaka/ffmpeg-rockchip.git
+	branch = 8.0
