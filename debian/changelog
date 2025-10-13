@@ -1,3 +1,13 @@
+jellyfin-ffmpeg (8.0-1) unstable; urgency=medium
+
+  * New upstream version 8.0
+  * Migrate all patches to FFmpeg 8.0 API
+  * Fix Rockchip MPP encoder dependencies
+  * Remove libpostproc (no longer in FFmpeg 8.0)
+  * Update Rockchip MPP version requirement to 1.3.9
+
+ -- nyanmisaka <nst799610810@gmail.com>  Mon, 14 Oct 2025 00:53:00 +0200
+
 jellyfin-ffmpeg (7.1.2-2) unstable; urgency=medium
 
   * Backport a fix for stripping FPS from setpts outlink
