@@ -1,4 +1,4 @@
-jellyfin-ffmpeg (8.0-1) unstable; urgency=medium
+jellyfin-ffmpeg (8.0.0-1) unstable; urgency=medium
 
   * New upstream version 8.0
   * Migrate all patches to FFmpeg 8.0 API
