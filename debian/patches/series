@@ -4,7 +4,7 @@
 0004-add-cuda-tonemap-impl.patch
 0005-add-amf-fixes-from-upstream-and-custom-tunings.patch
 0006-add-opencl-scaler-and-pixfmt-converter-impl.patch
-0007-add-bt2390-eetf-and-code-refactor-to-opencl-tonemap.patch
+# 0007-add-bt2390-eetf-and-code-refactor-to-opencl-tonemap.patch (needs rewrite for FFmpeg 8)
 0008-add-pgs-support-to-opencl-overlay.patch
 0009-add-d3d11-opencl-interop-for-amd.patch
 0010-add-a-hack-for-opencl-reverse-mapping.patch
@@ -58,11 +58,11 @@
 0058-add-ac4-decoder-for-atsc-3-0.patch
 0059-tune-the-default-inter-thread-queue-sizes.patch
 # 0060-backport-fixes-for-vulkan-from-upstream.patch (already in upstream)
-# 0061-revert-the-broken-vulkan-hwupload-rewrite.patch (not needed - hwupload works fine in master, tested successfully)
+# 0061-revert-the-broken-vulkan-hwupload-rewrite.patch (not needed)
 0062-use-linear-contiguous-vulkan-images-for-amd-encoder.patch
 0063-prefer-vulkan-device-with-higher-api-version.patch
-# 0064-add-pgs-support-to-vulkan-overlay.patch (FFmpeg 8 Vulkan API incompatible - would need complete rewrite)
-# 0065-fix-yuv420p-to-p01x-unscaled-conversion.patch (already in upstream - commit 0bb53948ac)
+# 0064-add-pgs-support-to-vulkan-overlay.patch (needs rewrite for FFmpeg 8)
+# 0065-fix-yuv420p-to-p01x-unscaled-conversion.patch (already in upstream )
 0066-allow-vt-sw-decoder-for-every-codec.patch
 0067-add-bwdif-videotoolbox-filter.patch
 0068-add-12bit-decoding-on-videotoolbox.patch
