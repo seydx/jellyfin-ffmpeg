@@ -48,3 +48,6 @@
 !/.forgejo/
 /projects
 *.patch~
+/builder/ffmpeg
+/builder/ffprobe
+/build_mac_local.sh
