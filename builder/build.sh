@@ -60,10 +60,10 @@ cat <<EOF >"$BUILD_SCRIPT"
     rm -rf prefix
     cd ffmpeg
 
-    # if [[ -f "debian/patches/series" ]]; then
-    #     ln -s /ffbuild/ffmpeg/debian/patches patches
-    #     quilt push -a
-    # fi
+    if [[ -f "debian/patches/series" ]]; then
+        ln -s /ffbuild/ffmpeg/debian/patches patches
+        quilt push -a
+    fi
 
     ./configure --prefix=/ffbuild/prefix \
         \$FFBUILD_TARGET_FLAGS \

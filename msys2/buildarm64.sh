@@ -27,10 +27,10 @@ done
 
 cd "$BUILDER_ROOT"
 cd ..
-# if [[ -f "debian/patches/series" ]]; then
-#     ln -s debian/patches patches
-#     quilt push -a
-# fi
+if [[ -f "debian/patches/series" ]]; then
+    ln -s debian/patches patches
+    quilt push -a
+fi
 
 PKG_CONFIG_PATH=/clangarm64/ffbuild/lib/pkgconfig ./configure --cc=clang \
     --arch=arm64 \

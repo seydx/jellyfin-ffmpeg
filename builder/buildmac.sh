@@ -96,10 +96,10 @@ fi
 
 cd "$BUILDER_ROOT"
 cd ..
-# if [[ -f "debian/patches/series" ]]; then
-#     ln -s debian/patches patches
-#     quilt push -a
-# fi
+if [[ -f "debian/patches/series" ]]; then
+    ln -s debian/patches patches
+    quilt push -a
+fi
 
 ./configure --prefix=/ffbuild/prefix \
     $FFBUILD_TARGET_FLAGS \
