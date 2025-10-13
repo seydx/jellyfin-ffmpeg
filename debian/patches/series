@@ -62,14 +62,14 @@
 0062-use-linear-contiguous-vulkan-images-for-amd-encoder.patch
 0063-prefer-vulkan-device-with-higher-api-version.patch
 # 0064-add-pgs-support-to-vulkan-overlay.patch (needs rewrite for FFmpeg 8)
-# 0065-fix-yuv420p-to-p01x-unscaled-conversion.patch (already in upstream )
+# 0065-fix-yuv420p-to-p01x-unscaled-conversion.patch (already in upstream)
 0066-allow-vt-sw-decoder-for-every-codec.patch
 0067-add-bwdif-videotoolbox-filter.patch
 0068-add-12bit-decoding-on-videotoolbox.patch
 0069-fix-the-sub2video-perf-regressions.patch
 0070-allow-vpl-qsv-to-init-with-the-legacy-msdk-path.patch
 0071-alway-set-videotoolboxenc-pixel-buffer-info.patch
-0072-add-remove-dovi-hdr10plus-bsf.patch
+# 0072-add-remove-dovi-hdr10plus-bsf.patch (needs rewrite for FFmpeg 8)
 0073-fix-atenc-layout-samplerate.patch
 0074-videotoolbox-remove-opengl-compatability.patch
 0075-use-dynamic-pool-for-vpl-qsv-hwupload.patch
