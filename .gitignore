@@ -52,3 +52,4 @@
 /builder/ffprobe
 /build_mac_local.sh
 /patches
+/runner.log
