@@ -16,12 +16,31 @@ get_output() {
     )
 }
 
-# Accept architecture as first argument, fallback to uname -m if not provided
-if [ -n "$1" ]; then
-    arch="$1"
-else
+# Parse arguments
+SKIP_BUILD=false
+arch=""
+
+for arg in "$@"; do
+    case "$arg" in
+        --skip-build)
+            SKIP_BUILD=true
+            ;;
+        arm64|x86_64)
+            arch="$arg"
+            ;;
+        *)
+            echo "Unknown argument: $arg"
+            echo "Usage: $0 [arm64|x86_64] [--skip-build]"
+            exit 1
+            ;;
+    esac
+done
+
+# Fallback to uname -m if architecture not provided
+if [ -z "$arch" ]; then
     arch=$(uname -m)
 fi
+
 TARGET="macarm64"
 VARIANT="gpl"
 if [ "$arch" = "arm64" ]; then
@@ -29,7 +48,7 @@ if [ "$arch" = "arm64" ]; then
 elif [ "$arch" = "x86_64" ]; then
     TARGET="mac64"
 else
-    echo "Unknown architecture"
+    echo "Unknown architecture: $arch"
     exit 1
 fi
 
@@ -58,20 +77,22 @@ FF_HOST_CFLAGS="$(xargs <<< "$FF_HOST_CFLAGS")"
 FF_HOST_LDFLAGS="$(xargs <<< "$FF_HOST_LDFLAGS")"
 FFBUILD_TARGET_FLAGS="$(xargs <<< "$FFBUILD_TARGET_FLAGS")"
 
-mkdir -p build
-for macbase in images/macos/*.sh; do
-    cd "$BUILDER_ROOT"/build
-    source "$BUILDER_ROOT"/"$macbase"
-    ffbuild_macbase || exit $?
-done
+if [ "$SKIP_BUILD" = false ]; then
+    mkdir -p build
+    for macbase in images/macos/*.sh; do
+        cd "$BUILDER_ROOT"/build
+        source "$BUILDER_ROOT"/"$macbase"
+        ffbuild_macbase || exit $?
+    done
 
-cd "$BUILDER_ROOT"
-for lib in scripts.d/*.sh; do
-    cd "$BUILDER_ROOT"/build
-    source "$BUILDER_ROOT"/"$lib"
-    ffbuild_enabled || continue
-    ffbuild_dockerbuild || exit $?
-done
+    cd "$BUILDER_ROOT"
+    for lib in scripts.d/*.sh; do
+        cd "$BUILDER_ROOT"/build
+        source "$BUILDER_ROOT"/"$lib"
+        ffbuild_enabled || continue
+        ffbuild_dockerbuild || exit $?
+    done
+fi
 
 cd "$BUILDER_ROOT"
 cd ..
