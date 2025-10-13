@@ -51,3 +51,4 @@
 /builder/ffmpeg
 /builder/ffprobe
 /build_mac_local.sh
+/patches
