@@ -3,6 +3,8 @@
 *.objs
 *.o.*
 *.d
+!*/scripts.d/
+!*/scripts.d/**
 *.def
 *.dll
 *.dylib
