@@ -32,7 +32,7 @@ if [[ -f "debian/patches/series" ]]; then
     quilt push -a
 fi
 
-PKG_CONFIG_PATH=/clangarm64/ffbuild/lib/pkgconfig ./configure --cc=clang \
+PKG_CONFIG_PATH=/clangarm64/ffbuild/lib/pkgconfig ./configure --cc=clang --cxx=clang++ \
     --arch=arm64 \
     --pkg-config-flags=--static \
     --extra-cflags=-I/clangarm64/ffbuild/include \
