@@ -1,0 +1,14 @@
+Index: FFmpeg/ffbuild/common.mak b/ffbuild/common.mak
+===================================================================
+--- FFmpeg.orig/ffbuild/common.mak b/ffbuild/common.mak
++++ FFmpeg/ffbuild/common.mak b/ffbuild/common.mak
+@@ -42,7 +42,8 @@ endif
+ PREPEND = $(eval $(1) = $(patsubst %,$$(%), $(2)) $(value $(1)))
+ 
+ # NASM requires -I path terminated with /
+-IFLAGS     := -I. -I$(SRC_LINK)/
++# Use -iquote for current directory to avoid VERSION file conflicting with C++20 <version> header
++IFLAGS     := -iquote . -I$(SRC_LINK)/
+ CPPFLAGS   := $(IFLAGS) $(CPPFLAGS)
+ CFLAGS     += $(ECFLAGS)
+ CCFLAGS     = $(CPPFLAGS) $(CFLAGS)
