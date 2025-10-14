@@ -12,14 +12,13 @@ Index: FFmpeg/ffbuild/common.mak b/ffbuild/common.mak
  CPPFLAGS   := $(IFLAGS) $(CPPFLAGS)
  CFLAGS     += $(ECFLAGS)
  CCFLAGS     = $(CPPFLAGS) $(CFLAGS)
-@@ -52,7 +53,9 @@ ASFLAGS    := $(CPPFLAGS) $(ASFLAGS)
+@@ -52,7 +53,8 @@ ASFLAGS    := $(CPPFLAGS) $(ASFLAGS)
  # Use PREPEND here so that later (target-dependent) additions to CPPFLAGS
  # end up in CXXFLAGS.
  $(call PREPEND,CXXFLAGS, CPPFLAGS)
 -X86ASMFLAGS += $(IFLAGS:%=%/) -I$(<D)/ -Pconfig.asm
 +# NASM doesn't support -iquote, so use explicit -I flags for assembly
 +X86ASMFLAGS += -I. -I$(SRC_LINK)/ -I$(<D)/ -Pconfig.asm
-+NVCCFLAGS  += $(IFLAGS)
+ NVCCFLAGS  += $(IFLAGS)
  
  HOSTCCFLAGS = $(IFLAGS) $(HOSTCPPFLAGS) $(HOSTCFLAGS)
- LDFLAGS    := $(ALLFFLIBS:%=$(LD_PATH)lib%) $(LDFLAGS)
