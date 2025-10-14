@@ -25,7 +25,6 @@ ffbuild_dockerbuild() {
         -DWHISPER_BUILD_SERVER=OFF
         -DWHISPER_USE_SYSTEM_GGML=OFF
         -DGGML_CCACHE=OFF
-        -DGGML_OPENCL=ON
         -DGGML_NATIVE=OFF
         -DGGML_SSE42=ON
         -DGGML_AVX=ON
@@ -35,11 +34,14 @@ ffbuild_dockerbuild() {
         -DGGML_FMA=ON
     )
 
-    # Vulkan is only available on Windows and Linux
+    # Platform-specific acceleration
     if [[ $TARGET != mac* ]]; then
         myconf+=(-DGGML_VULKAN=ON)
+        myconf+=(-DGGML_OPENCL=ON)
     else
         myconf+=(-DGGML_VULKAN=OFF)
+        myconf+=(-DGGML_OPENCL=OFF)
+        myconf+=(-DGGML_METAL=ON)
     fi
 
     cmake "${myconf[@]}" ..
@@ -55,8 +57,7 @@ ffbuild_dockerbuild() {
         echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-vulkan -lggml-opencl -lstdc++" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
         echo "Requires: vulkan OpenCL" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
     else
-        echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-opencl -lstdc++" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
-        echo "Requires: OpenCL" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
+        echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-metal -lstdc++" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
     fi
 }
 
