@@ -4,8 +4,9 @@ SCRIPT_REPO="https://github.com/ggml-org/whisper.cpp.git"
 SCRIPT_COMMIT="a91dd3be72f70dd1b3cb6e252f35fa17b93f596c"
 
 ffbuild_enabled() {
-    [[ $TARGET == *32 ]] && return -1
-    return 0
+    return -1
+    # [[ $TARGET == *32 ]] && return -1
+    # return 0
 }
 
 ffbuild_dockerbuild() {
