@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://github.com/intel/libva.git"
-SCRIPT_COMMIT="eec9f7132d4677575f929fc1dd3babc349cc56da" # 2.14.0
+SCRIPT_COMMIT="eec9f7132d4677575f929fc1dd3babc349cc56da"
 
 # Ubuntu 20.04  : 2.7.0     # c2be378312b0a17c796509defae42afba7351272
 # Ubuntu 22.04  : 2.14.0    # eec9f7132d4677575f929fc1dd3babc349cc56da
