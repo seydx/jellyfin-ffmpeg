@@ -1,12 +1,15 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://github.com/intel/libva.git"
-SCRIPT_COMMIT="df3c584bb79d1a1e521372d62fa62e8b1c52ce6c" # 2.17.0
+SCRIPT_COMMIT="eec9f7132d4677575f929fc1dd3babc349cc56da" # 2.14.0
 
-# Ubuntu 24.04: 2.20.0
-# Ubuntu 25.04: 2.22.0
-# Debian 12: 2.17.0
-# Debian 13: 2.22.0
+# Ubuntu 20.04  : 2.7.0     # c2be378312b0a17c796509defae42afba7351272
+# Ubuntu 22.04  : 2.14.0    # eec9f7132d4677575f929fc1dd3babc349cc56da
+# Ubuntu 24.04  : 2.20.0    # 907b2b5405ca1091b4360bf35060e143bd704b62
+# Ubuntu 25.04  : 2.22.0    # 217da1c28336d6a7e9c0c4cb8f1c303968a675f1
+# Debian 11     : 2.10.0    # e3c7598743f10477f5799df42c806ba4945fd5c1
+# Debian 12     : 2.17.0    # df3c584bb79d1a1e521372d62fa62e8b1c52ce6c
+# Debian 13     : 2.22.0    # 217da1c28336d6a7e9c0c4cb8f1c303968a675f1
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
