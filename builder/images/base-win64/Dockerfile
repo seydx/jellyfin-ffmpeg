@@ -1,4 +1,4 @@
-ARG GH_REPO=ghcr.io/jellyfin/jellyfin-ffmpeg
+ARG GH_REPO=ghcr.io/seydx/jellyfin-ffmpeg
 FROM $GH_REPO/base:latest
 
 RUN --mount=src=ct-ng-config,dst=/.config \
