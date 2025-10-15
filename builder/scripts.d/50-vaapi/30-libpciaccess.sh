@@ -1,7 +1,15 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git"
-SCRIPT_COMMIT="191dfe0707e2a93c08e4b3e99454b6146c5bfca2"
+SCRIPT_COMMIT="fbd1f0fe79ba25b72635f8e36a6c33d7e0ca19f6" # 0.16
+
+# Ubuntu 20.04  : 0.16-0        # fbd1f0fe79ba25b72635f8e36a6c33d7e0ca19f6
+# Ubuntu 22.04  : 0.16-3        # fbd1f0fe79ba25b72635f8e36a6c33d7e0ca19f6
+# Ubuntu 24.04  : 0.17-3        # 935f0b4d6983f77c4f35e6d492f9f2c2d1ed57f9
+# Ubuntu 25.04  : 0.17-3        # 935f0b4d6983f77c4f35e6d492f9f2c2d1ed57f9
+# Debian 11     : 0.16-1        # fbd1f0fe79ba25b72635f8e36a6c33d7e0ca19f6
+# Debian 12     : 0.17-2        # 935f0b4d6983f77c4f35e6d492f9f2c2d1ed57f9
+# Debian 13     : 0.17-3        # 935f0b4d6983f77c4f35e6d492f9f2c2d1ed57f9
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
