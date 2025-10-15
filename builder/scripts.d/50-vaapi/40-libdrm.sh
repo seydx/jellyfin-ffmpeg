@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/mesa/drm.git"
-SCRIPT_COMMIT="fb5c0c301aa9b6d984ffee522775ca19ea7c7be6" # 2.4.113
+SCRIPT_COMMIT="76a1e97a9a7c29fa3035bb370d654791bdc23d90"
 
 # Ubuntu 20.04  : 2.4.107               # 9cef5dee3cd817728c83aeb3c2010c1954e4c402
 # Ubuntu 22.04  : 2.4.113               # fb5c0c301aa9b6d984ffee522775ca19ea7c7be6
