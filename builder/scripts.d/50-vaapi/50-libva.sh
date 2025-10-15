@@ -1,7 +1,12 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://github.com/intel/libva.git"
-SCRIPT_COMMIT="217da1c28336d6a7e9c0c4cb8f1c303968a675f1"
+SCRIPT_COMMIT="df3c584bb79d1a1e521372d62fa62e8b1c52ce6c" # 2.17.0
+
+# Ubuntu 24.04: 2.20.0
+# Ubuntu 25.04: 2.22.0
+# Debian 12: 2.17.0
+# Debian 13: 2.22.0
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
