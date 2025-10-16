@@ -44,9 +44,11 @@ ffbuild_dockerbuild() {
 }
 
 ffbuild_configure() {
+    return 0
     echo --enable-xlib
 }
 
 ffbuild_unconfigure() {
+    return 0
     echo --disable-xlib
 }
