@@ -19,7 +19,7 @@ jobs:
       contents: read
       packages: write
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - target: linux64
@@ -46,17 +46,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Restore BuildX Cache
-        uses: actions/cache@v4
-        with:
-          path: builder/.cache
-          key: buildx-${{ matrix.target }}-${{ matrix.variant }}-${{ hashFiles('builder/**/*.sh', 'builder/scripts.d/**') }}
-          restore-keys: |
-            buildx-${{ matrix.target }}-${{ matrix.variant }}-
-
       - name: Build Docker Image
-        env:
-          QUICKBUILD: "1"
         run: |
           cd builder
           ./makeimage.sh ${{ matrix.target }} ${{ matrix.variant }}
