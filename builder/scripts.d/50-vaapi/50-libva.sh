@@ -9,9 +9,18 @@ ffbuild_enabled() {
     return 0
 }
 
+ffbuild_dockerstage() {
+    to_df "RUN --mount=src=${SELF},dst=/stage.sh --mount=src=patches/libva,dst=/patches run_stage /stage.sh"
+}
+
 ffbuild_dockerbuild() {
     git-mini-clone "$SCRIPT_REPO" "$SCRIPT_COMMIT" libva
     cd libva
+
+    for patch in /patches/*.patch; do
+        echo "Applying $patch"
+        patch -p1 < "$patch"
+    done
 
     autoreconf -i
 
