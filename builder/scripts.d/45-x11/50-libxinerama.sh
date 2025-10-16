@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libxinerama.git"
-SCRIPT_COMMIT="c3ab2361f13154921df2992f9eacc1ea1b3f946b"
+SCRIPT_COMMIT="c5187f076d16601c15c59c5a2f05c0513d9f042b"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
@@ -20,12 +20,6 @@ ffbuild_dockerbuild() {
         --disable-static
         --with-pic
     )
-
-    if [[ $TARGET == linuxarm64 ]]; then
-        myconf+=(
-            --disable-malloc0returnsnull
-        )
-    fi
 
     if [[ $TARGET == linux* ]]; then
         myconf+=(

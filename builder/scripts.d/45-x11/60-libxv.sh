@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libxv.git"
-SCRIPT_COMMIT="ef2a282876acc2316d338f8b66344ad5a2947057"
+SCRIPT_COMMIT="03a6f599d060591a9a7cd8558bd2143a1c7c70d7"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
@@ -22,12 +22,6 @@ ffbuild_dockerbuild() {
         --with-pic
         --without-lint
     )
-
-    if [[ $TARGET == linuxarm64 ]]; then
-        myconf+=(
-            --disable-malloc0returnsnull
-        )
-    fi
 
     if [[ $TARGET == linux* ]]; then
         myconf+=(
@@ -50,11 +44,9 @@ ffbuild_dockerbuild() {
 }
 
 ffbuild_configure() {
-    return 0
     echo --enable-xlib
 }
 
 ffbuild_unconfigure() {
-    return 0
     echo --disable-xlib
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libxscrnsaver.git"
-SCRIPT_COMMIT="96fffcd9dcaf2ba37ec56aa798677de9ad58ae81"
+SCRIPT_COMMIT="aa9fd5061d0a8832480ad0c1acc9d2e864e807f4"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
@@ -20,12 +20,6 @@ ffbuild_dockerbuild() {
         --disable-static
         --with-pic
     )
-
-    if [[ $TARGET == linuxarm64 ]]; then
-        myconf+=(
-            --disable-malloc0returnsnull
-        )
-    fi
 
     if [[ $TARGET == linux* ]]; then
         myconf+=(

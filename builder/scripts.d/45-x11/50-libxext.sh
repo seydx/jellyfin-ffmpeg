@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libxext.git"
-SCRIPT_COMMIT="ebb167f34a3514783966775fb12573c4ed209625"
+SCRIPT_COMMIT="47904063048fa6ef6e8e16219ddef4d14d5d9a4b"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
@@ -25,12 +25,6 @@ ffbuild_dockerbuild() {
         --without-lint
     )
 
-    if [[ $TARGET == linuxarm64 ]]; then
-        myconf+=(
-            --disable-malloc0returnsnull
-        )
-    fi
-
     if [[ $TARGET == linux* ]]; then
         myconf+=(
             --host="$FFBUILD_TOOLCHAIN"
@@ -40,7 +34,7 @@ ffbuild_dockerbuild() {
         return -1
     fi
 
-    export CFLAGS="$RAW_CFLAGS -D_GNU_SOURCE"
+    export CFLAGS="$RAW_CFLAGS"
     export LDFLAFS="$RAW_LDFLAGS"
 
     ./configure "${myconf[@]}"

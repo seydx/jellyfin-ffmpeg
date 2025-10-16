@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libxcb.git"
-SCRIPT_COMMIT="4b40b44cb6d088b6ffa2fb5cf3ad8f12da588cef"
+SCRIPT_COMMIT="43fbf03e549bf6da8d1d8522e0ceddc4d49c37c6"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
@@ -45,11 +45,9 @@ ffbuild_dockerbuild() {
 }
 
 ffbuild_configure() {
-    return 0
     echo --enable-libxcb
 }
 
 ffbuild_unconfigure() {
-    return 0
     echo --disable-libxcb
 }
