@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libx11.git"
-SCRIPT_COMMIT="4c96f3567a8d045ee57b886fddc9618b71282530"
+SCRIPT_COMMIT="44f908d9283710ffc75b22d2ae7a8948119b3e61"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
@@ -26,6 +26,12 @@ ffbuild_dockerbuild() {
         --disable-specs
         --enable-ipv6
     )
+
+    if [[ $TARGET == linuxarm64 ]]; then
+        myconf+=(
+            --disable-malloc0returnsnull
+        )
+    fi
 
     if [[ $TARGET == linux* ]]; then
         myconf+=(

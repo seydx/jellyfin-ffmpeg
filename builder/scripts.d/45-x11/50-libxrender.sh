@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libxrender.git"
-SCRIPT_COMMIT="bce0618839fc33f44edd8b5498b8e33d167806ff"
+SCRIPT_COMMIT="07efd80468f6b595e6432edd28b8560ca7695ba0"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
@@ -20,6 +20,12 @@ ffbuild_dockerbuild() {
         --disable-static
         --with-pic
     )
+
+    if [[ $TARGET == linuxarm64 ]]; then
+        myconf+=(
+            --disable-malloc0returnsnull
+        )
+    fi
 
     if [[ $TARGET == linux* ]]; then
         myconf+=(

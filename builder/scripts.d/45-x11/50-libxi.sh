@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libxi.git"
-SCRIPT_COMMIT="f24d7f43ab4d97203e60677a3d42e11dbc80c8b4"
+SCRIPT_COMMIT="09f3eb570fe79bfc0c430b6059d7b4acaf371c24"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
@@ -20,6 +20,12 @@ ffbuild_dockerbuild() {
         --disable-static
         --with-pic
     )
+
+    if [[ $TARGET == linuxarm64 ]]; then
+        myconf+=(
+            --disable-malloc0returnsnull
+        )
+    fi
 
     if [[ $TARGET == linux* ]]; then
         myconf+=(
