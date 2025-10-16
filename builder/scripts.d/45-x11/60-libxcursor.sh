@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libxcursor.git"
-SCRIPT_COMMIT="2197ca8cbb743d2fcc43c155396a724cad8f26f3"
+SCRIPT_COMMIT="b84b5d100f193fda0630c4d6fa889cd3e05ca033"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
