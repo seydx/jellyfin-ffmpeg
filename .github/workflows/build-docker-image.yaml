@@ -2,11 +2,12 @@ name: "🐳 Build Docker Images"
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * 0" # Weekly on Sunday
   push:
     branches:
       - ffmpeg-master
+    paths:
+      - 'builder/**'
+      - '.github/workflows/build-docker-image.yaml'
 
 env:
   REGISTRY: ghcr.io
