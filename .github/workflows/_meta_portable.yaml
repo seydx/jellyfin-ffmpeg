@@ -24,8 +24,8 @@ on:
 
 jobs:
   build:
-    name: 'Build Portable FFmpeg'
-    runs-on: ubuntu-latest
+    name: 'Build Portable FFmpeg - ${{ matrix.arch }}'
+    runs-on: ${{ matrix.arch == 'amd64' && 'ubuntu-latest' || 'ubuntu-24.04-arm' }}
     strategy:
       fail-fast: true
       matrix:
