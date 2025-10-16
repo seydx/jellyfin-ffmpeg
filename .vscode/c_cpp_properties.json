@@ -1,0 +1,37 @@
+{
+    "configurations": [
+        {
+            "name": "Mac (arm64)",
+            "includePath": [
+                "${workspaceFolder}",
+                "/opt/ffbuild/prefix/include"
+            ],
+            "defines": [
+                "__device__=",
+                "__constant__=",
+                "__global__=",
+                "__host__=",
+                "__inline__=inline",
+                "__shared__=",
+                "__device_builtin__=",
+                "__align__(x)="
+            ],
+            "forcedInclude": [
+                "${workspaceFolder}/config.h",
+                "${workspaceFolder}/config_components.h",
+                "${workspaceFolder}/compat/cuda/cuda_runtime.h",
+                "${workspaceFolder}/libavfilter/colorspace.h",
+                "${workspaceFolder}/libavutil/internal.h"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "macos-clang-arm64",
+            "compilerArgs": [
+                "-Wno-deprecated-declarations",
+                "-Wno-unused-function"
+            ]
+        }
+    ],
+    "version": 4
+}

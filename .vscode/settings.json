@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "hwcontext.h": "c",
+        "vulkan_spirv.h": "c",
+        "vulkan.h": "c",
+        "vulkan_functions.h": "c",
+        "hwcontext_vulkan.h": "c",
+        "hwcontext_cuda_internal.h": "c",
+        "dynlink_loader.h": "c",
+        "hwcontext_cuda.h": "c",
+        "common.h": "c",
+        "pixfmt.h": "cpp",
+        "util.h": "c",
+        "colorspace_common.h": "c",
+        "colorspace.h": "c",
+        "**/cuda/*.h": "cpp",
+        "**/cuda/*.cu": "cpp",
+        "compat/cuda/cuda_runtime.h": "cpp",
+        "hwcontext_qsv.h": "c",
+        "vaapi_vpp.h": "c",
+        "hwcontext_vaapi.h": "c"
+    }
+}
