@@ -8,9 +8,14 @@ for dep in bash docker; do
     command -v ${dep} &>/dev/null || { echo "The command '${dep}' is required."; exit 1; }
 done
 
-# Build the jellyfin-ffmpeg portable version
-[[ $(docker image ls 'ghcr.io/seydx/jellyfin-ffmpeg/linux64-gpl:latest' | wc -l) -eq 1 ]] && \
-    ./builder/makeimage.sh linux64 gpl
+# Pull or build the jellyfin-ffmpeg base image
+if [[ $(docker image ls 'ghcr.io/seydx/jellyfin-ffmpeg/linux64-gpl:latest' | wc -l) -eq 1 ]]; then
+    echo "Image not found locally, attempting to pull from registry..."
+    if ! docker pull ghcr.io/seydx/jellyfin-ffmpeg/linux64-gpl:latest; then
+        echo "Pull failed, building image locally..."
+        ./builder/makeimage.sh linux64 gpl
+    fi
+fi
 
 ./builder/build.sh linux64 gpl
 
