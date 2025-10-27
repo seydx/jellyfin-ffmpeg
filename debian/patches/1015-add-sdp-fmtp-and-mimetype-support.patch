@@ -2,24 +2,44 @@ Index: FFmpeg/libavformat/rtsp.c
 ===================================================================
 --- FFmpeg.orig/libavformat/rtsp.c
 +++ FFmpeg/libavformat/rtsp.c
-@@ -631,6 +631,8 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
+@@ -631,6 +631,11 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
              if (rtsp_st->stream_index >= 0) {
                  st = s->streams[rtsp_st->stream_index];
                  sdp_parse_rtpmap(s, st, rtsp_st, payload_type, p);
 +                // Store the complete MIME type from rtpmap line (e.g., "H264/90000" or "PCMA/8000/1")
++                // Skip leading whitespace
++                while (*p == ' ' || *p == '\t')
++                    p++;
 +                av_strlcpy(rtsp_st->sdp_mime_type, p, sizeof(rtsp_st->sdp_mime_type));
              }
              s1->seen_rtpmap = 1;
              if (s1->seen_fmtp) {
-@@ -641,6 +643,11 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
+@@ -638,9 +643,28 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
+             }
+         } else if (av_strstart(p, "fmtp:", &p) ||
+                    av_strstart(p, "framesize:", &p)) {
++            int stream_idx;
              // let dynamic protocol handlers have a stab at the line.
              get_word(buf1, sizeof(buf1), &p);
              payload_type = atoi(buf1);
-+            rtsp_st = rt->rtsp_streams[rt->nb_rtsp_streams - 1];
++
++            // Find the stream with matching payload type
++            rtsp_st = NULL;
++            for (stream_idx = 0; stream_idx < rt->nb_rtsp_streams; stream_idx++) {
++                if (rt->rtsp_streams[stream_idx]->sdp_payload_type == payload_type) {
++                    rtsp_st = rt->rtsp_streams[stream_idx];
++                    break;
++                }
++            }
++
 +            // Store the raw FMTP parameters (everything after "a=fmtp:PT ")
 +            if (rtsp_st) {
++                // Skip leading whitespace
++                while (*p == ' ' || *p == '\t')
++                    p++;
 +                av_strlcpy(rtsp_st->sdp_fmtp, p, sizeof(rtsp_st->sdp_fmtp));
 +            }
++
              if (s1->seen_rtpmap) {
                  parse_fmtp(s, rt, payload_type, buf);
              } else {
