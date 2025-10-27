@@ -2,7 +2,7 @@ Index: FFmpeg/libavformat/rtsp.c
 ===================================================================
 --- FFmpeg.orig/libavformat/rtsp.c
 +++ FFmpeg/libavformat/rtsp.c
-@@ -631,6 +631,11 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
+@@ -631,14 +631,47 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
              if (rtsp_st->stream_index >= 0) {
                  st = s->streams[rtsp_st->stream_index];
                  sdp_parse_rtpmap(s, st, rtsp_st, payload_type, p);
@@ -14,14 +14,16 @@ Index: FFmpeg/libavformat/rtsp.c
              }
              s1->seen_rtpmap = 1;
              if (s1->seen_fmtp) {
-@@ -638,9 +643,28 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
+                 parse_fmtp(s, rt, payload_type, s1->delayed_fmtp);
              }
-         } else if (av_strstart(p, "fmtp:", &p) ||
-                    av_strstart(p, "framesize:", &p)) {
+-        } else if (av_strstart(p, "fmtp:", &p) ||
+-                   av_strstart(p, "framesize:", &p)) {
+-            // let dynamic protocol handlers have a stab at the line.
++        } else if (av_strstart(p, "fmtp:", &p)) {
 +            int stream_idx;
-             // let dynamic protocol handlers have a stab at the line.
-             get_word(buf1, sizeof(buf1), &p);
-             payload_type = atoi(buf1);
++            // Parse FMTP line
++            get_word(buf1, sizeof(buf1), &p);
++            payload_type = atoi(buf1);
 +
 +            // Find the stream with matching payload type
 +            rtsp_st = NULL;
@@ -40,9 +42,17 @@ Index: FFmpeg/libavformat/rtsp.c
 +                av_strlcpy(rtsp_st->sdp_fmtp, p, sizeof(rtsp_st->sdp_fmtp));
 +            }
 +
++            if (s1->seen_rtpmap) {
++                parse_fmtp(s, rt, payload_type, buf);
++            } else {
++                s1->seen_fmtp = 1;
++                av_strlcpy(s1->delayed_fmtp, buf, sizeof(s1->delayed_fmtp));
++            }
++        } else if (av_strstart(p, "framesize:", &p)) {
++            // Parse framesize line (for dynamic protocol handlers)
+             get_word(buf1, sizeof(buf1), &p);
+             payload_type = atoi(buf1);
              if (s1->seen_rtpmap) {
-                 parse_fmtp(s, rt, payload_type, buf);
-             } else {
 Index: FFmpeg/libavformat/rtsp.h
 ===================================================================
 --- FFmpeg.orig/libavformat/rtsp.h
