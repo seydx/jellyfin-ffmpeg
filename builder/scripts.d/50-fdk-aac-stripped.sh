@@ -5,7 +5,7 @@ SCRIPT_COMMIT="529b87452cd33d45e1d0a5066d20b64f10b38845"
 
 ffbuild_enabled() {
     # Prefer AudioToolbox's AAC encoder on macOS
-    [[ $TARGET == mac* ]] && return -1
+    # [[ $TARGET == mac* ]] && return -1
     return 0
 }
 
