@@ -56,3 +56,4 @@
 /patches
 /runner.log
 /.tmp
+/refresh*.sh
