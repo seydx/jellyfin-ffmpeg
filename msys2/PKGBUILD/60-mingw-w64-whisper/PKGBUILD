@@ -78,8 +78,21 @@ package() {
 
   # Fix pkg-config file for correct linking order
   if [[ -f "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/whisper.pc ]]; then
+    echo "=== whisper.pc BEFORE modifications ==="
+    cat "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/whisper.pc
+    echo "=== END ==="
+
     sed -i -e 's/^\(Libs:\).*$/\1 -L${libdir} -lwhisper/' "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/whisper.pc
     echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-vulkan -lggml-opencl -lstdc++" >> "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/whisper.pc
+
+    echo "=== whisper.pc AFTER modifications ==="
+    cat "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/whisper.pc
+    echo "=== END ==="
+
+    echo "=== Testing pkg-config ==="
+    PKG_CONFIG_PATH="${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig" pkg-config --exists --print-errors "whisper >= 1.7.5" && echo "SUCCESS: pkg-config can find whisper >= 1.7.5" || echo "FAILED: pkg-config cannot find whisper >= 1.7.5"
+    PKG_CONFIG_PATH="${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig" pkg-config --modversion whisper || echo "FAILED: cannot get version"
+    echo "=== END ==="
   fi
 
   # License
