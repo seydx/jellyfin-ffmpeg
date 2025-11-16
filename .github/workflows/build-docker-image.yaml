@@ -33,6 +33,21 @@ jobs:
             runner: ubuntu-24.04-arm
 
     steps:
+      - name: Free Disk Space
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          # Remove unnecessary tools and files
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          echo "Disk space after cleanup:"
+          df -h
+
       - uses: actions/checkout@v5
         with:
           submodules: true
