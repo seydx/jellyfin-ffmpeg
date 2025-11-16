@@ -1,0 +1,99 @@
+# Maintainer: whisper.cpp integration for Jellyfin FFmpeg
+
+_realname=whisper
+pkgbase=mingw-w64-jellyfin-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-jellyfin-${_realname}")
+pkgver=1.8.2
+pkgrel=1
+pkgdesc="Port of OpenAI's Whisper model in C/C++ (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw64' 'ucrt64' 'clang64' 'clangarm64')
+url="https://github.com/ggml-org/whisper.cpp"
+msys2_repository_url="https://github.com/ggml-org/whisper.cpp"
+license=('spdx:MIT')
+makedepends=(
+    "${MINGW_PACKAGE_PREFIX}-cc"
+    "${MINGW_PACKAGE_PREFIX}-cmake"
+    "${MINGW_PACKAGE_PREFIX}-ninja"
+    "${MINGW_PACKAGE_PREFIX}-pkgconf"
+    "${MINGW_PACKAGE_PREFIX}-vulkan-headers"
+    "${MINGW_PACKAGE_PREFIX}-opencl-headers"
+)
+depends=(
+    "${MINGW_PACKAGE_PREFIX}-vulkan-loader"
+    "${MINGW_PACKAGE_PREFIX}-opencl-icd"
+)
+_commit="51656275c1c42b6b401c81010b2988f00c7e0b2c"
+source=("${_realname}::git+https://github.com/ggml-org/whisper.cpp.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+export MINGW_TOOLCHAIN_PREFIX="${MINGW_PREFIX}"
+export FF_MINGW_PREFIX="${MINGW_TOOLCHAIN_PREFIX}/ffbuild"
+
+build() {
+  mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
+
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe \
+      -GNinja \
+      -DCMAKE_INSTALL_PREFIX="${FF_MINGW_PREFIX}" \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_SHARED_LIBS=OFF \
+      -DWHISPER_BUILD_TESTS=OFF \
+      -DWHISPER_BUILD_EXAMPLES=OFF \
+      -DWHISPER_BUILD_SERVER=OFF \
+      -DWHISPER_USE_SYSTEM_GGML=OFF \
+      -DGGML_CCACHE=OFF \
+      -DGGML_OPENCL=ON \
+      -DGGML_VULKAN=ON \
+      -DGGML_METAL=OFF \
+      -DGGML_NATIVE=OFF \
+      -DGGML_SSE42=ON \
+      -DGGML_AVX=ON \
+      -DGGML_F16C=ON \
+      -DGGML_AVX2=ON \
+      -DGGML_BMI2=ON \
+      -DGGML_FMA=ON \
+      ../${_realname}
+
+  ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --build .
+}
+
+check() {
+  :
+}
+
+package() {
+  cd "${srcdir}/build-${MSYSTEM}"
+
+  DESTDIR="${pkgdir}" ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --install .
+
+  # Fix library prefix on Windows (ggml*.a -> libggml*.a)
+  shopt -s nullglob
+  for libfile in "${pkgdir}${FF_MINGW_PREFIX}"/lib/ggml*.a; do
+    if [[ -f "${libfile}" ]]; then
+      mv "${libfile}" "$(dirname "${libfile}")/lib$(basename "${libfile}")"
+    fi
+  done
+
+  # Fix pkg-config file for correct linking order
+  if [[ -f "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/whisper.pc ]]; then
+    sed -i -e 's/^\(Libs:\).*$/\1 -L${libdir} -lwhisper/' "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/whisper.pc
+    echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-vulkan -lggml-opencl -lstdc++" >> "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/whisper.pc
+    echo "Requires: vulkan OpenCL" >> "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/whisper.pc
+  fi
+
+  # License
+  install -Dm644 "${srcdir}/${_realname}/LICENSE" "${pkgdir}${FF_MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
+}
+
+# template start; name=mingw-w64-splitpkg-wrappers; version=1.0;
+# vim: set ft=bash :
+
+# generate wrappers
+for _name in "${pkgname[@]}"; do
+  _short="package_${_name#${MINGW_PACKAGE_PREFIX}-jellyfin-}"
+  _func="$(declare -f "${_short}")"
+  eval "${_func/#${_short}/package_${_name}}"
+done
+# template end;
