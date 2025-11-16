@@ -81,10 +81,10 @@ ffbuild_dockerbuild() {
 
         if [[ $TARGET == mac* ]]; then
             gsed -i -e 's/^\(Libs:\).*$/\1 -L${libdir} -lwhisper/' "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
-            echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-metal -lstdc++ -framework Metal -framework Foundation -framework MetalKit" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
+            echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-blas -lggml-metal -lstdc++ -framework Metal -framework Foundation -framework MetalKit" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
         else
             sed -i -e 's/^\(Libs:\).*$/\1 -L${libdir} -lwhisper/' "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
-            echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-vulkan -lggml-opencl -lstdc++" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
+            echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-blas -lggml-vulkan -lggml-opencl -lstdc++" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
         fi
 
         echo "=== whisper.pc AFTER modifications ==="
@@ -94,6 +94,8 @@ ffbuild_dockerbuild() {
         echo "=== Testing pkg-config ==="
         PKG_CONFIG_PATH="$FFBUILD_PREFIX/lib/pkgconfig" pkg-config --exists --print-errors "whisper >= 1.7.5" && echo "SUCCESS: pkg-config can find whisper >= 1.7.5" || echo "FAILED: pkg-config cannot find whisper >= 1.7.5"
         PKG_CONFIG_PATH="$FFBUILD_PREFIX/lib/pkgconfig" pkg-config --modversion whisper || echo "FAILED: cannot get version"
+        echo "Testing with --static flag (as FFmpeg does):"
+        PKG_CONFIG_PATH="$FFBUILD_PREFIX/lib/pkgconfig" pkg-config --static --libs whisper || echo "FAILED: cannot get static libs"
         echo "=== END ==="
     fi
 }
