@@ -73,18 +73,14 @@ ffbuild_dockerbuild() {
         fi
     done
 
-    # Fix pkg-config file for correct linking order and version
+    # Fix pkg-config file for correct linking order
     if [[ -f "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc ]]; then
-        # Ensure Version field is set (FFmpeg requires >= 1.7.5)
         if [[ $TARGET == mac* ]]; then
-            gsed -i -e 's/^\(Version:\).*$/\1 1.8.2/' "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc || echo "Version: 1.8.2" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
             gsed -i -e 's/^\(Libs:\).*$/\1 -L${libdir} -lwhisper/' "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
             echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-metal -lstdc++ -framework Metal -framework Foundation -framework MetalKit" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
         else
-            sed -i -e 's/^\(Version:\).*$/\1 1.8.2/' "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc || echo "Version: 1.8.2" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
             sed -i -e 's/^\(Libs:\).*$/\1 -L${libdir} -lwhisper/' "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
             echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-vulkan -lggml-opencl -lstdc++" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
-            echo "Requires: vulkan OpenCL" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
         fi
     fi
 }
