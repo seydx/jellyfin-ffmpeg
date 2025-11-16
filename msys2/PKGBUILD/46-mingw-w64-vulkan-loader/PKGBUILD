@@ -1,0 +1,63 @@
+# Maintainer: Vulkan shim loader for Jellyfin FFmpeg
+
+_realname=vulkan-loader
+pkgbase=mingw-w64-jellyfin-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-jellyfin-${_realname}")
+pkgver=1.4.326
+pkgrel=1
+pkgdesc="Vulkan Shim Loader for cross-compilation (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw64' 'ucrt64' 'clang64' 'clangarm64')
+url="https://github.com/BtbN/Vulkan-Shim-Loader"
+msys2_repository_url="https://github.com/BtbN/Vulkan-Shim-Loader"
+license=('spdx:Apache-2.0')
+makedepends=(
+    "${MINGW_PACKAGE_PREFIX}-cc"
+    "${MINGW_PACKAGE_PREFIX}-cmake"
+    "${MINGW_PACKAGE_PREFIX}-ninja"
+    "${MINGW_PACKAGE_PREFIX}-jellyfin-vulkan-headers"
+)
+_commit="9657ca8e395ef16c79b57c8bd3f4c1aebb319137"
+source=("${_realname}::git+https://github.com/BtbN/Vulkan-Shim-Loader.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+export MINGW_TOOLCHAIN_PREFIX="${MINGW_PREFIX}"
+export FF_MINGW_PREFIX="${MINGW_TOOLCHAIN_PREFIX}/ffbuild"
+
+build() {
+  mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
+
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe \
+      -GNinja \
+      -DCMAKE_INSTALL_PREFIX="${FF_MINGW_PREFIX}" \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DVULKAN_SHIM_IMPERSONATE=ON \
+      ../${_realname}
+
+  ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --build .
+}
+
+check() {
+  :
+}
+
+package() {
+  cd "${srcdir}/build-${MSYSTEM}"
+
+  DESTDIR="${pkgdir}" ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --install .
+
+  # License
+  install -Dm644 "${srcdir}/${_realname}/LICENSE" "${pkgdir}${FF_MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
+}
+
+# template start; name=mingw-w64-splitpkg-wrappers; version=1.0;
+# vim: set ft=bash :
+
+# generate wrappers
+for _name in "${pkgname[@]}"; do
+  _short="package_${_name#${MINGW_PACKAGE_PREFIX}-jellyfin-}"
+  _func="$(declare -f "${_short}")"
+  eval "${_func/#${_short}/package_${_name}}"
+done
+# template end;

@@ -1,0 +1,64 @@
+# Maintainer: Vulkan headers for Jellyfin FFmpeg
+
+_realname=vulkan-headers
+pkgbase=mingw-w64-jellyfin-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-jellyfin-${_realname}")
+pkgver=1.4.326
+pkgrel=1
+pkgdesc="Vulkan Header files and API registry (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw64' 'ucrt64' 'clang64' 'clangarm64')
+url="https://www.khronos.org/vulkan/"
+msys2_repository_url="https://github.com/KhronosGroup/Vulkan-Headers"
+license=('spdx:Apache-2.0')
+makedepends=(
+    "${MINGW_PACKAGE_PREFIX}-cc"
+    "${MINGW_PACKAGE_PREFIX}-cmake"
+    "${MINGW_PACKAGE_PREFIX}-ninja"
+)
+_commit="v1.4.333"
+source=("${_realname}::git+https://github.com/KhronosGroup/Vulkan-Headers.git#tag=${_commit}")
+sha256sums=('SKIP')
+
+export MINGW_TOOLCHAIN_PREFIX="${MINGW_PREFIX}"
+export FF_MINGW_PREFIX="${MINGW_TOOLCHAIN_PREFIX}/ffbuild"
+
+build() {
+  mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
+
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe \
+      -GNinja \
+      -DCMAKE_INSTALL_PREFIX="${FF_MINGW_PREFIX}" \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DVULKAN_HEADERS_ENABLE_MODULE=NO \
+      -DVULKAN_HEADERS_ENABLE_TESTS=NO \
+      -DVULKAN_HEADERS_ENABLE_INSTALL=YES \
+      ../${_realname}
+
+  ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --build .
+}
+
+check() {
+  :
+}
+
+package() {
+  cd "${srcdir}/build-${MSYSTEM}"
+
+  DESTDIR="${pkgdir}" ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --install .
+
+  # License
+  install -Dm644 "${srcdir}/${_realname}/LICENSE.md" "${pkgdir}${FF_MINGW_PREFIX}/share/licenses/${_realname}/LICENSE.md"
+}
+
+# template start; name=mingw-w64-splitpkg-wrappers; version=1.0;
+# vim: set ft=bash :
+
+# generate wrappers
+for _name in "${pkgname[@]}"; do
+  _short="package_${_name#${MINGW_PACKAGE_PREFIX}-jellyfin-}"
+  _func="$(declare -f "${_short}")"
+  eval "${_func/#${_short}/package_${_name}}"
+done
+# template end;
