@@ -84,7 +84,7 @@ ffbuild_dockerbuild() {
             echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-blas -lggml-metal -lstdc++ -framework Accelerate -framework Metal -framework Foundation -framework MetalKit" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
         else
             sed -i -e 's/^\(Libs:\).*$/\1 -L${libdir} -lwhisper/' "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
-            echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-vulkan -lggml-opencl -lstdc++" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
+            echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-vulkan -lggml-opencl -lstdc++ -lgomp" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
             echo "Requires: vulkan OpenCL" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
         fi
 
