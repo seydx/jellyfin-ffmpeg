@@ -17,6 +17,7 @@ makedepends=(
     "${MINGW_PACKAGE_PREFIX}-ninja"
     "${MINGW_PACKAGE_PREFIX}-pkgconf"
     "${MINGW_PACKAGE_PREFIX}-vulkan-headers"
+    "${MINGW_PACKAGE_PREFIX}-shaderc"
     "${MINGW_PACKAGE_PREFIX}-opencl-headers"
 )
 depends=(
