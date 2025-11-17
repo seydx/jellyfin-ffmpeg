@@ -32,7 +32,9 @@ export MINGW_TOOLCHAIN_PREFIX="${MINGW_PREFIX}"
 export FF_MINGW_PREFIX="${MINGW_TOOLCHAIN_PREFIX}/ffbuild"
 
 build() {
-  mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
+  # Use short build path to avoid Windows MAX_PATH issues
+  local _build_dir="/c/whisper-build-${MSYSTEM}"
+  mkdir -p "${_build_dir}" && cd "${_build_dir}"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
     ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe \
@@ -55,7 +57,7 @@ build() {
       -DGGML_AVX2=ON \
       -DGGML_BMI2=ON \
       -DGGML_FMA=ON \
-      ../${_realname}
+      "${srcdir}/${_realname}"
 
   ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --build .
 }
@@ -65,7 +67,8 @@ check() {
 }
 
 package() {
-  cd "${srcdir}/build-${MSYSTEM}"
+  local _build_dir="/c/whisper-build-${MSYSTEM}"
+  cd "${_build_dir}"
 
   DESTDIR="${pkgdir}" ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --install .
 
