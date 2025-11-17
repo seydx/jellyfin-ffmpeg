@@ -29,13 +29,11 @@ ffbuild_dockerbuild() {
     )
 
     if [[ $TARGET == linux* || $TARGET == win* ]]; then
-        # Linux/Windows: Use Vulkan and OpenCL
         myconf+=(
             -DGGML_OPENCL=ON
             -DGGML_VULKAN=ON
         )
 
-        # x86/x64 CPU optimizations (not for ARM)
         if [[ $TARGET != *arm64 ]]; then
             myconf+=(
                 -DGGML_SSE42=ON
@@ -47,14 +45,12 @@ ffbuild_dockerbuild() {
             )
         fi
     elif [[ $TARGET == mac* ]]; then
-        # macOS: Use Metal (native GPU acceleration)
         myconf+=(
             -DGGML_METAL=ON
             -DGGML_OPENCL=OFF
             -DGGML_VULKAN=OFF
         )
 
-        # Add CPU optimizations for x64
         if [[ $TARGET == mac64 ]]; then
             myconf+=(
                 -DGGML_SSE42=ON

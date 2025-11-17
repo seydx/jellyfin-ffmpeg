@@ -1,0 +1,123 @@
+# Maintainer: Shaderc for Jellyfin FFmpeg
+
+_realname=shaderc
+pkgbase=mingw-w64-jellyfin-${_realname}
+pkgname=${MINGW_PACKAGE_PREFIX}-jellyfin-${_realname}
+pkgver=2025.0.0
+pkgrel=1
+pkgdesc='Collection of tools, libraries and tests for shader compilation (mingw-w64)'
+arch=('any')
+mingw_arch=('mingw64' 'ucrt64' 'clang64' 'clangarm64')
+url='https://github.com/google/shaderc'
+license=('spdx:Apache-2.0')
+makedepends=(
+    "${MINGW_PACKAGE_PREFIX}-cmake"
+    "${MINGW_PACKAGE_PREFIX}-ninja"
+    "${MINGW_PACKAGE_PREFIX}-cc"
+    "git"
+    "python"
+)
+depends=(
+    "${MINGW_PACKAGE_PREFIX}-jellyfin-vulkan-headers"
+)
+_commit="73743588fe9c39f2f1c780a087d94afac691a189"
+source=("${_realname}::git+https://github.com/google/shaderc.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+export MINGW_TOOLCHAIN_PREFIX="${MINGW_PREFIX}"
+export FF_MINGW_PREFIX="${MINGW_TOOLCHAIN_PREFIX}/ffbuild"
+
+prepare() {
+  cd "${srcdir}/${_realname}"
+
+  # Sync dependencies (SPIRV-Tools, glslang, etc.)
+  python utils/git-sync-deps
+}
+
+build() {
+  # Build for target architecture
+  mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
+
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe \
+      -GNinja \
+      -DCMAKE_INSTALL_PREFIX="${FF_MINGW_PREFIX}" \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DSHADERC_SKIP_TESTS=ON \
+      -DSHADERC_SKIP_EXAMPLES=ON \
+      -DSHADERC_SKIP_COPYRIGHT_CHECK=ON \
+      -DENABLE_EXCEPTIONS=ON \
+      -DENABLE_GLSLANG_BINARIES=OFF \
+      -DSPIRV_SKIP_EXECUTABLES=ON \
+      -DSPIRV_TOOLS_BUILD_STATIC=ON \
+      -DBUILD_SHARED_LIBS=OFF \
+      ../${_realname}
+
+  ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --build .
+
+  # Build native glslc for build host (cross-compiled binary won't run on build host)
+  mkdir -p "${srcdir}/native_build" && cd "${srcdir}/native_build"
+
+  # Clear cross-compile environment
+  unset CC CXX CFLAGS CXXFLAGS LD LDFLAGS AR RANLIB NM DLLTOOL PKG_CONFIG_LIBDIR
+
+  cmake.exe \
+    -GNinja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DSHADERC_SKIP_TESTS=ON \
+    -DSHADERC_SKIP_EXAMPLES=ON \
+    -DSHADERC_SKIP_COPYRIGHT_CHECK=ON \
+    -DENABLE_EXCEPTIONS=ON \
+    -DSPIRV_TOOLS_BUILD_STATIC=ON \
+    -DBUILD_SHARED_LIBS=OFF \
+    ../${_realname}
+
+  ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --build . --target glslc
+}
+
+check() {
+  :
+}
+
+package() {
+  cd "${srcdir}/build-${MSYSTEM}"
+
+  # Install to temporary location to filter out unwanted files
+  export DESTDIR="/tmp/staging${MSYSTEM}"
+  ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --install .
+
+  # Remove DLL-related files and binaries (we only want static libs)
+  rm -rf "${DESTDIR}${FF_MINGW_PREFIX}"/bin
+  rm -f "${DESTDIR}${FF_MINGW_PREFIX}"/lib/*.dll.a 2>/dev/null || true
+
+  # Copy to final destination
+  cp -r "${DESTDIR}${FF_MINGW_PREFIX}"/* "${pkgdir}${FF_MINGW_PREFIX}/"
+  rm -rf "${DESTDIR}"
+  unset DESTDIR
+
+  # Install libshaderc_util.a manually (sometimes not installed by cmake)
+  if [ -f "libshaderc_util/libshaderc_util.a" ]; then
+    cp libshaderc_util/libshaderc_util.a "${pkgdir}${FF_MINGW_PREFIX}/lib/"
+  fi
+
+  # Fix pkg-config files
+  if [ -f "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_combined.pc" ]; then
+    echo "Libs: -lstdc++" >> "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_combined.pc"
+  fi
+
+  if [ -f "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_static.pc" ]; then
+    echo "Libs: -lstdc++" >> "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_static.pc"
+  fi
+
+  # Create shaderc.pc as copy of shaderc_combined.pc
+  if [ -f "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_combined.pc" ]; then
+    cp "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_combined.pc" \
+       "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc.pc"
+  fi
+
+  # Copy native glslc to bin directory for use during whisper Vulkan shader compilation
+  mkdir -p "${pkgdir}${FF_MINGW_PREFIX}/bin"
+  if [ -f "${srcdir}/native_build/glslc/glslc.exe" ]; then
+    cp "${srcdir}/native_build/glslc/glslc.exe" "${pkgdir}${FF_MINGW_PREFIX}/bin/"
+  fi
+}

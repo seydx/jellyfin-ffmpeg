@@ -16,13 +16,13 @@ makedepends=(
     "${MINGW_PACKAGE_PREFIX}-cmake"
     "${MINGW_PACKAGE_PREFIX}-ninja"
     "${MINGW_PACKAGE_PREFIX}-pkgconf"
-    "${MINGW_PACKAGE_PREFIX}-vulkan-headers"
-    "${MINGW_PACKAGE_PREFIX}-shaderc"
-    "${MINGW_PACKAGE_PREFIX}-opencl-headers"
+    "${MINGW_PACKAGE_PREFIX}-jellyfin-vulkan-headers"
+    "${MINGW_PACKAGE_PREFIX}-jellyfin-shaderc"
+    "${MINGW_PACKAGE_PREFIX}-jellyfin-opencl-headers"
 )
 depends=(
-    "${MINGW_PACKAGE_PREFIX}-vulkan-loader"
-    "${MINGW_PACKAGE_PREFIX}-opencl-icd"
+    "${MINGW_PACKAGE_PREFIX}-jellyfin-vulkan-loader"
+    "${MINGW_PACKAGE_PREFIX}-jellyfin-opencl-icd"
 )
 _commit="d9b7613b34a343848af572cc14467fc5e82fc788"
 source=("${_realname}::git+https://github.com/ggml-org/whisper.cpp.git#commit=${_commit}")

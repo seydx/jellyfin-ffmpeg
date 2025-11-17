@@ -74,6 +74,8 @@ PKG_CONFIG_PATH=/clangarm64/ffbuild/lib/pkgconfig ./configure --cc=clang --cxx=c
     --enable-libfdk-aac \
     --enable-whisper \
     --enable-opencl \
+    --enable-vulkan \
+    --enable-libshaderc \
     --enable-dxva2 \
     --enable-d3d11va \
     --enable-d3d12va \
