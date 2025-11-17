@@ -3,6 +3,9 @@
 SCRIPT_REPO="https://github.com/BtbN/Vulkan-Shim-Loader.git"
 SCRIPT_COMMIT="9657ca8e395ef16c79b57c8bd3f4c1aebb319137"
 
+SCRIPT_REPO2="https://github.com/KhronosGroup/Vulkan-Headers.git"
+SCRIPT_COMMIT2="v1.4.333"
+
 ffbuild_enabled() {
     [[ $TARGET == mac* ]] && return -1
     return 0
@@ -11,6 +14,9 @@ ffbuild_enabled() {
 ffbuild_dockerbuild() {
     git-mini-clone "$SCRIPT_REPO" "$SCRIPT_COMMIT" vulkan-loader
     cd vulkan-loader
+
+    # Clone Vulkan-Headers into the loader directory (required dependency)
+    git-mini-clone "$SCRIPT_REPO2" "$SCRIPT_COMMIT2" Vulkan-Headers
 
     mkdir build && cd build
 
