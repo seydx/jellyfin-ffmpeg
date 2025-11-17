@@ -39,6 +39,16 @@ ffbuild_dockerbuild() {
         echo "Unknown target"
         return -1
     fi
+
+    mkdir ../native_build && cd ../native_build
+
+    unset CC CXX CFLAGS CXXFLAGS LD LDFLAGS AR RANLIB NM DLLTOOL PKG_CONFIG_LIBDIR
+    cmake -GNinja -DCMAKE_BUILD_TYPE=Release \
+        -DSHADERC_SKIP_TESTS=ON -DSHADERC_SKIP_EXAMPLES=ON -DSHADERC_SKIP_COPYRIGHT_CHECK=ON \
+        -DENABLE_EXCEPTIONS=ON -DSPIRV_TOOLS_BUILD_STATIC=ON -DBUILD_SHARED_LIBS=OFF ..
+    ninja -j$(nproc) glslc/glslc
+
+    cp glslc/glslc /opt/glslc
 }
 
 ffbuild_configure() {

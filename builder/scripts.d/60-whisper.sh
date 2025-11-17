@@ -33,13 +33,19 @@ ffbuild_dockerbuild() {
         myconf+=(
             -DGGML_OPENCL=ON
             -DGGML_VULKAN=ON
-            -DGGML_SSE42=ON
-            -DGGML_AVX=ON
-            -DGGML_F16C=ON
-            -DGGML_AVX2=ON
-            -DGGML_BMI2=ON
-            -DGGML_FMA=ON
         )
+
+        # x86/x64 CPU optimizations (not for ARM)
+        if [[ $TARGET != *arm64 ]]; then
+            myconf+=(
+                -DGGML_SSE42=ON
+                -DGGML_AVX=ON
+                -DGGML_F16C=ON
+                -DGGML_AVX2=ON
+                -DGGML_BMI2=ON
+                -DGGML_FMA=ON
+            )
+        fi
     elif [[ $TARGET == mac* ]]; then
         # macOS: Use Metal (native GPU acceleration)
         myconf+=(
@@ -75,29 +81,14 @@ ffbuild_dockerbuild() {
 
     # Fix pkg-config file for correct linking order
     if [[ -f "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc ]]; then
-        echo "=== whisper.pc BEFORE modifications ==="
-        cat "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
-        echo "=== END ==="
-
         if [[ $TARGET == mac* ]]; then
             gsed -i -e 's/^\(Libs:\).*$/\1 -L${libdir} -lwhisper/' "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
             echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-blas -lggml-metal -lstdc++ -framework Accelerate -framework Metal -framework Foundation -framework MetalKit" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
         else
             sed -i -e 's/^\(Libs:\).*$/\1 -L${libdir} -lwhisper/' "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
-            echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-vulkan -lggml-opencl -lstdc++ -lgomp" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
+            echo "Libs.private: -lggml -lggml-base -lggml-cpu -lggml-vulkan -lggml-opencl -lstdc++" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
             echo "Requires: vulkan OpenCL" >> "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
         fi
-
-        echo "=== whisper.pc AFTER modifications ==="
-        cat "$FFBUILD_PREFIX"/lib/pkgconfig/whisper.pc
-        echo "=== END ==="
-
-        echo "=== Testing pkg-config ==="
-        PKG_CONFIG_PATH="$FFBUILD_PREFIX/lib/pkgconfig" pkg-config --exists --print-errors "whisper >= 1.7.5" && echo "SUCCESS: pkg-config can find whisper >= 1.7.5" || echo "FAILED: pkg-config cannot find whisper >= 1.7.5"
-        PKG_CONFIG_PATH="$FFBUILD_PREFIX/lib/pkgconfig" pkg-config --modversion whisper || echo "FAILED: cannot get version"
-        echo "Testing with --static flag (as FFmpeg does):"
-        PKG_CONFIG_PATH="$FFBUILD_PREFIX/lib/pkgconfig" pkg-config --static --libs whisper || echo "FAILED: cannot get static libs"
-        echo "=== END ==="
     fi
 }
 
