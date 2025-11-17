@@ -8,8 +8,8 @@ ffbuild_enabled() {
 }
 
 ffbuild_dockerlayer() {
-    to_df "COPY --from=\${SELFLAYER} \$FFBUILD_PREFIX/. \$FFBUILD_PREFIX"
-    to_df "COPY --from=\${SELFLAYER} /opt/glslc /usr/bin/glslc"
+    to_df "COPY --from=${SELFLAYER} \$FFBUILD_PREFIX/. \$FFBUILD_PREFIX"
+    to_df "COPY --from=${SELFLAYER} /opt/glslc /usr/bin/glslc"
 }
 
 ffbuild_dockerbuild() {
