@@ -40,6 +40,18 @@ jobs:
       - name: Build Portable
         run: ./builder/buildmac.sh ${{ matrix.os.arch }}
 
+      - name: Debug FFmpeg config on failure
+        if: ${{ failure() }}
+        run: |
+          echo "=== FFmpeg config.log ==="
+          cat ffbuild/config.log || echo "config.log not found"
+          echo ""
+          echo "=== FFmpeg config.mak ==="
+          cat ffbuild/config.mak || echo "config.mak not found"
+          echo ""
+          echo "=== FFmpeg config.h ==="
+          cat config.h || echo "config.h not found"
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
