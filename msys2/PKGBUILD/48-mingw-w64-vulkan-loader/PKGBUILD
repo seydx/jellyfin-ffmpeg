@@ -14,25 +14,25 @@ makedepends=(
     "${MINGW_PACKAGE_PREFIX}-cmake"
     "${MINGW_PACKAGE_PREFIX}-ninja"
     "${MINGW_PACKAGE_PREFIX}-cc"
-    "${MINGW_PACKAGE_PREFIX}-jellyfin-vulkan-headers"
-)
-depends=(
-    "${MINGW_PACKAGE_PREFIX}-jellyfin-vulkan-headers"
+    "git"
 )
 _commit="9657ca8e395ef16c79b57c8bd3f4c1aebb319137"
-_commit_headers="v1.4.332"
-source=(
-    "${_realname}::git+https://github.com/BtbN/Vulkan-Shim-Loader.git#commit=${_commit}"
-    "vulkan-headers::git+https://github.com/KhronosGroup/Vulkan-Headers.git#tag=${_commit_headers}"
-)
-sha256sums=('SKIP' 'SKIP')
+source=("${_realname}::git+https://github.com/BtbN/Vulkan-Shim-Loader.git#commit=${_commit}")
+sha256sums=('SKIP')
 
 export MINGW_TOOLCHAIN_PREFIX="${MINGW_PREFIX}"
 export FF_MINGW_PREFIX="${MINGW_TOOLCHAIN_PREFIX}/ffbuild"
 
 prepare() {
-  # Copy Vulkan-Headers into the loader directory (required dependency)
-  cp -r "${srcdir}/vulkan-headers" "${srcdir}/${_realname}/Vulkan-Headers"
+  cd "${srcdir}/${_realname}"
+
+  # Initialize and update git submodules (Vulkan-Headers)
+  # The Vulkan-Shim-Loader repository has Vulkan-Headers as a git submodule
+  git submodule init
+  git submodule update
+
+  echo "Vulkan-Headers submodule initialized. Contents:"
+  ls -la Vulkan-Headers/ | head -20
 }
 
 build() {
