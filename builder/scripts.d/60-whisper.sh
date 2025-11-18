@@ -24,8 +24,15 @@ ffbuild_dockerbuild() {
         -DWHISPER_BUILD_EXAMPLES=OFF
         -DWHISPER_BUILD_SERVER=OFF
         -DWHISPER_USE_SYSTEM_GGML=OFF
+        -DGGML_OPENCL_USE_ADRENO_KERNELS=OFF
         -DGGML_CCACHE=OFF
         -DGGML_NATIVE=OFF
+        -DGGML_SSE42=ON
+        -DGGML_AVX=ON
+        -DGGML_F16C=ON
+        -DGGML_AVX2=ON
+        -DGGML_BMI2=ON
+        -DGGML_FMA=ON
     )
 
     if [[ $TARGET == linux* || $TARGET == win* ]]; then
@@ -33,34 +40,12 @@ ffbuild_dockerbuild() {
             -DGGML_OPENCL=ON
             -DGGML_VULKAN=ON
         )
-
-        if [[ $TARGET != *arm64 ]]; then
-            myconf+=(
-                -DGGML_SSE42=ON
-                -DGGML_AVX=ON
-                -DGGML_F16C=ON
-                -DGGML_AVX2=ON
-                -DGGML_BMI2=ON
-                -DGGML_FMA=ON
-            )
-        fi
     elif [[ $TARGET == mac* ]]; then
         myconf+=(
             -DGGML_METAL=ON
             -DGGML_OPENCL=OFF
             -DGGML_VULKAN=OFF
         )
-
-        if [[ $TARGET == mac64 ]]; then
-            myconf+=(
-                -DGGML_SSE42=ON
-                -DGGML_AVX=ON
-                -DGGML_F16C=ON
-                -DGGML_AVX2=ON
-                -DGGML_BMI2=ON
-                -DGGML_FMA=ON
-            )
-        fi
     fi
 
     cmake "${myconf[@]}" ..
