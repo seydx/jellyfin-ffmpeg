@@ -72,7 +72,10 @@ build() {
     -DBUILD_SHARED_LIBS=OFF \
     ../${_realname}
 
-  ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --build . --target glslc
+  echo "DEBUG: Building native glslc_exe target"
+  ${MINGW_TOOLCHAIN_PREFIX}/bin/cmake.exe --build . --target glslc_exe
+  echo "DEBUG: Native build complete. Checking for glslc.exe:"
+  ls -la glslc/glslc.exe || echo "ERROR: glslc.exe not found after build"
 }
 
 check() {
