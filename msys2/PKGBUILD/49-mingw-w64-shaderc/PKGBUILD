@@ -91,33 +91,53 @@ package() {
   rm -f "${DESTDIR}${FF_MINGW_PREFIX}"/lib/*.dll.a 2>/dev/null || true
 
   # Copy to final destination
+  echo "DEBUG: Creating package directory ${pkgdir}${FF_MINGW_PREFIX}"
+  mkdir -p "${pkgdir}${FF_MINGW_PREFIX}"
+  echo "DEBUG: Copying from ${DESTDIR}${FF_MINGW_PREFIX} to ${pkgdir}${FF_MINGW_PREFIX}"
   cp -r "${DESTDIR}${FF_MINGW_PREFIX}"/* "${pkgdir}${FF_MINGW_PREFIX}/"
+  echo "DEBUG: Files copied successfully. Contents:"
+  ls -la "${pkgdir}${FF_MINGW_PREFIX}" | head -20
   rm -rf "${DESTDIR}"
   unset DESTDIR
 
   # Install libshaderc_util.a manually (sometimes not installed by cmake)
   if [ -f "libshaderc_util/libshaderc_util.a" ]; then
     cp libshaderc_util/libshaderc_util.a "${pkgdir}${FF_MINGW_PREFIX}/lib/"
+    echo "DEBUG: libshaderc_util.a copied to ${pkgdir}${FF_MINGW_PREFIX}/lib/"
+  else
+    echo "WARNING: libshaderc_util.a not found at libshaderc_util/libshaderc_util.a"
   fi
 
   # Fix pkg-config files
   if [ -f "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_combined.pc" ]; then
     echo "Libs: -lstdc++" >> "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_combined.pc"
+    echo "DEBUG: shaderc_combined.pc found and patched"
+  else
+    echo "WARNING: shaderc_combined.pc not found at ${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_combined.pc"
   fi
 
   if [ -f "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_static.pc" ]; then
     echo "Libs: -lstdc++" >> "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_static.pc"
+    echo "DEBUG: shaderc_static.pc found and patched"
+  else
+    echo "WARNING: shaderc_static.pc not found at ${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_static.pc"
   fi
 
   # Create shaderc.pc as copy of shaderc_combined.pc
   if [ -f "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_combined.pc" ]; then
     cp "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc_combined.pc" \
        "${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/shaderc.pc"
+    echo "DEBUG: shaderc.pc created from shaderc_combined.pc"
+  else
+    echo "WARNING: Cannot create shaderc.pc - shaderc_combined.pc not found"
   fi
 
   # Copy native glslc to bin directory for use during whisper Vulkan shader compilation
   mkdir -p "${pkgdir}${FF_MINGW_PREFIX}/bin"
   if [ -f "${srcdir}/native_build/glslc/glslc.exe" ]; then
     cp "${srcdir}/native_build/glslc/glslc.exe" "${pkgdir}${FF_MINGW_PREFIX}/bin/"
+    echo "DEBUG: Native glslc.exe copied to ${pkgdir}${FF_MINGW_PREFIX}/bin/"
+  else
+    echo "WARNING: Native glslc.exe not found at ${srcdir}/native_build/glslc/glslc.exe"
   fi
 }
