@@ -39,6 +39,7 @@ ADD toolchain.cmake /toolchain.cmake
 ADD cross.meson /cross.meson
 
 ADD gen-implib.sh /usr/bin/gen-implib
+ADD ../implib-graceful-callback.c /usr/bin/implib-graceful-callback.c
 RUN git clone --filter=blob:none --depth=1 https://github.com/yugr/Implib.so /opt/implib
 
 ENV FFBUILD_TOOLCHAIN=aarch64-ffbuild-linux-gnu

@@ -7,9 +7,8 @@ fi
 IN="$1"
 OUT="$2"
 
-# Get the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CALLBACK_FILE="$SCRIPT_DIR/../implib-graceful-callback.c"
+# Graceful callback file location (installed alongside this script)
+CALLBACK_FILE="/usr/bin/implib-graceful-callback.c"
 
 TMPDIR="$(mktemp -d)"
 trap "rm -rf '$TMPDIR'" EXIT
