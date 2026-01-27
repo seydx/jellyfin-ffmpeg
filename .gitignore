@@ -57,3 +57,4 @@
 /runner.log
 /.tmp
 /refresh*.sh
+/builder/build/*
