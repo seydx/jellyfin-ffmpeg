@@ -38,7 +38,9 @@ ADD cross.meson /cross.meson
 
 ADD gen-implib.sh /usr/bin/gen-implib
 ADD implib-graceful-callback.c /usr/bin/implib-graceful-callback.c
-RUN git clone --filter=blob:none --depth=1 https://github.com/yugr/Implib.so /opt/implib
+ADD init.c.tpl /usr/bin/init.c.tpl
+RUN git clone --filter=blob:none --depth=1 https://github.com/yugr/Implib.so /opt/implib && \
+    cp /usr/bin/init.c.tpl /opt/implib/arch/common/init.c.tpl
 
 ENV FFBUILD_TOOLCHAIN=x86_64-ffbuild-linux-gnu
 ENV PATH="/opt/ct-ng/bin:${PATH}" \
