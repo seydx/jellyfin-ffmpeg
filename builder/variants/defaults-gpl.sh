@@ -10,6 +10,6 @@ LICENSE_FILE="COPYING.GPLv3"
 [[ $TARGET == mac* ]] && FF_CONFIGURE+=" --enable-lto=thin" || true
 
 # Enable input devices for device capture (webcam, microphone, screen)
-[[ $TARGET == linux* ]] && FF_CONFIGURE+=" --enable-indev=v4l2 --enable-indev=alsa --enable-indev=xcbgrab" || true
+[[ $TARGET == linux* ]] && FF_CONFIGURE+=" --enable-indev=v4l2" || true
 [[ $TARGET == win* ]] && FF_CONFIGURE+=" --enable-indev=dshow --enable-indev=gdigrab" || true
 [[ $TARGET == mac* ]] && FF_CONFIGURE+=" --enable-indev=avfoundation" || true
