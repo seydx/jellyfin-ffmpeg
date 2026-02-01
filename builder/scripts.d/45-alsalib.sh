@@ -32,7 +32,7 @@ ffbuild_dockerbuild() {
         --without-versioned
     )
 
-    export CFLAGS="$RAW_CFLAGS -fPIE"
+    export CFLAGS="$RAW_CFLAGS -fPIC"
     export LDFLAGS="$RAW_LDFLAGS"
 
     ./configure "${myconf[@]}"
