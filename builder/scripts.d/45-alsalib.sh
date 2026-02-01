@@ -29,6 +29,7 @@ ffbuild_dockerbuild() {
         --disable-alisp
         --with-pcm-plugins=hw
         --without-debug
+        --without-versioned
     )
 
     export CFLAGS="$RAW_CFLAGS -fPIE"
