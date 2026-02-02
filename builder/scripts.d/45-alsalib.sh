@@ -32,11 +32,16 @@ ffbuild_dockerbuild() {
         --without-versioned
     )
 
-    export CFLAGS="$RAW_CFLAGS -fPIC"
+    # -fPIC: Required for linking into shared objects (Node.js addons / .node files).
+    # -UPIC: Undefine the PIC preprocessor macro so ALSA's source code takes the
+    #        static symbol resolution path (#ifndef PIC) in dlmisc.c and all
+    #        *_symbols.c / *_hw.c files. Without this, ALSA uses dlopen(NULL)
+    #        which crashes when statically linked into PIE binaries or .node files.
+    export CFLAGS="$RAW_CFLAGS -fPIC -UPIC"
     export LDFLAGS="$RAW_LDFLAGS"
 
     ./configure "${myconf[@]}"
-    make -j$(nproc)
+    make V=1 -j$(nproc)
     make install
 }
 
