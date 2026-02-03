@@ -27,6 +27,7 @@ ffbuild_dockerbuild() {
         --disable-ucm
         --disable-topology
         --disable-alisp
+        --with-configdir=/usr/share/alsa
         --with-pcm-plugins=hw
         --without-debug
         --without-versioned
@@ -41,7 +42,7 @@ ffbuild_dockerbuild() {
     export LDFLAGS="$RAW_LDFLAGS"
 
     ./configure "${myconf[@]}"
-    make V=1 -j$(nproc)
+    make -j$(nproc)
     make install
 }
 
