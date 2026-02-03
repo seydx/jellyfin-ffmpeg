@@ -256,7 +256,7 @@ static void run_transcription(AVFilterContext *ctx, AVFrame *frame, int samples)
             } else if (!av_strcasecmp(wctx->format, "json")) {
                 buf = av_asprintf("{\"start\":%" PRId64 ",\"end\":%" PRId64 ",\"text\":\"%s\"}\n", start_t, end_t, text_cleaned);
             } else
-                buf = av_strdup(text_cleaned);
+                buf = av_asprintf("%s\n", text_cleaned);
 
             if (buf) {
                 avio_write(wctx->avio_context, buf, strlen(buf));
@@ -414,7 +414,7 @@ static int query_formats(const AVFilterContext *ctx,
     int sample_rates[] = { WHISPER_SAMPLE_RATE, -1 };
     int ret;
 
-    ret = ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, sample_fmts);
+    ret = ff_set_sample_formats_from_list2(ctx, cfg_in, cfg_out, sample_fmts);
     if (ret < 0)
         return ret;
 
