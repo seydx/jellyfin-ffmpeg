@@ -15,13 +15,14 @@ Index: FFmpeg/libavdevice/avfoundation.m
 ===================================================================
 --- FFmpeg.orig/libavdevice/avfoundation.m
 +++ FFmpeg/libavdevice/avfoundation.m
-@@ -28,6 +28,13 @@
+@@ -28,6 +28,14 @@
  #import <AVFoundation/AVFoundation.h>
  #include <pthread.h>
  
 +#if !TARGET_OS_IPHONE && __has_include(<ScreenCaptureKit/ScreenCaptureKit.h>)
 +#define AVF_HAS_SCREEN_CAPTURE_KIT 1
 +#import <ScreenCaptureKit/ScreenCaptureKit.h>
++#import <AppKit/AppKit.h>
 +#else
 +#define AVF_HAS_SCREEN_CAPTURE_KIT 0
 +#endif
@@ -29,7 +30,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
  #include "libavutil/channel_layout.h"
  #include "libavutil/mem.h"
  #include "libavutil/pixdesc.h"
-@@ -138,6 +145,19 @@ typedef struct
+@@ -138,6 +146,20 @@ typedef struct
      AVCaptureDeviceTransportControlsPlaybackMode observed_mode;
  #endif
      int                      observed_quit;
@@ -40,6 +41,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
 +    int              exclude_process_audio;    // 1 = exclude own app audio
 +    int              sck_audio_sample_rate;    // SCK audio sample rate (8000/16000/24000/48000, 0=default 48000)
 +    int              sck_audio_channels;       // SCK audio channels (1=mono, 2=stereo, 0=default 2)
++    int              capture_window_id;        // Window ID to capture (0 = disabled, use screen capture)
 +    id               sck_stream;               // SCStream*
 +    id               sck_delegate;             // AVFSCKFrameReceiver*
 +    dispatch_queue_t sck_video_queue;          // serial queue for video callbacks
@@ -49,7 +51,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
  } AVFContext;
  
  static void lock_frames(AVFContext* ctx)
-@@ -286,8 +306,355 @@ static void unlock_frames(AVFContext* ct
+@@ -286,8 +308,397 @@ static void unlock_frames(AVFContext* ct
  
  @end
  
@@ -142,14 +144,15 @@ Index: FFmpeg/libavdevice/avfoundation.m
 +/* ---- synchronous SCK helpers (dispatch_async to avoid XPC deadlocks) ---- */
 +
 +API_AVAILABLE(macos(12.3))
-+static SCShareableContent* avf_get_shareable_content_sync(AVFormatContext *s)
++static SCShareableContent* avf_get_shareable_content_sync(AVFormatContext *s, int include_windows)
 +{
 +    __block SCShareableContent* result = nil;
 +    __block NSError* blockError = nil;
 +    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
 +
++    BOOL excludeDesktopWindows = include_windows ? NO : YES;
 +    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-+        [SCShareableContent getShareableContentExcludingDesktopWindows:YES
++        [SCShareableContent getShareableContentExcludingDesktopWindows:excludeDesktopWindows
 +                                                 onScreenWindowsOnly:YES
 +                                                    completionHandler:^(SCShareableContent *content, NSError *error) {
 +            result = [content retain];
@@ -228,26 +231,63 @@ Index: FFmpeg/libavdevice/avfoundation.m
 +static int avf_setup_sck_screen_capture(AVFormatContext *s, int screen_index)
 +{
 +    AVFContext *ctx = (AVFContext*)s->priv_data;
++    int need_windows = ctx->capture_window_id > 0;
 +
 +    // 1. Get shareable content
-+    SCShareableContent *shareableContent = avf_get_shareable_content_sync(s);
++    SCShareableContent *shareableContent = avf_get_shareable_content_sync(s, need_windows);
 +    if (!shareableContent) return AVERROR_EXTERNAL;
 +
-+    NSArray<SCDisplay*> *displays = shareableContent.displays;
-+    if (screen_index < 0 || screen_index >= (int)displays.count) {
-+        av_log(s, AV_LOG_ERROR, "ScreenCaptureKit: display index %d out of range (0-%lu)\n",
-+               screen_index, (unsigned long)(displays.count - 1));
-+        return AVERROR(EINVAL);
++    SCContentFilter *filter = nil;
++    int captureWidth  = 0;
++    int captureHeight = 0;
++
++    if (need_windows) {
++        // Window capture requires a window server connection.
++        // CLI processes don't have one by default, so ensure NSApplication
++        // is initialized as an accessory (no dock icon, no menu bar).
++        [NSApplication sharedApplication];
++        [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
++
++        // Window capture mode
++        NSArray<SCWindow*> *windows = shareableContent.windows;
++        SCWindow *targetWindow = nil;
++        for (SCWindow *w in windows) {
++            if ((int)w.windowID == ctx->capture_window_id) {
++                targetWindow = w;
++                break;
++            }
++        }
++        if (!targetWindow) {
++            av_log(s, AV_LOG_ERROR, "ScreenCaptureKit: window ID %d not found\n",
++                   ctx->capture_window_id);
++            return AVERROR(EINVAL);
++        }
++
++        filter = [[SCContentFilter alloc] initWithDesktopIndependentWindow:targetWindow];
++        CGRect frame = targetWindow.frame;
++        captureWidth  = ctx->width > 0  ? ctx->width  : (int)frame.size.width;
++        captureHeight = ctx->height > 0 ? ctx->height : (int)frame.size.height;
++
++        av_log(s, AV_LOG_INFO, "ScreenCaptureKit: targeting window ID %d (%s)\n",
++               ctx->capture_window_id,
++               targetWindow.title ? [targetWindow.title UTF8String] : "untitled");
++    } else {
++        // Display capture mode
++        NSArray<SCDisplay*> *displays = shareableContent.displays;
++        if (screen_index < 0 || screen_index >= (int)displays.count) {
++            av_log(s, AV_LOG_ERROR, "ScreenCaptureKit: display index %d out of range (0-%lu)\n",
++                   screen_index, (unsigned long)(displays.count - 1));
++            return AVERROR(EINVAL);
++        }
++
++        SCDisplay *display = displays[screen_index];
++        filter = [[SCContentFilter alloc] initWithDisplay:display excludingWindows:@[]];
++        captureWidth  = ctx->width > 0  ? ctx->width  : (int)display.width;
++        captureHeight = ctx->height > 0 ? ctx->height : (int)display.height;
 +    }
 +
-+    SCDisplay *display = displays[screen_index];
-+
 +    // 2. Configure
-+    SCContentFilter *filter = [[SCContentFilter alloc] initWithDisplay:display excludingWindows:@[]];
 +    SCStreamConfiguration *config = [[SCStreamConfiguration alloc] init];
-+
-+    int captureWidth  = ctx->width > 0  ? ctx->width  : (int)display.width;
-+    int captureHeight = ctx->height > 0 ? ctx->height : (int)display.height;
 +    config.width  = captureWidth;
 +    config.height = captureHeight;
 +
@@ -364,8 +404,12 @@ Index: FFmpeg/libavdevice/avfoundation.m
 +    ctx->height        = captureHeight;
 +    ctx->video_is_screen = 1;
 +
-+    av_log(s, AV_LOG_INFO, "ScreenCaptureKit: capturing display %d at %dx%d\n",
-+           screen_index, captureWidth, captureHeight);
++    if (need_windows)
++        av_log(s, AV_LOG_INFO, "ScreenCaptureKit: capturing window %d at %dx%d\n",
++               ctx->capture_window_id, captureWidth, captureHeight);
++    else
++        av_log(s, AV_LOG_INFO, "ScreenCaptureKit: capturing display %d at %dx%d\n",
++               screen_index, captureWidth, captureHeight);
 +
 +    return 0;
 +}
@@ -405,7 +449,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
      [ctx->capture_session stopRunning];
  
      [ctx->capture_session release];
-@@ -310,6 +677,10 @@ static void destroy_context(AVFContext*
+@@ -310,6 +721,10 @@ static void destroy_context(AVFContext*
      if (ctx->current_frame) {
          CFRelease(ctx->current_frame);
      }
@@ -416,7 +460,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
  }
  
  static int parse_device_name(AVFormatContext *s)
-@@ -640,8 +1011,26 @@ static int get_video_config(AVFormatCont
+@@ -640,8 +1055,26 @@ static int get_video_config(AVFormatCont
      }
  
      // Take stream info from the first frame.
@@ -445,7 +489,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
      }
  
      lock_frames(ctx);
-@@ -685,8 +1074,26 @@ static int get_audio_config(AVFormatCont
+@@ -685,8 +1118,26 @@ static int get_audio_config(AVFormatCont
      }
  
      // Take stream info from the first frame.
@@ -474,7 +518,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
      }
  
      lock_frames(ctx);
-@@ -897,32 +1304,16 @@ static int avf_read_header(AVFormatConte
+@@ -897,32 +1348,16 @@ static int avf_read_header(AVFormatConte
                  ctx->video_is_muxed = 1;
              }
          } else if (ctx->video_device_index < ctx->num_video_devices + num_screens) {
@@ -515,7 +559,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
           } else {
              av_log(ctx, AV_LOG_ERROR, "Invalid device index\n");
              goto fail;
-@@ -948,38 +1339,21 @@ static int avf_read_header(AVFormatConte
+@@ -948,38 +1383,21 @@ static int avf_read_header(AVFormatConte
              }
          }
  
@@ -561,7 +605,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
          }
  
          if (!video_device) {
-@@ -1036,6 +1410,33 @@ static int avf_read_header(AVFormatConte
+@@ -1036,6 +1454,33 @@ static int avf_read_header(AVFormatConte
          av_log(s, AV_LOG_DEBUG, "audio device '%s' opened\n", [[audio_device localizedName] UTF8String]);
      }
  
@@ -595,7 +639,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
      // Initialize capture session
      ctx->capture_session = [[AVCaptureSession alloc] init];
  
-@@ -1286,6 +1687,21 @@ static const AVOption options[] = {
+@@ -1286,6 +1731,24 @@ static const AVOption options[] = {
      { "capture_raw_data", "capture the raw data from device connection", offsetof(AVFContext, capture_raw_data), AV_OPT_TYPE_BOOL, {.i64=0}, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
      { "drop_late_frames", "drop frames that are available later than expected", offsetof(AVFContext, drop_late_frames), AV_OPT_TYPE_BOOL, {.i64=1}, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
  
@@ -612,6 +656,9 @@ Index: FFmpeg/libavdevice/avfoundation.m
 +    { "sck_audio_channels", "set system audio channel count (1=mono, 2=stereo)",
 +      offsetof(AVFContext, sck_audio_channels), AV_OPT_TYPE_INT,
 +      {.i64 = 0}, 0, 2, AV_OPT_FLAG_DECODING_PARAM },
++    { "capture_window_id", "capture a specific window by ID via ScreenCaptureKit (0=disabled)",
++      offsetof(AVFContext, capture_window_id), AV_OPT_TYPE_INT,
++      {.i64 = 0}, 0, INT_MAX, AV_OPT_FLAG_DECODING_PARAM },
 +#endif
 +
      { NULL },
