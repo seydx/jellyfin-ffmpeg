@@ -51,7 +51,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
  } AVFContext;
  
  static void lock_frames(AVFContext* ctx)
-@@ -286,8 +308,397 @@ static void unlock_frames(AVFContext* ct
+@@ -286,8 +308,452 @@ static void unlock_frames(AVFContext* ct
  
  @end
  
@@ -307,9 +307,21 @@ Index: FFmpeg/libavdevice/avfoundation.m
 +    }
 +
 +    // Pixel format: map AVPixelFormat → CVPixelFormatType via avf_pixel_formats[]
++    // SCStreamConfiguration only supports: BGRA, l10r, 420v, 420f
++    // (see Apple docs: SCStreamConfiguration.pixelFormat)
++    static const OSType sck_supported_formats[] = {
++        kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,  // 420v (NV12) — preferred, encoder-compatible
++        kCVPixelFormatType_420YpCbCr8BiPlanarFullRange,    // 420f
++        kCVPixelFormatType_32BGRA,                         // BGRA
++        kCVPixelFormatType_64RGBAHalf,                     // l10r
++        0
++    };
++
 +    OSType pixelType = 0;
++    struct AVFPixelFormatSpec pxl_fmt_spec = { AV_PIX_FMT_NONE, 0 };
 +    for (int i = 0; avf_pixel_formats[i].ff_id != AV_PIX_FMT_NONE; i++) {
 +        if (ctx->pixel_format == avf_pixel_formats[i].ff_id) {
++            pxl_fmt_spec = avf_pixel_formats[i];
 +            pixelType = avf_pixel_formats[i].avf_id;
 +            break;
 +        }
@@ -318,6 +330,49 @@ Index: FFmpeg/libavdevice/avfoundation.m
 +        pixelType = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
 +        ctx->pixel_format = AV_PIX_FMT_NV12;
 +    }
++
++    // Check if the resolved pixel format is supported by ScreenCaptureKit
++    int sck_fmt_supported = 0;
++    for (int i = 0; sck_supported_formats[i] != 0; i++) {
++        if (pixelType == sck_supported_formats[i]) {
++            sck_fmt_supported = 1;
++            break;
++        }
++    }
++
++    if (!sck_fmt_supported) {
++        av_log(s, AV_LOG_ERROR, "ScreenCaptureKit: selected pixel format (%s) is not supported.\n",
++               av_get_pix_fmt_name(ctx->pixel_format));
++        av_log(s, AV_LOG_ERROR, "ScreenCaptureKit: supported pixel formats:\n");
++
++        // List supported SCK formats that have an FFmpeg equivalent
++        struct AVFPixelFormatSpec fallback = { AV_PIX_FMT_NONE, 0 };
++        for (int i = 0; sck_supported_formats[i] != 0; i++) {
++            for (int j = 0; avf_pixel_formats[j].ff_id != AV_PIX_FMT_NONE; j++) {
++                if (sck_supported_formats[i] == avf_pixel_formats[j].avf_id) {
++                    av_log(s, AV_LOG_ERROR, "ScreenCaptureKit:   %s\n",
++                           av_get_pix_fmt_name(avf_pixel_formats[j].ff_id));
++                    if (fallback.ff_id == AV_PIX_FMT_NONE)
++                        fallback = avf_pixel_formats[j];
++                    break;
++                }
++            }
++        }
++
++        if (fallback.ff_id == AV_PIX_FMT_NONE) {
++            av_log(s, AV_LOG_ERROR, "ScreenCaptureKit: no usable pixel format found.\n");
++            [shareableContent release];
++            [filter release];
++            [config release];
++            return AVERROR(EINVAL);
++        }
++
++        pixelType = fallback.avf_id;
++        ctx->pixel_format = fallback.ff_id;
++        av_log(s, AV_LOG_WARNING, "ScreenCaptureKit: overriding pixel format to use %s instead.\n",
++               av_get_pix_fmt_name(fallback.ff_id));
++    }
++
 +    config.pixelFormat = pixelType;
 +
 +    // 3. Audio configuration (macOS 13.0+)
@@ -449,7 +504,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
      [ctx->capture_session stopRunning];
  
      [ctx->capture_session release];
-@@ -310,6 +721,10 @@ static void destroy_context(AVFContext*
+@@ -310,6 +776,10 @@ static void destroy_context(AVFContext*
      if (ctx->current_frame) {
          CFRelease(ctx->current_frame);
      }
@@ -460,7 +515,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
  }
  
  static int parse_device_name(AVFormatContext *s)
-@@ -640,8 +1055,26 @@ static int get_video_config(AVFormatCont
+@@ -640,8 +1110,26 @@ static int get_video_config(AVFormatCont
      }
  
      // Take stream info from the first frame.
@@ -489,7 +544,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
      }
  
      lock_frames(ctx);
-@@ -685,8 +1118,26 @@ static int get_audio_config(AVFormatCont
+@@ -685,8 +1173,26 @@ static int get_audio_config(AVFormatCont
      }
  
      // Take stream info from the first frame.
@@ -518,7 +573,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
      }
  
      lock_frames(ctx);
-@@ -897,32 +1348,16 @@ static int avf_read_header(AVFormatConte
+@@ -897,32 +1403,16 @@ static int avf_read_header(AVFormatConte
                  ctx->video_is_muxed = 1;
              }
          } else if (ctx->video_device_index < ctx->num_video_devices + num_screens) {
@@ -559,7 +614,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
           } else {
              av_log(ctx, AV_LOG_ERROR, "Invalid device index\n");
              goto fail;
-@@ -948,38 +1383,21 @@ static int avf_read_header(AVFormatConte
+@@ -948,38 +1438,21 @@ static int avf_read_header(AVFormatConte
              }
          }
  
@@ -605,7 +660,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
          }
  
          if (!video_device) {
-@@ -1036,6 +1454,33 @@ static int avf_read_header(AVFormatConte
+@@ -1036,6 +1509,33 @@ static int avf_read_header(AVFormatConte
          av_log(s, AV_LOG_DEBUG, "audio device '%s' opened\n", [[audio_device localizedName] UTF8String]);
      }
  
@@ -639,7 +694,7 @@ Index: FFmpeg/libavdevice/avfoundation.m
      // Initialize capture session
      ctx->capture_session = [[AVCaptureSession alloc] init];
  
-@@ -1286,6 +1731,24 @@ static const AVOption options[] = {
+@@ -1286,6 +1786,24 @@ static const AVOption options[] = {
      { "capture_raw_data", "capture the raw data from device connection", offsetof(AVFContext, capture_raw_data), AV_OPT_TYPE_BOOL, {.i64=0}, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
      { "drop_late_frames", "drop frames that are available later than expected", offsetof(AVFContext, drop_late_frames), AV_OPT_TYPE_BOOL, {.i64=1}, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
  
