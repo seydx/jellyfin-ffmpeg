@@ -61,8 +61,8 @@ cat <<EOF >"$BUILD_SCRIPT"
     cd ffmpeg
 
     if [[ -f "debian/patches/series" ]]; then
-        ln -s /ffbuild/ffmpeg/debian/patches patches
-        quilt push -a
+        ln -sf /ffbuild/ffmpeg/debian/patches patches
+        quilt push -a || true
     fi
 
     ./configure --prefix=/ffbuild/prefix \
