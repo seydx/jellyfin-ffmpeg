@@ -35,10 +35,6 @@ build() {
     extra_config+=("-DCMAKE_BUILD_TYPE=Debug")
   fi
 
-  # Fix AVX2 related crash due to unaligned stack memory
-  export CXXFLAGS="${CXXFLAGS} -Wa,-muse-unaligned-vector-move"
-  export CFLAGS="${CFLAGS} -Wa,-muse-unaligned-vector-move"
-
   mkdir -p "${srcdir}/build-${MSYSTEM}-static" && cd "${srcdir}/build-${MSYSTEM}-static"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
