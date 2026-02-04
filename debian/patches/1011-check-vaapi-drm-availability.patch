@@ -58,7 +58,7 @@ Index: FFmpeg/libavutil/hwcontext_vaapi.c
  
  typedef struct VAAPIDevicePriv {
  #if HAVE_VAAPI_X11
-@@ -1739,6 +1781,11 @@ static int vaapi_device_create(AVHWDevic
+@@ -1755,6 +1797,11 @@ static int vaapi_device_create(AVHWDevic
      }
  
  #if HAVE_VAAPI_DRM
@@ -70,7 +70,7 @@ Index: FFmpeg/libavutil/hwcontext_vaapi.c
      while (!display && try_drm) {
          // If the device is specified, try to open it as a DRM device node.
          // If not, look for a usable render node, possibly restricted to those
-@@ -1866,6 +1913,11 @@ static int vaapi_device_create(AVHWDevic
+@@ -1882,6 +1929,11 @@ static int vaapi_device_create(AVHWDevic
  #endif
  
  #if HAVE_VAAPI_X11
@@ -82,7 +82,7 @@ Index: FFmpeg/libavutil/hwcontext_vaapi.c
      if (!display && try_x11) {
          // Try to open the device as an X11 display.
          priv->x11_display = XOpenDisplay(device);
-@@ -1989,6 +2041,12 @@ static int vaapi_device_derive(AVHWDevic
+@@ -2005,6 +2057,12 @@ static int vaapi_device_derive(AVHWDevic
          VAAPIDevicePriv *priv;
          int fd;
  
