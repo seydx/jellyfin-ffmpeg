@@ -13,8 +13,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-meson"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-pkgconf"
              "${MINGW_PACKAGE_PREFIX}-cc")
-source=("https://github.com/mm2/Little-CMS/releases/download/lcms${pkgver}/lcms2-${pkgver}.tar.gz")
-sha256sums=('d11af569e42a1baa7b29b8a4bfe529f05e80af6c517c2c570a4e9118e3bfa636')
+source=("https://github.com/mm2/Little-CMS/releases/download/lcms${pkgver}/${_realname}-${pkgver}.tar.gz")
+sha256sums=('d11af569e42a1baa1650d20ad61d12e41af4fead4aa7964a01f93b08b53ab074')
 
 export FF_MINGW_PREFIX="${MINGW_PREFIX}/ffbuild"
 
