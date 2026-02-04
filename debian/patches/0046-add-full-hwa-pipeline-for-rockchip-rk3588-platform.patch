@@ -2905,7 +2905,7 @@ Index: FFmpeg/libavcodec/rkmppenc.c
 +
 +        if (sd->size < AV_UUID_LEN) {
 +            av_log(avctx, AV_LOG_WARNING, "Invalid UDU SEI data: "
-+                   "(%"SIZE_SPECIFIER" < UUID(%d-bytes)), skipping\n",
++                   "(%zu < UUID(%d-bytes)), skipping\n",
 +                   sd->size, AV_UUID_LEN);
 +            continue;
 +        }
