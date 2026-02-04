@@ -10,7 +10,7 @@ Index: FFmpeg/configure
  bwdif_videotoolbox_filter_deps="metal corevideo videotoolbox"
  bwdif_vulkan_filter_deps="vulkan spirv_compiler"
  chromaber_vulkan_filter_deps="vulkan spirv_library"
-@@ -4225,6 +4226,7 @@ xfade_opencl_filter_deps="opencl"
+@@ -4227,6 +4228,7 @@ xfade_opencl_filter_deps="opencl"
  xfade_vulkan_filter_deps="vulkan spirv_library"
  yadif_cuda_filter_deps="ffnvcodec"
  yadif_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
