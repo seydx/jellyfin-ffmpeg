@@ -347,7 +347,10 @@ typedef struct OutputFilterOptions {
     int                 sample_rate;
     AVChannelLayout     ch_layout;
 
-    const int                *formats;
+    union {
+        const enum AVPixelFormat *pix_fmts;
+        const enum AVSampleFormat *sample_fmts;
+    };
     const int                *sample_rates;
     const AVChannelLayout    *ch_layouts;
     const AVRational         *frame_rates;
@@ -602,6 +605,8 @@ enum {
 #if FFMPEG_OPT_FORCE_KF_SOURCE_NO_DROP
     KF_FORCE_SOURCE_NO_DROP = 2,
 #endif
+    // force keyframe if lavfi.scd.time metadata is set
+    KF_FORCE_SCD_METADATA = 3,
 };
 
 typedef struct KeyframeForceCtx {
