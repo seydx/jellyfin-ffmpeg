@@ -1,0 +1,85 @@
+_realname=libjxl
+pkgbase=mingw-w64-jellyfin-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-jellyfin-${_realname}")
+pkgver=0.11.1
+_commit="8ce9537c989cfc7adff034556c8a4b9469e874d6"
+pkgrel=1
+pkgdesc="JPEG XL image format reference implementation (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clangarm64')
+url='https://github.com/libjxl/libjxl'
+license=('spdx:BSD-3-Clause')
+depends=()
+makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
+             "${MINGW_PACKAGE_PREFIX}-cmake"
+             "${MINGW_PACKAGE_PREFIX}-ninja"
+             "git")
+source=("${_realname}::git+https://github.com/libjxl/libjxl.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+export MINGW_TOOLCHAIN_PREFIX="${MINGW_PREFIX}"
+export FF_MINGW_PREFIX="${MINGW_TOOLCHAIN_PREFIX}/ffbuild"
+
+prepare() {
+  cd "${srcdir}/${_realname}"
+  git submodule update --init --recursive --depth 1 --recommend-shallow third_party/highway
+}
+
+build() {
+  export CMAKE_PREFIX_PATH="${FF_MINGW_PREFIX}"
+  export PKG_CONFIG_PATH="${FF_MINGW_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+  declare -a extra_config
+  if check_option "debug" "n"; then
+    extra_config+=("-DCMAKE_BUILD_TYPE=Release")
+  else
+    extra_config+=("-DCMAKE_BUILD_TYPE=Debug")
+  fi
+
+  # Fix AVX2 related crash due to unaligned stack memory
+  export CXXFLAGS="${CXXFLAGS} -Wa,-muse-unaligned-vector-move"
+  export CFLAGS="${CFLAGS} -Wa,-muse-unaligned-vector-move"
+
+  mkdir -p "${srcdir}/build-${MSYSTEM}-static" && cd "${srcdir}/build-${MSYSTEM}-static"
+
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    "${MINGW_TOOLCHAIN_PREFIX}"/bin/cmake.exe \
+      -GNinja \
+      -DCMAKE_INSTALL_PREFIX="${FF_MINGW_PREFIX}" \
+      "${extra_config[@]}" \
+      -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+      -DBUILD_SHARED_LIBS=OFF \
+      -DJPEGXL_STATIC=OFF \
+      -DJPEGXL_ENABLE_SKCMS=OFF \
+      -DJPEGXL_FORCE_SYSTEM_LCMS2=ON \
+      -DJPEGXL_FORCE_SYSTEM_BROTLI=ON \
+      -DJPEGXL_ENABLE_TOOLS=OFF \
+      -DJPEGXL_ENABLE_VIEWERS=OFF \
+      -DJPEGXL_EMSCRIPTEN=OFF \
+      -DJPEGXL_ENABLE_DOXYGEN=OFF \
+      -DJPEGXL_ENABLE_JPEGLI=OFF \
+      -DBUILD_TESTING=OFF \
+      -DJPEGXL_ENABLE_EXAMPLES=OFF \
+      -DJPEGXL_ENABLE_MANPAGES=OFF \
+      -DJPEGXL_ENABLE_JNI=OFF \
+      -DJPEGXL_ENABLE_PLUGINS=OFF \
+      -DJPEGXL_ENABLE_DEVTOOLS=OFF \
+      -DJPEGXL_ENABLE_BENCHMARK=OFF \
+      -DJPEGXL_BUNDLE_LIBPNG=OFF \
+      -DJPEGXL_ENABLE_SJPEG=OFF \
+      ../${_realname}
+
+  "${MINGW_TOOLCHAIN_PREFIX}"/bin/cmake.exe --build .
+}
+
+package() {
+  cd "${srcdir}/build-${MSYSTEM}-static"
+
+  DESTDIR="${pkgdir}" "${MINGW_TOOLCHAIN_PREFIX}"/bin/cmake.exe --install .
+
+  # Add private libs for static linking
+  echo "Libs.private: -lstdc++ -ladvapi32" >> "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/libjxl.pc
+  echo "Libs.private: -lstdc++ -ladvapi32" >> "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/libjxl_threads.pc
+  echo "Requires.private: lcms2" >> "${pkgdir}${FF_MINGW_PREFIX}"/lib/pkgconfig/libjxl_cms.pc
+
+  install -Dm644 "${srcdir}/${_realname}/LICENSE" "${pkgdir}${FF_MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
+}

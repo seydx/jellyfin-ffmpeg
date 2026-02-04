@@ -63,6 +63,7 @@ PKG_CONFIG_PATH=/clang64/ffbuild/lib/pkgconfig ./configure --cc=clang --cxx=clan
     --enable-libtheora \
     --enable-libvorbis \
     --enable-libopenmpt \
+    --enable-libjxl \
     --enable-libwebp \
     --enable-libvpx \
     --enable-libzimg \

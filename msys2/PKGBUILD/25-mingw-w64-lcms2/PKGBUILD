@@ -1,0 +1,45 @@
+_realname=lcms2
+pkgbase=mingw-w64-jellyfin-${_realname}
+pkgname="${MINGW_PACKAGE_PREFIX}-jellyfin-${_realname}"
+pkgver=2.17
+pkgrel=1
+pkgdesc="Small-footprint color management engine, version 2 (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clangarm64')
+license=('spdx:MIT')
+url="https://github.com/mm2/Little-CMS"
+depends=()
+makedepends=("${MINGW_PACKAGE_PREFIX}-meson"
+             "${MINGW_PACKAGE_PREFIX}-ninja"
+             "${MINGW_PACKAGE_PREFIX}-pkgconf"
+             "${MINGW_PACKAGE_PREFIX}-cc")
+source=("https://github.com/mm2/Little-CMS/releases/download/lcms${pkgver}/lcms2-${pkgver}.tar.gz")
+sha256sums=('d11af569e42a1baa7b29b8a4bfe529f05e80af6c517c2c570a4e9118e3bfa636')
+
+export FF_MINGW_PREFIX="${MINGW_PREFIX}/ffbuild"
+
+build() {
+  export PKG_CONFIG_PATH="${FF_MINGW_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+  MSYS2_ARG_CONV_EXCL="--prefix=" \
+  ${MINGW_PREFIX}/bin/meson.exe setup \
+      --prefix=${FF_MINGW_PREFIX} \
+      --buildtype plain \
+      --default-library static \
+      -Dutils=false \
+      -Dfastfloat=true \
+      -Dthreaded=true \
+      build-${MSYSTEM}-static \
+      ${_realname}-${pkgver}
+
+  ${MINGW_PREFIX}/bin/meson.exe compile -C build-${MSYSTEM}-static
+}
+
+check() {
+  :
+}
+
+package() {
+  meson install -C build-${MSYSTEM}-static --destdir="${pkgdir}"
+
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/LICENSE" "${pkgdir}${FF_MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
+}
