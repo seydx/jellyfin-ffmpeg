@@ -1,7 +1,7 @@
-Index: FFmpeg/libavfilter/avfilter.h
+Index: jellyfin-ffmpeg/libavfilter/avfilter.h
 ===================================================================
---- FFmpeg.orig/libavfilter/avfilter.h
-+++ FFmpeg/libavfilter/avfilter.h
+--- jellyfin-ffmpeg.orig/libavfilter/avfilter.h
++++ jellyfin-ffmpeg/libavfilter/avfilter.h
 @@ -417,6 +417,8 @@ struct AVFilterLink {
      enum AVColorSpace colorspace;   ///< agreed upon YUV color space
      enum AVColorRange color_range;  ///< agreed upon YUV color range
@@ -11,10 +11,10 @@ Index: FFmpeg/libavfilter/avfilter.h
      /* These parameters apply only to audio */
      int sample_rate;            ///< samples per second
      AVChannelLayout ch_layout;  ///< channel layout of current buffer (see libavutil/channel_layout.h)
-Index: FFmpeg/libavfilter/opencl.c
+Index: jellyfin-ffmpeg/libavfilter/opencl.c
 ===================================================================
---- FFmpeg.orig/libavfilter/opencl.c
-+++ FFmpeg/libavfilter/opencl.c
+--- jellyfin-ffmpeg.orig/libavfilter/opencl.c
++++ jellyfin-ffmpeg/libavfilter/opencl.c
 @@ -77,6 +77,9 @@ int ff_opencl_filter_config_input(AVFilt
      if (!ctx->output_height)
          ctx->output_height = inlink->h;
@@ -35,10 +35,10 @@ Index: FFmpeg/libavfilter/opencl.c
      return 0;
  fail:
      av_buffer_unref(&output_frames_ref);
-Index: FFmpeg/libavfilter/vf_hwmap.c
+Index: jellyfin-ffmpeg/libavfilter/vf_hwmap.c
 ===================================================================
---- FFmpeg.orig/libavfilter/vf_hwmap.c
-+++ FFmpeg/libavfilter/vf_hwmap.c
+--- jellyfin-ffmpeg.orig/libavfilter/vf_hwmap.c
++++ jellyfin-ffmpeg/libavfilter/vf_hwmap.c
 @@ -22,6 +22,10 @@
  #include "libavutil/opt.h"
  #include "libavutil/pixdesc.h"
@@ -95,10 +95,10 @@ Index: FFmpeg/libavfilter/vf_hwmap.c
  
              err = av_hwframe_ctx_init(ctx->hwframes_ref);
              if (err < 0) {
-Index: FFmpeg/libavfilter/vf_hwupload.c
+Index: jellyfin-ffmpeg/libavfilter/vf_hwupload.c
 ===================================================================
---- FFmpeg.orig/libavfilter/vf_hwupload.c
-+++ FFmpeg/libavfilter/vf_hwupload.c
+--- jellyfin-ffmpeg.orig/libavfilter/vf_hwupload.c
++++ jellyfin-ffmpeg/libavfilter/vf_hwupload.c
 @@ -23,6 +23,10 @@
  #include "libavutil/pixdesc.h"
  #include "libavutil/opt.h"
@@ -132,10 +132,10 @@ Index: FFmpeg/libavfilter/vf_hwupload.c
      err = av_hwframe_ctx_init(ctx->hwframes_ref);
      if (err < 0)
          goto fail;
-Index: FFmpeg/libavutil/hwcontext_d3d11va.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_d3d11va.c
-+++ FFmpeg/libavutil/hwcontext_d3d11va.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_d3d11va.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
 @@ -235,7 +235,7 @@ static AVBufferRef *d3d11va_alloc_single
          .ArraySize  = 1,
          .Usage      = D3D11_USAGE_DEFAULT,

@@ -1,7 +1,7 @@
-Index: FFmpeg/libavformat/rtsp.c
+Index: jellyfin-ffmpeg/libavformat/rtsp.c
 ===================================================================
---- FFmpeg.orig/libavformat/rtsp.c
-+++ FFmpeg/libavformat/rtsp.c
+--- jellyfin-ffmpeg.orig/libavformat/rtsp.c
++++ jellyfin-ffmpeg/libavformat/rtsp.c
 @@ -290,6 +290,7 @@ static int init_satip_stream(AVFormatCon
                   &rt->nb_rtsp_streams, rtsp_st);
  
@@ -45,11 +45,11 @@ Index: FFmpeg/libavformat/rtsp.c
          } else if (av_strstart(p, "IsRealDataType:integer;",&p)) {
              if (atoi(p) == 1)
                  rt->transport = RTSP_TRANSPORT_RDT;
-Index: FFmpeg/libavformat/rtsp.h
+Index: jellyfin-ffmpeg/libavformat/rtsp.h
 ===================================================================
---- FFmpeg.orig/libavformat/rtsp.h
-+++ FFmpeg/libavformat/rtsp.h
-@@ -447,6 +447,16 @@ typedef struct RTSPSource {
+--- jellyfin-ffmpeg.orig/libavformat/rtsp.h
++++ jellyfin-ffmpeg/libavformat/rtsp.h
+@@ -469,6 +469,16 @@ typedef struct RTSPSource {
  } RTSPSource;
  
  /**
@@ -66,7 +66,7 @@ Index: FFmpeg/libavformat/rtsp.h
   * Describe a single stream, as identified by a single m= line block in the
   * SDP content. In the case of RDT, one RTSPStream can represent multiple
   * AVStreams. In this case, each AVStream in this set has similar content
-@@ -475,6 +485,7 @@ typedef struct RTSPStream {
+@@ -497,6 +507,7 @@ typedef struct RTSPStream {
      struct RTSPSource **exclude_source_addrs; /**< Source-specific multicast exclude source IP addresses (from SDP content) */
      int sdp_ttl;              /**< IP Time-To-Live (from SDP content) */
      int sdp_payload_type;     /**< payload type */

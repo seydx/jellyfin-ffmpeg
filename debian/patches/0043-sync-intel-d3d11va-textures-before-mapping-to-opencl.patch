@@ -1,7 +1,7 @@
-Index: FFmpeg/libavcodec/dxva2.c
+Index: jellyfin-ffmpeg/libavcodec/dxva2.c
 ===================================================================
---- FFmpeg.orig/libavcodec/dxva2.c
-+++ FFmpeg/libavcodec/dxva2.c
+--- jellyfin-ffmpeg.orig/libavcodec/dxva2.c
++++ jellyfin-ffmpeg/libavcodec/dxva2.c
 @@ -715,8 +715,10 @@ int ff_dxva2_common_frame_params(AVCodec
  #if CONFIG_D3D11VA
      if (frames_ctx->format == AV_PIX_FMT_D3D11) {
@@ -13,10 +13,10 @@ Index: FFmpeg/libavcodec/dxva2.c
      }
  #endif
  
-Index: FFmpeg/libavfilter/qsvvpp.c
+Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
 ===================================================================
---- FFmpeg.orig/libavfilter/qsvvpp.c
-+++ FFmpeg/libavfilter/qsvvpp.c
+--- jellyfin-ffmpeg.orig/libavfilter/qsvvpp.c
++++ jellyfin-ffmpeg/libavfilter/qsvvpp.c
 @@ -653,6 +653,9 @@ static int init_vpp_session(AVFilterCont
  
          out_frames_hwctx->frame_type      = s->out_mem_mode;
@@ -27,10 +27,10 @@ Index: FFmpeg/libavfilter/qsvvpp.c
          ret = av_hwframe_ctx_init(out_frames_ref);
          if (ret < 0) {
              av_buffer_unref(&out_frames_ref);
-Index: FFmpeg/libavutil/hwcontext_d3d11va.h
+Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_d3d11va.h
-+++ FFmpeg/libavutil/hwcontext_d3d11va.h
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_d3d11va.h
++++ jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
 @@ -197,6 +197,11 @@ typedef struct AVD3D11VAFramesContext {
       * This field is ignored/invalid if a user-allocated texture is provided.
      */
@@ -43,10 +43,10 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.h
  } AVD3D11VAFramesContext;
  
  #endif /* AVUTIL_HWCONTEXT_D3D11VA_H */
-Index: FFmpeg/libavutil/hwcontext_opencl.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_opencl.c
-+++ FFmpeg/libavutil/hwcontext_opencl.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_opencl.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 @@ -181,6 +181,10 @@ typedef struct OpenCLFramesContext {
      int                   nb_mapped_frames;
      AVOpenCLFrameDescriptor *mapped_frames;
@@ -241,10 +241,10 @@ Index: FFmpeg/libavutil/hwcontext_opencl.c
      desc = &frames_priv->mapped_frames[index];
  
      // deferred clCreateFromD3D11Texture2DKHR() for low startup latency.
-Index: FFmpeg/libavutil/hwcontext_qsv.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_qsv.c
-+++ FFmpeg/libavutil/hwcontext_qsv.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_qsv.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 @@ -2064,6 +2064,7 @@ static int qsv_dynamic_frames_derive_to(
          } else {
              dst_hwctx->frame_type |= MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
@@ -261,10 +261,10 @@ Index: FFmpeg/libavutil/hwcontext_qsv.c
          }
          break;
  #endif
-Index: FFmpeg/libavutil/hwcontext_qsv.h
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.h
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_qsv.h
-+++ FFmpeg/libavutil/hwcontext_qsv.h
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_qsv.h
++++ jellyfin-ffmpeg/libavutil/hwcontext_qsv.h
 @@ -81,6 +81,11 @@ typedef struct AVQSVFramesContext {
       * pool have the same mfxFrameInfo.
       */

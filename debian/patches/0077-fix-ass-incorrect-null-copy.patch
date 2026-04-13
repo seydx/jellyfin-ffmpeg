@@ -1,7 +1,7 @@
-Index: FFmpeg/libavformat/assenc.c
+Index: jellyfin-ffmpeg/libavformat/assenc.c
 ===================================================================
---- FFmpeg.orig/libavformat/assenc.c
-+++ FFmpeg/libavformat/assenc.c
+--- jellyfin-ffmpeg.orig/libavformat/assenc.c
++++ jellyfin-ffmpeg/libavformat/assenc.c
 @@ -68,7 +68,8 @@ static int write_header(AVFormatContext
                  ass->trailer = trailer;
          }

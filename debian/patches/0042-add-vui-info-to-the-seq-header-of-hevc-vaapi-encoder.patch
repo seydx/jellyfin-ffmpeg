@@ -1,7 +1,7 @@
-Index: FFmpeg/libavcodec/vaapi_encode_h265.c
+Index: jellyfin-ffmpeg/libavcodec/vaapi_encode_h265.c
 ===================================================================
---- FFmpeg.orig/libavcodec/vaapi_encode_h265.c
-+++ FFmpeg/libavcodec/vaapi_encode_h265.c
+--- jellyfin-ffmpeg.orig/libavcodec/vaapi_encode_h265.c
++++ jellyfin-ffmpeg/libavcodec/vaapi_encode_h265.c
 @@ -264,6 +264,7 @@ static int vaapi_encode_h265_init_sequen
      H265RawVPS                        *vps = &priv->units.raw_vps;
      H265RawSPS                        *sps = &priv->units.raw_sps;

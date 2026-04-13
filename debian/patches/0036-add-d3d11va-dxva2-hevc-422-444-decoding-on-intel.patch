@@ -1,7 +1,7 @@
-Index: FFmpeg/libavcodec/d3d12va_hevc.c
+Index: jellyfin-ffmpeg/libavcodec/d3d12va_hevc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/d3d12va_hevc.c
-+++ FFmpeg/libavcodec/d3d12va_hevc.c
+--- jellyfin-ffmpeg.orig/libavcodec/d3d12va_hevc.c
++++ jellyfin-ffmpeg/libavcodec/d3d12va_hevc.c
 @@ -33,7 +33,7 @@
  #define MAX_SLICES 256
  
@@ -26,10 +26,10 @@ Index: FFmpeg/libavcodec/d3d12va_hevc.c
                 scale ? &ctx_pic->qm : NULL, scale ? sizeof(ctx_pic->qm) : 0, update_input_arguments);
  }
  
-Index: FFmpeg/libavcodec/dxva2.c
+Index: jellyfin-ffmpeg/libavcodec/dxva2.c
 ===================================================================
---- FFmpeg.orig/libavcodec/dxva2.c
-+++ FFmpeg/libavcodec/dxva2.c
+--- jellyfin-ffmpeg.orig/libavcodec/dxva2.c
++++ jellyfin-ffmpeg/libavcodec/dxva2.c
 @@ -44,6 +44,12 @@ DEFINE_GUID(ff_DXVA2_ModeVC1_D,
  DEFINE_GUID(ff_DXVA2_ModeVC1_D2010,      0x1b81beA4, 0xa0c7,0x11d3,0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5);
  DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main,  0x5b11d51b, 0x2f4c,0x4452,0xbc,0xc3,0x09,0xf2,0xa1,0x16,0x0c,0xc0);
@@ -177,10 +177,10 @@ Index: FFmpeg/libavcodec/dxva2.c
      frames_ctx->width = FFALIGN(avctx->coded_width, surface_alignment);
      frames_ctx->height = FFALIGN(avctx->coded_height, surface_alignment);
      frames_ctx->initial_pool_size = num_surfaces;
-Index: FFmpeg/libavcodec/dxva2_hevc.c
+Index: jellyfin-ffmpeg/libavcodec/dxva2_hevc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/dxva2_hevc.c
-+++ FFmpeg/libavcodec/dxva2_hevc.c
+--- jellyfin-ffmpeg.orig/libavcodec/dxva2_hevc.c
++++ jellyfin-ffmpeg/libavcodec/dxva2_hevc.c
 @@ -32,7 +32,7 @@
  #define MAX_SLICES 256
  
@@ -261,10 +261,10 @@ Index: FFmpeg/libavcodec/dxva2_hevc.c
                                      scale ? &ctx_pic->qm : NULL, scale ? sizeof(ctx_pic->qm) : 0,
                                      commit_bitstream_and_slice_buffer);
      return ret;
-Index: FFmpeg/libavcodec/dxva2_internal.h
+Index: jellyfin-ffmpeg/libavcodec/dxva2_internal.h
 ===================================================================
---- FFmpeg.orig/libavcodec/dxva2_internal.h
-+++ FFmpeg/libavcodec/dxva2_internal.h
+--- jellyfin-ffmpeg.orig/libavcodec/dxva2_internal.h
++++ jellyfin-ffmpeg/libavcodec/dxva2_internal.h
 @@ -134,6 +134,58 @@ typedef struct FFDXVASharedContext {
                                                   DXVA_CONTEXT_CFG(avctx, ctx)     && \
                                                   (ff_dxva2_is_d3d11(avctx) || DXVA2_VAR(ctx, surface_count)))
@@ -333,10 +333,10 @@ Index: FFmpeg/libavcodec/dxva2_internal.h
  
  void ff_dxva2_hevc_fill_scaling_lists(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_Qmatrix_HEVC *qm);
  #endif
-Index: FFmpeg/libavcodec/hevc/hevcdec.c
+Index: jellyfin-ffmpeg/libavcodec/hevc/hevcdec.c
 ===================================================================
---- FFmpeg.orig/libavcodec/hevc/hevcdec.c
-+++ FFmpeg/libavcodec/hevc/hevcdec.c
+--- jellyfin-ffmpeg.orig/libavcodec/hevc/hevcdec.c
++++ jellyfin-ffmpeg/libavcodec/hevc/hevcdec.c
 @@ -648,6 +648,13 @@ static enum AVPixelFormat get_format(HEV
  #endif
          break;

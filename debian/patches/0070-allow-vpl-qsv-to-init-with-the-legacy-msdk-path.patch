@@ -1,8 +1,8 @@
-Index: FFmpeg/configure
+Index: jellyfin-ffmpeg/configure
 ===================================================================
---- FFmpeg.orig/configure
-+++ FFmpeg/configure
-@@ -2644,6 +2644,7 @@ HAVE_LIST="
+--- jellyfin-ffmpeg.orig/configure
++++ jellyfin-ffmpeg/configure
+@@ -2737,6 +2737,7 @@ HAVE_LIST="
      xmllint
      zlib_gzip
      openvino2
@@ -10,7 +10,7 @@ Index: FFmpeg/configure
  "
  
  # options emitted with CONFIG_ prefix but not available on the command line
-@@ -7311,6 +7312,9 @@ elif enabled libvpl; then
+@@ -7434,6 +7435,9 @@ elif enabled libvpl; then
              die "ERROR: libvpl >= 2.6 not found"
      add_cppflags -DMFX_DEPRECATED_OFF
      check_type "vpl/mfxdefs.h vpl/mfxvideo.h" "struct mfxConfigInterface"
@@ -20,10 +20,10 @@ Index: FFmpeg/configure
  fi
  
  if enabled libmfx; then
-Index: FFmpeg/libavcodec/qsv.c
+Index: jellyfin-ffmpeg/libavcodec/qsv.c
 ===================================================================
---- FFmpeg.orig/libavcodec/qsv.c
-+++ FFmpeg/libavcodec/qsv.c
+--- jellyfin-ffmpeg.orig/libavcodec/qsv.c
++++ jellyfin-ffmpeg/libavcodec/qsv.c
 @@ -499,6 +499,17 @@ static int ff_qsv_set_display_handle(AVC
  }
  #endif //AVCODEC_QSV_LINUX_SESSION_HANDLE
@@ -80,10 +80,10 @@ Index: FFmpeg/libavcodec/qsv.c
      mfxInitParam init_par = { MFX_IMPL_AUTO_ANY };
      mfxSession session = NULL;
      mfxStatus sts;
-Index: FFmpeg/libavcodec/qsvenc.c
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/qsvenc.c
-+++ FFmpeg/libavcodec/qsvenc.c
+--- jellyfin-ffmpeg.orig/libavcodec/qsvenc.c
++++ jellyfin-ffmpeg/libavcodec/qsvenc.c
 @@ -1190,7 +1190,7 @@ static int init_video_param(AVCodecConte
  
  #if QSV_HAVE_EXT_AV1_PARAM
@@ -102,10 +102,10 @@ Index: FFmpeg/libavcodec/qsvenc.c
          av_log(avctx, AV_LOG_ERROR,
                 "This version of runtime doesn't support AV1 encoding\n");
          return AVERROR_UNKNOWN;
-Index: FFmpeg/libavfilter/qsvvpp.c
+Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
 ===================================================================
---- FFmpeg.orig/libavfilter/qsvvpp.c
-+++ FFmpeg/libavfilter/qsvvpp.c
+--- jellyfin-ffmpeg.orig/libavfilter/qsvvpp.c
++++ jellyfin-ffmpeg/libavfilter/qsvvpp.c
 @@ -1066,6 +1066,16 @@ int ff_qsvvpp_filter_frame(QSVVPPContext
      return 0;
  }
@@ -159,10 +159,10 @@ Index: FFmpeg/libavfilter/qsvvpp.c
      mfxSession session = NULL;
      mfxStatus sts;
  
-Index: FFmpeg/libavfilter/vf_vpp_qsv.c
+Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
 ===================================================================
---- FFmpeg.orig/libavfilter/vf_vpp_qsv.c
-+++ FFmpeg/libavfilter/vf_vpp_qsv.c
+--- jellyfin-ffmpeg.orig/libavfilter/vf_vpp_qsv.c
++++ jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
 @@ -426,7 +426,7 @@ static int vpp_set_frame_ext_params(AVFi
      fp->num_ext_buf = 0;
  
@@ -172,10 +172,10 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
          return 0;
  
      memset(&invsi_conf, 0, sizeof(mfxExtVideoSignalInfo));
-Index: FFmpeg/libavutil/hwcontext_qsv.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_qsv.c
-+++ FFmpeg/libavutil/hwcontext_qsv.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_qsv.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 @@ -827,6 +827,18 @@ static mfxStatus frame_get_hdl(mfxHDL pt
      return MFX_ERR_NONE;
  }

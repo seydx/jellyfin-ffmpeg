@@ -1,7 +1,7 @@
-Index: FFmpeg/libavfilter/vf_overlay_vaapi.c
+Index: jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
 ===================================================================
---- FFmpeg.orig/libavfilter/vf_overlay_vaapi.c
-+++ FFmpeg/libavfilter/vf_overlay_vaapi.c
+--- jellyfin-ffmpeg.orig/libavfilter/vf_overlay_vaapi.c
++++ jellyfin-ffmpeg/libavfilter/vf_overlay_vaapi.c
 @@ -53,6 +53,7 @@ typedef struct OverlayVAAPIContext {
      int              ow;
      int              oh;

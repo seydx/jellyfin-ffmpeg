@@ -1,7 +1,7 @@
-Index: FFmpeg/tests/fate/hevc.mak
+Index: jellyfin-ffmpeg/tests/fate/hevc.mak
 ===================================================================
---- FFmpeg.orig/tests/fate/hevc.mak
-+++ FFmpeg/tests/fate/hevc.mak
+--- jellyfin-ffmpeg.orig/tests/fate/hevc.mak
++++ jellyfin-ffmpeg/tests/fate/hevc.mak
 @@ -233,7 +233,7 @@ FATE_HEVC-$(call DEMMUX, HEVC MOV, MOV H
  fate-hevc-bsf-mp4toannexb: tests/data/hevc-mp4.mov
  fate-hevc-bsf-mp4toannexb: CMD = md5 -i $(TARGET_PATH)/tests/data/hevc-mp4.mov -c:v copy -fflags +bitexact -f hevc

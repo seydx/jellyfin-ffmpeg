@@ -1,7 +1,7 @@
-Index: FFmpeg/libavfilter/vf_tonemap_vaapi.c
+Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
 ===================================================================
---- FFmpeg.orig/libavfilter/vf_tonemap_vaapi.c
-+++ FFmpeg/libavfilter/vf_tonemap_vaapi.c
+--- jellyfin-ffmpeg.orig/libavfilter/vf_tonemap_vaapi.c
++++ jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
 @@ -56,7 +56,7 @@ static int tonemap_vaapi_save_metadata(A
      AVContentLightMetadata *light_meta;
  

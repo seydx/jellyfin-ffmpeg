@@ -1,7 +1,7 @@
-Index: FFmpeg/ffbuild/version.sh
+Index: jellyfin-ffmpeg/ffbuild/version.sh
 ===================================================================
---- FFmpeg.orig/ffbuild/version.sh
-+++ FFmpeg/ffbuild/version.sh
+--- jellyfin-ffmpeg.orig/ffbuild/version.sh
++++ jellyfin-ffmpeg/ffbuild/version.sh
 @@ -35,7 +35,7 @@ test "$revision" || revision=$(cd "$1" &
  test "$revision" && test "$git_hash" && revision="$revision-$git_hash"
  

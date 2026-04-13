@@ -1,7 +1,7 @@
-Index: FFmpeg/libavcodec/qsv_internal.h
+Index: jellyfin-ffmpeg/libavcodec/qsv_internal.h
 ===================================================================
---- FFmpeg.orig/libavcodec/qsv_internal.h
-+++ FFmpeg/libavcodec/qsv_internal.h
+--- jellyfin-ffmpeg.orig/libavcodec/qsv_internal.h
++++ jellyfin-ffmpeg/libavcodec/qsv_internal.h
 @@ -100,6 +100,7 @@ typedef struct QSVFrame {
  
      int queued;
@@ -10,10 +10,10 @@ Index: FFmpeg/libavcodec/qsv_internal.h
  
      struct QSVFrame *next;
  } QSVFrame;
-Index: FFmpeg/libavcodec/qsvenc.c
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/qsvenc.c
-+++ FFmpeg/libavcodec/qsvenc.c
+--- jellyfin-ffmpeg.orig/libavcodec/qsvenc.c
++++ jellyfin-ffmpeg/libavcodec/qsvenc.c
 @@ -1898,6 +1898,10 @@ static void clear_unused_frames(QSVEncCo
              memset(&cur->enc_ctrl, 0, sizeof(cur->enc_ctrl));
              cur->enc_ctrl.Payload = cur->payloads;
@@ -65,10 +65,10 @@ Index: FFmpeg/libavcodec/qsvenc.c
          }
      } else {
          /* make a copy if the input is not padded as libmfx requires */
-Index: FFmpeg/libavutil/hwcontext_qsv.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_qsv.c
-+++ FFmpeg/libavutil/hwcontext_qsv.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_qsv.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 @@ -2190,11 +2190,25 @@ static int qsv_frames_derive_to(AVHWFram
      }
  }

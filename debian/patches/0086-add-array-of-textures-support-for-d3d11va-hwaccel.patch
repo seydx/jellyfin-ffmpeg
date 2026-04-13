@@ -1,7 +1,7 @@
-Index: FFmpeg/libavcodec/dxva2.c
+Index: jellyfin-ffmpeg/libavcodec/dxva2.c
 ===================================================================
---- FFmpeg.orig/libavcodec/dxva2.c
-+++ FFmpeg/libavcodec/dxva2.c
+--- jellyfin-ffmpeg.orig/libavcodec/dxva2.c
++++ jellyfin-ffmpeg/libavcodec/dxva2.c
 @@ -298,12 +298,13 @@ static void dxva_list_guids_debug(AVCode
  }
  
@@ -245,10 +245,10 @@ Index: FFmpeg/libavcodec/dxva2.c
      if (avctx->pix_fmt == AV_PIX_FMT_D3D11VA_VLD) {
          D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
          ID3D11VideoDecoderOutputView_GetDesc((ID3D11VideoDecoderOutputView*) surface, &viewDesc);
-Index: FFmpeg/libavcodec/dxva2_internal.h
+Index: jellyfin-ffmpeg/libavcodec/dxva2_internal.h
 ===================================================================
---- FFmpeg.orig/libavcodec/dxva2_internal.h
-+++ FFmpeg/libavcodec/dxva2_internal.h
+--- jellyfin-ffmpeg.orig/libavcodec/dxva2_internal.h
++++ jellyfin-ffmpeg/libavcodec/dxva2_internal.h
 @@ -100,6 +100,7 @@ typedef struct FFDXVASharedContext {
      ID3D11VideoDecoderOutputView  **d3d11_views;
      int                          nb_d3d11_views;
@@ -257,10 +257,10 @@ Index: FFmpeg/libavcodec/dxva2_internal.h
  #endif
  
  #if CONFIG_DXVA2
-Index: FFmpeg/libavutil/hwcontext_d3d11va.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_d3d11va.c
-+++ FFmpeg/libavutil/hwcontext_d3d11va.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_d3d11va.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
 @@ -329,7 +329,8 @@ static int d3d11va_frames_init(AVHWFrame
          ctx->initial_pool_size = texDesc2.ArraySize;
          hwctx->BindFlags = texDesc2.BindFlags;
@@ -271,10 +271,10 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.c
          hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &hwctx->texture);
          if (FAILED(hr)) {
              av_log(ctx, AV_LOG_ERROR, "Could not create the texture (%lx)\n", (long)hr);
-Index: FFmpeg/libavutil/hwcontext_d3d11va.h
+Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_d3d11va.h
-+++ FFmpeg/libavutil/hwcontext_d3d11va.h
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_d3d11va.h
++++ jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
 @@ -202,6 +202,11 @@ typedef struct AVD3D11VAFramesContext {
       * Whether the frames require extra sync when exporting as external memory.
       */

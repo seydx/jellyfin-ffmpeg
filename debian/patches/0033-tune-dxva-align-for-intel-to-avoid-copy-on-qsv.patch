@@ -1,7 +1,7 @@
-Index: FFmpeg/libavcodec/dxva2.c
+Index: jellyfin-ffmpeg/libavcodec/dxva2.c
 ===================================================================
---- FFmpeg.orig/libavcodec/dxva2.c
-+++ FFmpeg/libavcodec/dxva2.c
+--- jellyfin-ffmpeg.orig/libavcodec/dxva2.c
++++ jellyfin-ffmpeg/libavcodec/dxva2.c
 @@ -616,6 +616,16 @@ int ff_dxva2_common_frame_params(AVCodec
      else
          surface_alignment = 16;
@@ -31,10 +31,10 @@ Index: FFmpeg/libavcodec/dxva2.c
  
      frames_ctx->sw_format = avctx->sw_pix_fmt == AV_PIX_FMT_YUV420P10 ?
                              AV_PIX_FMT_P010 : AV_PIX_FMT_NV12;
-Index: FFmpeg/libavutil/hwcontext_d3d11va.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_d3d11va.c
-+++ FFmpeg/libavutil/hwcontext_d3d11va.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_d3d11va.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
 @@ -622,6 +622,35 @@ static int d3d11va_device_find_adapter_b
      return -1;
  }
@@ -81,10 +81,10 @@ Index: FFmpeg/libavutil/hwcontext_d3d11va.c
  #if !HAVE_UWP && HAVE_DXGIDEBUG_H
      if (is_debug) {
          HANDLE dxgidebug_dll = LoadLibrary("dxgidebug.dll");
-Index: FFmpeg/libavutil/hwcontext_d3d11va.h
+Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_d3d11va.h
-+++ FFmpeg/libavutil/hwcontext_d3d11va.h
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_d3d11va.h
++++ jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.h
 @@ -108,6 +108,16 @@ typedef struct AVD3D11VADeviceContext {
       * It applies globally to all AVD3D11VAFramesContext allocated from this device context.
       */

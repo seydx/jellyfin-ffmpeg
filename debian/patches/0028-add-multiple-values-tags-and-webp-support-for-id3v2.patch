@@ -1,8 +1,8 @@
-Index: FFmpeg/libavformat/id3v2.c
+Index: jellyfin-ffmpeg/libavformat/id3v2.c
 ===================================================================
---- FFmpeg.orig/libavformat/id3v2.c
-+++ FFmpeg/libavformat/id3v2.c
-@@ -334,39 +334,54 @@ static void read_ttag(AVFormatContext *s
+--- jellyfin-ffmpeg.orig/libavformat/id3v2.c
++++ jellyfin-ffmpeg/libavformat/id3v2.c
+@@ -335,39 +335,54 @@ static void read_ttag(AVFormatContext *s
                        AVDictionary **metadata, const char *key)
  {
      uint8_t *dst;

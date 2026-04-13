@@ -1,7 +1,7 @@
-Index: FFmpeg/fftools/Makefile
+Index: jellyfin-ffmpeg/fftools/Makefile
 ===================================================================
---- FFmpeg.orig/fftools/Makefile
-+++ FFmpeg/fftools/Makefile
+--- jellyfin-ffmpeg.orig/fftools/Makefile
++++ jellyfin-ffmpeg/fftools/Makefile
 @@ -69,6 +69,12 @@ endef
  
  $(foreach P,$(AVPROGS-yes),$(eval $(call DOFFTOOL,$(P))))
@@ -15,10 +15,10 @@ Index: FFmpeg/fftools/Makefile
  all: $(AVPROGS)
  
  fftools/ffprobe.o fftools/cmdutils.o: libavutil/ffversion.h | fftools
-Index: FFmpeg/fftools/fftoolsres.rc
+Index: jellyfin-ffmpeg/fftools/fftoolsres.rc
 ===================================================================
---- FFmpeg.orig/fftools/fftoolsres.rc
-+++ FFmpeg/fftools/fftoolsres.rc
+--- jellyfin-ffmpeg.orig/fftools/fftoolsres.rc
++++ jellyfin-ffmpeg/fftools/fftoolsres.rc
 @@ -1,2 +1,34 @@
  #include <windows.h>
 +#include "libavutil/version.h"

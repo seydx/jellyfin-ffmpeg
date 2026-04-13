@@ -1,8 +1,8 @@
-Index: FFmpeg/libavfilter/Makefile
+Index: jellyfin-ffmpeg/libavfilter/Makefile
 ===================================================================
---- FFmpeg.orig/libavfilter/Makefile
-+++ FFmpeg/libavfilter/Makefile
-@@ -609,6 +609,7 @@ OBJS-$(CONFIG_DRAWBOX_VAAPI_FILTER)
+--- jellyfin-ffmpeg.orig/libavfilter/Makefile
++++ jellyfin-ffmpeg/libavfilter/Makefile
+@@ -612,6 +612,7 @@ OBJS-$(CONFIG_DRAWBOX_VAAPI_FILTER)
  
  OBJS-$(CONFIG_ALLRGB_FILTER)                 += vsrc_testsrc.o
  OBJS-$(CONFIG_ALLYUV_FILTER)                 += vsrc_testsrc.o
@@ -10,11 +10,11 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_CELLAUTO_FILTER)               += vsrc_cellauto.o
  OBJS-$(CONFIG_COLOR_FILTER)                  += vsrc_testsrc.o
  OBJS-$(CONFIG_COLORCHART_FILTER)             += vsrc_testsrc.o
-Index: FFmpeg/libavfilter/allfilters.c
+Index: jellyfin-ffmpeg/libavfilter/allfilters.c
 ===================================================================
---- FFmpeg.orig/libavfilter/allfilters.c
-+++ FFmpeg/libavfilter/allfilters.c
-@@ -569,6 +569,7 @@ extern const FFFilter ff_vf_drawbox_vaap
+--- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
++++ jellyfin-ffmpeg/libavfilter/allfilters.c
+@@ -572,6 +572,7 @@ extern const FFFilter ff_vf_drawbox_vaap
  
  extern const FFFilter ff_vsrc_allrgb;
  extern const FFFilter ff_vsrc_allyuv;
@@ -22,10 +22,10 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vsrc_amf_capture;
  extern const FFFilter ff_vsrc_cellauto;
  extern const FFFilter ff_vsrc_color;
-Index: FFmpeg/libavfilter/vsrc_alphasrc.c
+Index: jellyfin-ffmpeg/libavfilter/vsrc_alphasrc.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/vsrc_alphasrc.c
++++ jellyfin-ffmpeg/libavfilter/vsrc_alphasrc.c
 @@ -0,0 +1,164 @@
 +/*
 + * Copyright (c) 2021 NyanMisaka

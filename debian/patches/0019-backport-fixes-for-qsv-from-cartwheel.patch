@@ -1,7 +1,7 @@
-Index: FFmpeg/libavcodec/qsv_internal.h
+Index: jellyfin-ffmpeg/libavcodec/qsv_internal.h
 ===================================================================
---- FFmpeg.orig/libavcodec/qsv_internal.h
-+++ FFmpeg/libavcodec/qsv_internal.h
+--- jellyfin-ffmpeg.orig/libavcodec/qsv_internal.h
++++ jellyfin-ffmpeg/libavcodec/qsv_internal.h
 @@ -56,6 +56,8 @@
  
  #define QSV_MAX_FRAME_EXT_PARAMS 4
@@ -11,10 +11,10 @@ Index: FFmpeg/libavcodec/qsv_internal.h
  #define QSV_VERSION_ATLEAST(MAJOR, MINOR)   \
      (MFX_VERSION_MAJOR > (MAJOR) ||         \
       MFX_VERSION_MAJOR == (MAJOR) && MFX_VERSION_MINOR >= (MINOR))
-Index: FFmpeg/libavcodec/qsvdec.c
+Index: jellyfin-ffmpeg/libavcodec/qsvdec.c
 ===================================================================
---- FFmpeg.orig/libavcodec/qsvdec.c
-+++ FFmpeg/libavcodec/qsvdec.c
+--- jellyfin-ffmpeg.orig/libavcodec/qsvdec.c
++++ jellyfin-ffmpeg/libavcodec/qsvdec.c
 @@ -43,13 +43,16 @@
  #include "libavutil/film_grain_params.h"
  #include "libavutil/mastering_display_metadata.h"
@@ -214,10 +214,10 @@ Index: FFmpeg/libavcodec/qsvdec.c
  }
  
  static int qsv_process_data(AVCodecContext *avctx, QSVContext *q,
-Index: FFmpeg/libavcodec/qsvenc.c
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/qsvenc.c
-+++ FFmpeg/libavcodec/qsvenc.c
+--- jellyfin-ffmpeg.orig/libavcodec/qsvenc.c
++++ jellyfin-ffmpeg/libavcodec/qsvenc.c
 @@ -203,6 +203,7 @@ static void dump_video_param(AVCodecCont
  #endif
  
@@ -296,10 +296,10 @@ Index: FFmpeg/libavcodec/qsvenc.c
  
      q->param.ExtParam    = ext_buffers;
      q->param.NumExtParam = ext_buf_num;
-Index: FFmpeg/libavcodec/qsvenc.h
+Index: jellyfin-ffmpeg/libavcodec/qsvenc.h
 ===================================================================
---- FFmpeg.orig/libavcodec/qsvenc.h
-+++ FFmpeg/libavcodec/qsvenc.h
+--- jellyfin-ffmpeg.orig/libavcodec/qsvenc.h
++++ jellyfin-ffmpeg/libavcodec/qsvenc.h
 @@ -175,6 +175,7 @@ typedef struct QSVEncContext {
      mfxExtMultiFrameControl extmfc;
  #endif
@@ -327,10 +327,10 @@ Index: FFmpeg/libavcodec/qsvenc.h
  } QSVEncContext;
  
  int ff_qsv_enc_init(AVCodecContext *avctx, QSVEncContext *q);
-Index: FFmpeg/libavcodec/qsvenc_hevc.c
+Index: jellyfin-ffmpeg/libavcodec/qsvenc_hevc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/qsvenc_hevc.c
-+++ FFmpeg/libavcodec/qsvenc_hevc.c
+--- jellyfin-ffmpeg.orig/libavcodec/qsvenc_hevc.c
++++ jellyfin-ffmpeg/libavcodec/qsvenc_hevc.c
 @@ -365,6 +365,9 @@ static const AVOption options[] = {
      { "int_ref_qp_delta",   "QP difference for the refresh MBs",                 OFFSET(qsv.int_ref_qp_delta),        AV_OPT_TYPE_INT, { .i64 = INT16_MIN }, INT16_MIN,  INT16_MAX, VE },
      { "int_ref_cycle_dist",   "Distance between the beginnings of the intra-refresh cycles in frames",  OFFSET(qsv.int_ref_cycle_dist),      AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT16_MAX, VE },

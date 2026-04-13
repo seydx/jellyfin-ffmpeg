@@ -1,8 +1,8 @@
-Index: FFmpeg/configure
+Index: jellyfin-ffmpeg/configure
 ===================================================================
---- FFmpeg.orig/configure
-+++ FFmpeg/configure
-@@ -4070,6 +4070,7 @@ boxblur_opencl_filter_deps="opencl gpl"
+--- jellyfin-ffmpeg.orig/configure
++++ jellyfin-ffmpeg/configure
+@@ -4176,6 +4176,7 @@ boxblur_opencl_filter_deps="opencl gpl"
  bs2b_filter_deps="libbs2b"
  bwdif_cuda_filter_deps="ffnvcodec"
  bwdif_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -10,7 +10,7 @@ Index: FFmpeg/configure
  bwdif_videotoolbox_filter_deps="metal corevideo videotoolbox"
  bwdif_vulkan_filter_deps="vulkan spirv_compiler"
  chromaber_vulkan_filter_deps="vulkan spirv_library"
-@@ -4227,6 +4228,7 @@ xfade_opencl_filter_deps="opencl"
+@@ -4336,6 +4337,7 @@ xfade_opencl_filter_deps="opencl"
  xfade_vulkan_filter_deps="vulkan spirv_library"
  yadif_cuda_filter_deps="ffnvcodec"
  yadif_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -18,10 +18,10 @@ Index: FFmpeg/configure
  yadif_videotoolbox_filter_deps="metal corevideo videotoolbox"
  hstack_vaapi_filter_deps="vaapi_1"
  vstack_vaapi_filter_deps="vaapi_1"
-Index: FFmpeg/libavfilter/Makefile
+Index: jellyfin-ffmpeg/libavfilter/Makefile
 ===================================================================
---- FFmpeg.orig/libavfilter/Makefile
-+++ FFmpeg/libavfilter/Makefile
+--- jellyfin-ffmpeg.orig/libavfilter/Makefile
++++ jellyfin-ffmpeg/libavfilter/Makefile
 @@ -224,6 +224,8 @@ OBJS-$(CONFIG_BOXBLUR_OPENCL_FILTER)
  OBJS-$(CONFIG_BWDIF_FILTER)                  += vf_bwdif.o bwdifdsp.o yadif_common.o
  OBJS-$(CONFIG_BWDIF_CUDA_FILTER)             += vf_bwdif_cuda.o vf_bwdif_cuda.ptx.o \
@@ -31,7 +31,7 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_BWDIF_VIDEOTOOLBOX_FILTER)     += vf_bwdif_videotoolbox.o \
                                                  metal/vf_bwdif_videotoolbox.metallib.o \
                                                  metal/utils.o \
-@@ -607,6 +609,8 @@ OBJS-$(CONFIG_XSTACK_FILTER)
+@@ -610,6 +612,8 @@ OBJS-$(CONFIG_XSTACK_FILTER)
  OBJS-$(CONFIG_YADIF_FILTER)                  += vf_yadif.o yadif_common.o
  OBJS-$(CONFIG_YADIF_CUDA_FILTER)             += vf_yadif_cuda.o vf_yadif_cuda.ptx.o \
                                                  yadif_common.o cuda/load_helper.o
@@ -40,10 +40,10 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_YADIF_VIDEOTOOLBOX_FILTER)     += vf_yadif_videotoolbox.o \
                                                  metal/vf_yadif_videotoolbox.metallib.o \
                                                  metal/utils.o \
-Index: FFmpeg/libavfilter/allfilters.c
+Index: jellyfin-ffmpeg/libavfilter/allfilters.c
 ===================================================================
---- FFmpeg.orig/libavfilter/allfilters.c
-+++ FFmpeg/libavfilter/allfilters.c
+--- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
++++ jellyfin-ffmpeg/libavfilter/allfilters.c
 @@ -204,6 +204,7 @@ extern const FFFilter ff_vf_boxblur;
  extern const FFFilter ff_vf_boxblur_opencl;
  extern const FFFilter ff_vf_bwdif;
@@ -52,7 +52,7 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_bwdif_videotoolbox;
  extern const FFFilter ff_vf_bwdif_vulkan;
  extern const FFFilter ff_vf_cas;
-@@ -561,6 +562,7 @@ extern const FFFilter ff_vf_xpsnr;
+@@ -564,6 +565,7 @@ extern const FFFilter ff_vf_xpsnr;
  extern const FFFilter ff_vf_xstack;
  extern const FFFilter ff_vf_yadif;
  extern const FFFilter ff_vf_yadif_cuda;
@@ -60,10 +60,10 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_yadif_videotoolbox;
  extern const FFFilter ff_vf_yaepblur;
  extern const FFFilter ff_vf_zmq;
-Index: FFmpeg/libavfilter/opencl.c
+Index: jellyfin-ffmpeg/libavfilter/opencl.c
 ===================================================================
---- FFmpeg.orig/libavfilter/opencl.c
-+++ FFmpeg/libavfilter/opencl.c
+--- jellyfin-ffmpeg.orig/libavfilter/opencl.c
++++ jellyfin-ffmpeg/libavfilter/opencl.c
 @@ -85,9 +85,17 @@ int ff_opencl_filter_config_input(AVFilt
  
  int ff_opencl_filter_config_output(AVFilterLink *outlink)
@@ -114,10 +114,10 @@ Index: FFmpeg/libavfilter/opencl.c
      cl_int cle;
  
      ctx->program = clCreateProgramWithSource(ctx->hwctx->context, nb_strings,
-Index: FFmpeg/libavfilter/opencl.h
+Index: jellyfin-ffmpeg/libavfilter/opencl.h
 ===================================================================
---- FFmpeg.orig/libavfilter/opencl.h
-+++ FFmpeg/libavfilter/opencl.h
+--- jellyfin-ffmpeg.orig/libavfilter/opencl.h
++++ jellyfin-ffmpeg/libavfilter/opencl.h
 @@ -247,6 +247,9 @@ int ff_opencl_filter_config_input(AVFilt
   */
  int ff_opencl_filter_config_output(AVFilterLink *outlink);
@@ -150,10 +150,10 @@ Index: FFmpeg/libavfilter/opencl.h
  /**
   * Load a new OpenCL program from a file.
   *
-Index: FFmpeg/libavfilter/opencl/bwdif.cl
+Index: jellyfin-ffmpeg/libavfilter/opencl/bwdif.cl
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/opencl/bwdif.cl
++++ jellyfin-ffmpeg/libavfilter/opencl/bwdif.cl
 @@ -0,0 +1,183 @@
 +/*
 + * Copyright (C) 2019 Philip Langdale <philipl@overt.org>
@@ -338,10 +338,10 @@ Index: FFmpeg/libavfilter/opencl/bwdif.cl
 +        write_imagef(dst, pos, (float4)(pred.x, pred.y, 0.0f, 1.0f));
 +    }
 +}
-Index: FFmpeg/libavfilter/opencl/yadif.cl
+Index: jellyfin-ffmpeg/libavfilter/opencl/yadif.cl
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/opencl/yadif.cl
++++ jellyfin-ffmpeg/libavfilter/opencl/yadif.cl
 @@ -0,0 +1,197 @@
 +/*
 + * Copyright (C) 2018 Philip Langdale <philipl@overt.org>
@@ -540,10 +540,10 @@ Index: FFmpeg/libavfilter/opencl/yadif.cl
 +        write_imagef(dst, pos, (float4)(pred.x, pred.y, 0.0f, 1.0f));
 +    }
 +}
-Index: FFmpeg/libavfilter/opencl_source.h
+Index: jellyfin-ffmpeg/libavfilter/opencl_source.h
 ===================================================================
---- FFmpeg.orig/libavfilter/opencl_source.h
-+++ FFmpeg/libavfilter/opencl_source.h
+--- jellyfin-ffmpeg.orig/libavfilter/opencl_source.h
++++ jellyfin-ffmpeg/libavfilter/opencl_source.h
 @@ -20,6 +20,7 @@
  #define AVFILTER_OPENCL_SOURCE_H
  
@@ -559,10 +559,10 @@ Index: FFmpeg/libavfilter/opencl_source.h
 +extern const char *ff_source_yadif_cl;
  
  #endif /* AVFILTER_OPENCL_SOURCE_H */
-Index: FFmpeg/libavfilter/vf_bwdif_opencl.c
+Index: jellyfin-ffmpeg/libavfilter/vf_bwdif_opencl.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/vf_bwdif_opencl.c
++++ jellyfin-ffmpeg/libavfilter/vf_bwdif_opencl.c
 @@ -0,0 +1,328 @@
 +/*
 + * Copyright (c) 2025 NyanMisaka
@@ -892,10 +892,10 @@ Index: FFmpeg/libavfilter/vf_bwdif_opencl.c
 +    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_OPENCL),
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};
-Index: FFmpeg/libavfilter/vf_yadif_opencl.c
+Index: jellyfin-ffmpeg/libavfilter/vf_yadif_opencl.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/vf_yadif_opencl.c
++++ jellyfin-ffmpeg/libavfilter/vf_yadif_opencl.c
 @@ -0,0 +1,320 @@
 +/*
 + * Copyright (c) 2025 NyanMisaka

@@ -1,8 +1,8 @@
-Index: FFmpeg/configure
+Index: jellyfin-ffmpeg/configure
 ===================================================================
---- FFmpeg.orig/configure
-+++ FFmpeg/configure
-@@ -5859,7 +5859,7 @@ elif enabled x86; then
+--- jellyfin-ffmpeg.orig/configure
++++ jellyfin-ffmpeg/configure
+@@ -5979,7 +5979,7 @@ elif enabled x86; then
          ;;
          # everything else should support nopl and conditional mov (cmov)
          *)
@@ -11,10 +11,10 @@ Index: FFmpeg/configure
              enable i686
              enable fast_cmov
          ;;
-Index: FFmpeg/libavcodec/huffyuvdsp.c
+Index: jellyfin-ffmpeg/libavcodec/huffyuvdsp.c
 ===================================================================
---- FFmpeg.orig/libavcodec/huffyuvdsp.c
-+++ FFmpeg/libavcodec/huffyuvdsp.c
+--- jellyfin-ffmpeg.orig/libavcodec/huffyuvdsp.c
++++ jellyfin-ffmpeg/libavcodec/huffyuvdsp.c
 @@ -16,6 +16,13 @@
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
   */
@@ -29,10 +29,10 @@ Index: FFmpeg/libavcodec/huffyuvdsp.c
  #include <stdint.h>
  
  #include "config.h"
-Index: FFmpeg/libavcodec/huffyuvenc.c
+Index: jellyfin-ffmpeg/libavcodec/huffyuvenc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/huffyuvenc.c
-+++ FFmpeg/libavcodec/huffyuvenc.c
+--- jellyfin-ffmpeg.orig/libavcodec/huffyuvenc.c
++++ jellyfin-ffmpeg/libavcodec/huffyuvenc.c
 @@ -28,6 +28,13 @@
   * huffyuv encoder
   */
@@ -47,10 +47,10 @@ Index: FFmpeg/libavcodec/huffyuvenc.c
  #include "config_components.h"
  
  #include "avcodec.h"
-Index: FFmpeg/libavcodec/x86/cabac.h
+Index: jellyfin-ffmpeg/libavcodec/x86/cabac.h
 ===================================================================
---- FFmpeg.orig/libavcodec/x86/cabac.h
-+++ FFmpeg/libavcodec/x86/cabac.h
+--- jellyfin-ffmpeg.orig/libavcodec/x86/cabac.h
++++ jellyfin-ffmpeg/libavcodec/x86/cabac.h
 @@ -183,6 +183,9 @@ av_noinline
  #else
  av_always_inline

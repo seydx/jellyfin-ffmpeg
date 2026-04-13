@@ -1,8 +1,8 @@
-Index: FFmpeg/configure
+Index: jellyfin-ffmpeg/configure
 ===================================================================
---- FFmpeg.orig/configure
-+++ FFmpeg/configure
-@@ -2418,6 +2418,9 @@ HEADERS_LIST="
+--- jellyfin-ffmpeg.orig/configure
++++ jellyfin-ffmpeg/configure
+@@ -2507,6 +2507,9 @@ HEADERS_LIST="
  INTRINSICS_LIST="
      intrinsics_neon
      intrinsics_sse2
@@ -12,7 +12,7 @@ Index: FFmpeg/configure
  "
  
  MATH_FUNCS="
-@@ -2870,6 +2873,9 @@ armv8_deps="aarch64"
+@@ -2966,6 +2969,9 @@ armv8_deps="aarch64"
  neon_deps_any="aarch64 arm"
  intrinsics_neon_deps="neon"
  intrinsics_sse2_deps="sse2"
@@ -22,7 +22,7 @@ Index: FFmpeg/configure
  vfp_deps="arm"
  vfpv3_deps="vfp"
  setend_deps="arm"
-@@ -4190,6 +4196,7 @@ tinterlace_filter_deps="gpl"
+@@ -4298,6 +4304,7 @@ tinterlace_filter_deps="gpl"
  tinterlace_merge_test_deps="tinterlace_filter"
  tinterlace_pad_test_deps="tinterlace_filter"
  tonemap_filter_deps="const_nan"
@@ -30,7 +30,7 @@ Index: FFmpeg/configure
  tonemap_vaapi_filter_deps="vaapi VAProcFilterParameterBufferHDRToneMapping"
  tonemap_videotoolbox_filter_deps="metal corevideo videotoolbox const_nan"
  tonemap_opencl_filter_deps="opencl const_nan"
-@@ -6785,6 +6792,19 @@ fi
+@@ -6906,6 +6913,19 @@ fi
  
  check_cc intrinsics_neon arm_neon.h "int16x8_t test = vdupq_n_s16(0)"
  
@@ -50,7 +50,7 @@ Index: FFmpeg/configure
  check_ldflags -Wl,--as-needed
  check_ldflags -Wl,-z,noexecstack
  if [ $target_os = "darwin" ]; then
-@@ -8032,6 +8052,16 @@ elif enabled gcc; then
+@@ -8182,6 +8202,16 @@ elif enabled gcc; then
              check_allcflags -mpreferred-stack-boundary=4
              ;;
          esac
@@ -67,11 +67,11 @@ Index: FFmpeg/configure
      fi
  elif enabled llvm_gcc; then
      check_allcflags -mllvm -stack-alignment=16
-Index: FFmpeg/libavfilter/Makefile
+Index: jellyfin-ffmpeg/libavfilter/Makefile
 ===================================================================
---- FFmpeg.orig/libavfilter/Makefile
-+++ FFmpeg/libavfilter/Makefile
-@@ -547,6 +547,7 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
+--- jellyfin-ffmpeg.orig/libavfilter/Makefile
++++ jellyfin-ffmpeg/libavfilter/Makefile
+@@ -549,6 +549,7 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
  OBJS-$(CONFIG_TMIDEQUALIZER_FILTER)          += vf_tmidequalizer.o
  OBJS-$(CONFIG_TMIX_FILTER)                   += vf_mix.o framesync.o
  OBJS-$(CONFIG_TONEMAP_FILTER)                += vf_tonemap.o
@@ -79,10 +79,10 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.ptx.o \
                                                  cuda/host_util.o cuda/load_helper.o
  OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o opencl.o \
-Index: FFmpeg/libavfilter/aarch64/Makefile
+Index: jellyfin-ffmpeg/libavfilter/aarch64/Makefile
 ===================================================================
---- FFmpeg.orig/libavfilter/aarch64/Makefile
-+++ FFmpeg/libavfilter/aarch64/Makefile
+--- jellyfin-ffmpeg.orig/libavfilter/aarch64/Makefile
++++ jellyfin-ffmpeg/libavfilter/aarch64/Makefile
 @@ -1,6 +1,7 @@
  OBJS-$(CONFIG_BWDIF_FILTER)                  += aarch64/vf_bwdif_init_aarch64.o
  OBJS-$(CONFIG_COLORDETECT_FILTER)            += aarch64/vf_colordetect_init.o
@@ -91,10 +91,10 @@ Index: FFmpeg/libavfilter/aarch64/Makefile
  
  NEON-OBJS-$(CONFIG_BWDIF_FILTER)             += aarch64/vf_bwdif_neon.o
  NEON-OBJS-$(CONFIG_COLORDETECT_FILTER)       += aarch64/vf_colordetect_neon.o
-Index: FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.c
+Index: jellyfin-ffmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.c
++++ jellyfin-ffmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.c
 @@ -0,0 +1,2360 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
@@ -2456,10 +2456,10 @@ Index: FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.c
 +    }
 +#endif // ENABLE_TONEMAPX_NEON_INTRINSICS
 +}
-Index: FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.h
+Index: jellyfin-ffmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.h
++++ jellyfin-ffmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.h
 @@ -0,0 +1,75 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
@@ -2536,11 +2536,11 @@ Index: FFmpeg/libavfilter/aarch64/vf_tonemapx_intrin_neon.h
 +                                    const struct TonemapIntParams *params);
 +
 +#endif // AVFILTER_AARCH64_TONEMAPX_INTRIN_NEON_H
-Index: FFmpeg/libavfilter/allfilters.c
+Index: jellyfin-ffmpeg/libavfilter/allfilters.c
 ===================================================================
---- FFmpeg.orig/libavfilter/allfilters.c
-+++ FFmpeg/libavfilter/allfilters.c
-@@ -512,6 +512,7 @@ extern const FFFilter ff_vf_tmedian;
+--- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
++++ jellyfin-ffmpeg/libavfilter/allfilters.c
+@@ -514,6 +514,7 @@ extern const FFFilter ff_vf_tmedian;
  extern const FFFilter ff_vf_tmidequalizer;
  extern const FFFilter ff_vf_tmix;
  extern const FFFilter ff_vf_tonemap;
@@ -2548,10 +2548,10 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_tonemap_cuda;
  extern const FFFilter ff_vf_tonemap_opencl;
  extern const FFFilter ff_vf_tonemap_vaapi;
-Index: FFmpeg/libavfilter/colorspace.c
+Index: jellyfin-ffmpeg/libavfilter/colorspace.c
 ===================================================================
---- FFmpeg.orig/libavfilter/colorspace.c
-+++ FFmpeg/libavfilter/colorspace.c
+--- jellyfin-ffmpeg.orig/libavfilter/colorspace.c
++++ jellyfin-ffmpeg/libavfilter/colorspace.c
 @@ -17,6 +17,7 @@
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
   */
@@ -2612,10 +2612,10 @@ Index: FFmpeg/libavfilter/colorspace.c
 +        av_assert2(out[1][2][0] == out[2][0][0]);
 +    }
 +}
-Index: FFmpeg/libavfilter/colorspace.h
+Index: jellyfin-ffmpeg/libavfilter/colorspace.h
 ===================================================================
---- FFmpeg.orig/libavfilter/colorspace.h
-+++ FFmpeg/libavfilter/colorspace.h
+--- jellyfin-ffmpeg.orig/libavfilter/colorspace.h
++++ jellyfin-ffmpeg/libavfilter/colorspace.h
 @@ -110,4 +110,8 @@ float eotf_arib_b67(float x);
  float inverse_eotf_arib_b67(float x);
  float inverse_eotf_bt1886(float x);
@@ -2625,10 +2625,10 @@ Index: FFmpeg/libavfilter/colorspace.h
 +void ff_get_yuv_coeffs(int out[3][3][8], double (*table)[3],
 +                       int depth, int y_rng, int uv_rng, int yuv2rgb);
  #endif
-Index: FFmpeg/libavfilter/vf_tonemapx.c
+Index: jellyfin-ffmpeg/libavfilter/vf_tonemapx.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/vf_tonemapx.c
++++ jellyfin-ffmpeg/libavfilter/vf_tonemapx.c
 @@ -0,0 +1,1948 @@
 +/*
 + * This file is part of FFmpeg.
@@ -4578,10 +4578,10 @@ Index: FFmpeg/libavfilter/vf_tonemapx.c
 +    FILTER_OUTPUTS(ff_video_default_filterpad),
 +    FILTER_QUERY_FUNC(query_formats),
 +};
-Index: FFmpeg/libavfilter/vf_tonemapx.h
+Index: jellyfin-ffmpeg/libavfilter/vf_tonemapx.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/vf_tonemapx.h
++++ jellyfin-ffmpeg/libavfilter/vf_tonemapx.h
 @@ -0,0 +1,144 @@
 +/*
 + * This file is part of FFmpeg.
@@ -4727,10 +4727,10 @@ Index: FFmpeg/libavfilter/vf_tonemapx.h
 +                               const struct TonemapIntParams *params);
 +
 +#endif // AVFILTER_TONEMAPX_H
-Index: FFmpeg/libavfilter/x86/Makefile
+Index: jellyfin-ffmpeg/libavfilter/x86/Makefile
 ===================================================================
---- FFmpeg.orig/libavfilter/x86/Makefile
-+++ FFmpeg/libavfilter/x86/Makefile
+--- jellyfin-ffmpeg.orig/libavfilter/x86/Makefile
++++ jellyfin-ffmpeg/libavfilter/x86/Makefile
 @@ -1,5 +1,7 @@
  OBJS-$(CONFIG_NOISE_FILTER)                  += x86/vf_noise.o
  OBJS-$(CONFIG_SPP_FILTER)                    += x86/vf_spp.o
@@ -4739,10 +4739,10 @@ Index: FFmpeg/libavfilter/x86/Makefile
  
  X86ASM-OBJS-$(CONFIG_SCENE_SAD)              += x86/scene_sad.o x86/scene_sad_init.o
  
-Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.c
+Index: jellyfin-ffmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.c
++++ jellyfin-ffmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.c
 @@ -0,0 +1,2577 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
@@ -7321,10 +7321,10 @@ Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.c
 +    }
 +#endif // ENABLE_TONEMAPX_AVX_INTRINSICS
 +}
-Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.h
+Index: jellyfin-ffmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.h
++++ jellyfin-ffmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.h
 @@ -0,0 +1,75 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
@@ -7401,10 +7401,10 @@ Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_avx.h
 +                                             const struct TonemapIntParams *params);
 +
 +#endif // AVFILTER_X86_TONEMAPX_INTRIN_AVX_H
-Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.c
+Index: jellyfin-ffmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.c
++++ jellyfin-ffmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.c
 @@ -0,0 +1,2740 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
@@ -10146,10 +10146,10 @@ Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.c
 +    }
 +#endif // ENABLE_TONEMAPX_SSE_INTRINSICS
 +}
-Index: FFmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.h
+Index: jellyfin-ffmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.h
++++ jellyfin-ffmpeg/libavfilter/x86/vf_tonemapx_intrin_sse.h
 @@ -0,0 +1,75 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>

@@ -1,7 +1,7 @@
-Index: FFmpeg/libavutil/hwcontext.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext.c
-+++ FFmpeg/libavutil/hwcontext.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext.c
++++ jellyfin-ffmpeg/libavutil/hwcontext.c
 @@ -92,21 +92,6 @@ static const char *const hw_type_names[]
      [AV_HWDEVICE_TYPE_OHCODEC] = "ohcodec",
  };
@@ -99,10 +99,10 @@ Index: FFmpeg/libavutil/hwcontext.c
                  ret = av_hwdevice_ctx_init(dst_ref);
                  if (ret < 0)
                      goto fail;
-Index: FFmpeg/libavutil/hwcontext.h
+Index: jellyfin-ffmpeg/libavutil/hwcontext.h
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext.h
-+++ FFmpeg/libavutil/hwcontext.h
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext.h
++++ jellyfin-ffmpeg/libavutil/hwcontext.h
 @@ -41,6 +41,7 @@ enum AVHWDeviceType {
      AV_HWDEVICE_TYPE_AMF,
      /* OpenHarmony Codec device */
@@ -111,10 +111,10 @@ Index: FFmpeg/libavutil/hwcontext.h
  };
  
  /**
-Index: FFmpeg/libavutil/hwcontext_internal.h
+Index: jellyfin-ffmpeg/libavutil/hwcontext_internal.h
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_internal.h
-+++ FFmpeg/libavutil/hwcontext_internal.h
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_internal.h
++++ jellyfin-ffmpeg/libavutil/hwcontext_internal.h
 @@ -166,4 +166,25 @@ extern const HWContextType ff_hwcontext_
  extern const HWContextType ff_hwcontext_type_amf;
  extern const HWContextType ff_hwcontext_type_oh;
@@ -141,10 +141,10 @@ Index: FFmpeg/libavutil/hwcontext_internal.h
 +} FFHWDeviceContext;
 +
  #endif /* AVUTIL_HWCONTEXT_INTERNAL_H */
-Index: FFmpeg/libavutil/hwcontext_qsv.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_qsv.c
-+++ FFmpeg/libavutil/hwcontext_qsv.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_qsv.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 @@ -379,7 +379,7 @@ static void qsv_frames_uninit(AVHWFrames
      av_buffer_unref(&s->child_frames_ref);
  }

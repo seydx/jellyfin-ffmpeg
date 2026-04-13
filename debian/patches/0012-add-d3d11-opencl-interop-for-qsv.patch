@@ -1,7 +1,7 @@
-Index: FFmpeg/libavutil/hwcontext_opencl.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_opencl.c
-+++ FFmpeg/libavutil/hwcontext_opencl.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_opencl.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
 @@ -62,6 +62,9 @@
  #endif
  

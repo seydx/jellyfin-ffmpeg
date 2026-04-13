@@ -1,7 +1,7 @@
-Index: FFmpeg/libavfilter/qsvvpp.c
+Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
 ===================================================================
---- FFmpeg.orig/libavfilter/qsvvpp.c
-+++ FFmpeg/libavfilter/qsvvpp.c
+--- jellyfin-ffmpeg.orig/libavfilter/qsvvpp.c
++++ jellyfin-ffmpeg/libavfilter/qsvvpp.c
 @@ -70,6 +70,36 @@ static const struct {
  #endif
  };
@@ -39,10 +39,10 @@ Index: FFmpeg/libavfilter/qsvvpp.c
  int ff_qsvvpp_print_iopattern(void *log_ctx, int mfx_iopattern,
                                const char *extra_string)
  {
-Index: FFmpeg/libavfilter/vf_hwupload.c
+Index: jellyfin-ffmpeg/libavfilter/vf_hwupload.c
 ===================================================================
---- FFmpeg.orig/libavfilter/vf_hwupload.c
-+++ FFmpeg/libavfilter/vf_hwupload.c
+--- jellyfin-ffmpeg.orig/libavfilter/vf_hwupload.c
++++ jellyfin-ffmpeg/libavfilter/vf_hwupload.c
 @@ -32,6 +32,10 @@
  #include "formats.h"
  #include "video.h"

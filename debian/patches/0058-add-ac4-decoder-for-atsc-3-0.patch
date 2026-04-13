@@ -1,8 +1,8 @@
-Index: FFmpeg/libavcodec/Makefile
+Index: jellyfin-ffmpeg/libavcodec/Makefile
 ===================================================================
---- FFmpeg.orig/libavcodec/Makefile
-+++ FFmpeg/libavcodec/Makefile
-@@ -218,6 +218,7 @@ OBJS-$(CONFIG_AC3_ENCODER)             +
+--- jellyfin-ffmpeg.orig/libavcodec/Makefile
++++ jellyfin-ffmpeg/libavcodec/Makefile
+@@ -219,6 +219,7 @@ OBJS-$(CONFIG_AC3_ENCODER)             +
                                            ac3.o kbdwin.o
  OBJS-$(CONFIG_AC3_FIXED_ENCODER)       += ac3enc_fixed.o ac3enc.o ac3tab.o ac3.o kbdwin.o
  OBJS-$(CONFIG_AC3_MF_ENCODER)          += mfenc.o mf_utils.o
@@ -10,10 +10,10 @@ Index: FFmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_ACELP_KELVIN_DECODER)    += g729dec.o lsp.o celp_filters.o acelp_filters.o acelp_pitch_delay.o acelp_vectors.o g729postfilter.o
  OBJS-$(CONFIG_AGM_DECODER)             += agm.o jpegquanttables.o
  OBJS-$(CONFIG_AHX_DECODER)             += mpegaudiodec_float.o
-Index: FFmpeg/libavcodec/ac4dec.c
+Index: jellyfin-ffmpeg/libavcodec/ac4dec.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavcodec/ac4dec.c
++++ jellyfin-ffmpeg/libavcodec/ac4dec.c
 @@ -0,0 +1,5925 @@
 +/*
 + * AC-4 Audio Decoder
@@ -5940,10 +5940,10 @@ Index: FFmpeg/libavcodec/ac4dec.c
 +    .p.sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_FLTP,
 +                                                        AV_SAMPLE_FMT_NONE },
 +};
-Index: FFmpeg/libavcodec/ac4dec_data.h
+Index: jellyfin-ffmpeg/libavcodec/ac4dec_data.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavcodec/ac4dec_data.h
++++ jellyfin-ffmpeg/libavcodec/ac4dec_data.h
 @@ -0,0 +1,1664 @@
 +/*
 + * AC-4 Audio Decoder
@@ -7609,11 +7609,11 @@ Index: FFmpeg/libavcodec/ac4dec_data.h
 +};
 +
 +#endif /* AVCODEC_AC4DEC_DATA_H */
-Index: FFmpeg/libavcodec/allcodecs.c
+Index: jellyfin-ffmpeg/libavcodec/allcodecs.c
 ===================================================================
---- FFmpeg.orig/libavcodec/allcodecs.c
-+++ FFmpeg/libavcodec/allcodecs.c
-@@ -439,6 +439,7 @@ extern const FFCodec ff_ac3_encoder;
+--- jellyfin-ffmpeg.orig/libavcodec/allcodecs.c
++++ jellyfin-ffmpeg/libavcodec/allcodecs.c
+@@ -443,6 +443,7 @@ extern const FFCodec ff_ac3_encoder;
  extern const FFCodec ff_ac3_decoder;
  extern const FFCodec ff_ac3_fixed_encoder;
  extern const FFCodec ff_ac3_fixed_decoder;
@@ -7621,10 +7621,10 @@ Index: FFmpeg/libavcodec/allcodecs.c
  extern const FFCodec ff_acelp_kelvin_decoder;
  extern const FFCodec ff_ahx_decoder;
  extern const FFCodec ff_alac_encoder;
-Index: FFmpeg/libavcodec/kbdwin.h
+Index: jellyfin-ffmpeg/libavcodec/kbdwin.h
 ===================================================================
---- FFmpeg.orig/libavcodec/kbdwin.h
-+++ FFmpeg/libavcodec/kbdwin.h
+--- jellyfin-ffmpeg.orig/libavcodec/kbdwin.h
++++ jellyfin-ffmpeg/libavcodec/kbdwin.h
 @@ -24,7 +24,7 @@
  /**
   * Maximum window size for ff_kbd_window_init.
@@ -7634,10 +7634,10 @@ Index: FFmpeg/libavcodec/kbdwin.h
  
  /**
   * Generate a Kaiser-Bessel Derived Window.
-Index: FFmpeg/libavcodec/utils.c
+Index: jellyfin-ffmpeg/libavcodec/utils.c
 ===================================================================
---- FFmpeg.orig/libavcodec/utils.c
-+++ FFmpeg/libavcodec/utils.c
+--- jellyfin-ffmpeg.orig/libavcodec/utils.c
++++ jellyfin-ffmpeg/libavcodec/utils.c
 @@ -602,7 +602,8 @@ static int get_audio_frame_duration(enum
      case AV_CODEC_ID_ATRAC3P:      return 2048;
      case AV_CODEC_ID_MP2:
@@ -7648,10 +7648,10 @@ Index: FFmpeg/libavcodec/utils.c
      case AV_CODEC_ID_FTR:          return 1024;
      }
  
-Index: FFmpeg/libavformat/isom_tags.c
+Index: jellyfin-ffmpeg/libavformat/isom_tags.c
 ===================================================================
---- FFmpeg.orig/libavformat/isom_tags.c
-+++ FFmpeg/libavformat/isom_tags.c
+--- jellyfin-ffmpeg.orig/libavformat/isom_tags.c
++++ jellyfin-ffmpeg/libavformat/isom_tags.c
 @@ -323,6 +323,7 @@ const AVCodecTag ff_codec_movaudio_tags[
      { AV_CODEC_ID_DTS,             MKTAG('d', 't', 's', 'e') }, /* DTS Express */
      { AV_CODEC_ID_DTS,             MKTAG('D', 'T', 'S', ' ') }, /* non-standard */

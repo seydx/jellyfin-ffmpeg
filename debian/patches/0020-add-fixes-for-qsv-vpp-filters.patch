@@ -1,7 +1,7 @@
-Index: FFmpeg/libavfilter/qsvvpp.c
+Index: jellyfin-ffmpeg/libavfilter/qsvvpp.c
 ===================================================================
---- FFmpeg.orig/libavfilter/qsvvpp.c
-+++ FFmpeg/libavfilter/qsvvpp.c
+--- jellyfin-ffmpeg.orig/libavfilter/qsvvpp.c
++++ jellyfin-ffmpeg/libavfilter/qsvvpp.c
 @@ -168,7 +168,7 @@ int ff_qsvvpp_print_warning(void *log_ct
      const char *desc;
      int ret;
@@ -49,10 +49,10 @@ Index: FFmpeg/libavfilter/qsvvpp.c
          else if (ret > 0)
              ff_qsvvpp_print_warning(avctx, ret, "Warning When querying VPP params");
  
-Index: FFmpeg/libavfilter/vf_overlay_qsv.c
+Index: jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
 ===================================================================
---- FFmpeg.orig/libavfilter/vf_overlay_qsv.c
-+++ FFmpeg/libavfilter/vf_overlay_qsv.c
+--- jellyfin-ffmpeg.orig/libavfilter/vf_overlay_qsv.c
++++ jellyfin-ffmpeg/libavfilter/vf_overlay_qsv.c
 @@ -227,43 +227,47 @@ static int config_overlay_input(AVFilter
  
  static int process_frame(FFFrameSync *fs)
@@ -166,10 +166,10 @@ Index: FFmpeg/libavfilter/vf_overlay_qsv.c
          AV_PIX_FMT_QSV,
          AV_PIX_FMT_NONE
      };
-Index: FFmpeg/libavfilter/vf_vpp_qsv.c
+Index: jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
 ===================================================================
---- FFmpeg.orig/libavfilter/vf_vpp_qsv.c
-+++ FFmpeg/libavfilter/vf_vpp_qsv.c
+--- jellyfin-ffmpeg.orig/libavfilter/vf_vpp_qsv.c
++++ jellyfin-ffmpeg/libavfilter/vf_vpp_qsv.c
 @@ -388,6 +388,30 @@ static mfxStatus get_mfx_version(const A
      return MFXQueryVersion(device_hwctx->session, mfx_version);
  }
@@ -331,10 +331,10 @@ Index: FFmpeg/libavfilter/vf_vpp_qsv.c
      { NULL },
  };
  
-Index: FFmpeg/libavutil/hwcontext_qsv.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_qsv.c
-+++ FFmpeg/libavutil/hwcontext_qsv.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_qsv.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_qsv.c
 @@ -1706,13 +1706,47 @@ static int qsv_transfer_data_child(AVHWF
      dummy->width         = src->width;
      dummy->height        = src->height;

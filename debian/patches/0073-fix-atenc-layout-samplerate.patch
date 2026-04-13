@@ -1,7 +1,7 @@
-Index: FFmpeg/libavcodec/audiotoolboxenc.c
+Index: jellyfin-ffmpeg/libavcodec/audiotoolboxenc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/audiotoolboxenc.c
-+++ FFmpeg/libavcodec/audiotoolboxenc.c
+--- jellyfin-ffmpeg.orig/libavcodec/audiotoolboxenc.c
++++ jellyfin-ffmpeg/libavcodec/audiotoolboxenc.c
 @@ -236,8 +236,8 @@ static int get_aac_tag(const AVChannelLa
          { AV_CHANNEL_LAYOUT_6POINT0,           kAudioChannelLayoutTag_AAC_6_0 },
          { AV_CHANNEL_LAYOUT_6POINT1,           kAudioChannelLayoutTag_AAC_6_1 },

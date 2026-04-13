@@ -1,7 +1,7 @@
-Index: FFmpeg/libavutil/hwcontext_vaapi.c
+Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
 ===================================================================
---- FFmpeg.orig/libavutil/hwcontext_vaapi.c
-+++ FFmpeg/libavutil/hwcontext_vaapi.c
+--- jellyfin-ffmpeg.orig/libavutil/hwcontext_vaapi.c
++++ jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
 @@ -33,6 +33,9 @@ typedef HRESULT (WINAPI *PFN_CREATE_DXGI
  #if HAVE_VAAPI_DRM
  #   include <va/va_drm.h>

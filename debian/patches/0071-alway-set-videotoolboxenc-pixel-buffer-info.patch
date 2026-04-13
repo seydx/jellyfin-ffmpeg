@@ -1,7 +1,7 @@
-Index: FFmpeg/libavcodec/videotoolboxenc.c
+Index: jellyfin-ffmpeg/libavcodec/videotoolboxenc.c
 ===================================================================
---- FFmpeg.orig/libavcodec/videotoolboxenc.c
-+++ FFmpeg/libavcodec/videotoolboxenc.c
+--- jellyfin-ffmpeg.orig/libavcodec/videotoolboxenc.c
++++ jellyfin-ffmpeg/libavcodec/videotoolboxenc.c
 @@ -1050,9 +1050,10 @@ static int create_cv_pixel_buffer_info(A
      CFNumberRef width_num = NULL;
      CFNumberRef height_num = NULL;

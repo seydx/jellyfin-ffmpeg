@@ -1,8 +1,8 @@
-Index: FFmpeg/configure
+Index: jellyfin-ffmpeg/configure
 ===================================================================
---- FFmpeg.orig/configure
-+++ FFmpeg/configure
-@@ -3473,6 +3473,8 @@ scale_cuda_filter_deps="ffnvcodec"
+--- jellyfin-ffmpeg.orig/configure
++++ jellyfin-ffmpeg/configure
+@@ -3576,6 +3576,8 @@ scale_cuda_filter_deps="ffnvcodec"
  scale_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  thumbnail_cuda_filter_deps="ffnvcodec"
  thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
@@ -11,7 +11,7 @@ Index: FFmpeg/configure
  transpose_npp_filter_deps="ffnvcodec libnpp"
  overlay_cuda_filter_deps="ffnvcodec"
  overlay_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
-@@ -4920,8 +4922,10 @@ if enabled cuda_nvcc; then
+@@ -5040,8 +5042,10 @@ if enabled cuda_nvcc; then
      nvcc_default="nvcc"
      nvccflags_default="-gencode arch=compute_30,code=sm_30 -O2"
  else
@@ -23,7 +23,7 @@ Index: FFmpeg/configure
      NVCC_C=""
  fi
  
-@@ -4934,6 +4938,11 @@ if enabled cuda_nvcc; then
+@@ -5054,6 +5058,11 @@ if enabled cuda_nvcc; then
      if $nvcc $nvccflags_default 2>&1 | grep -qi unsupported; then
          nvccflags_default="-gencode arch=compute_75,code=sm_75 -O2"
      fi
@@ -35,7 +35,7 @@ Index: FFmpeg/configure
  fi
  
  set_default arch cc cxx doxygen pkg_config ranlib strip sysinclude \
-@@ -7061,7 +7070,7 @@ fi
+@@ -7183,7 +7192,7 @@ fi
  if enabled cuda_nvcc; then
      nvccflags="$nvccflags -ptx"
  else
@@ -44,11 +44,11 @@ Index: FFmpeg/configure
      check_nvcc cuda_llvm
  fi
  
-Index: FFmpeg/ffbuild/common.mak
+Index: jellyfin-ffmpeg/ffbuild/common.mak
 ===================================================================
---- FFmpeg.orig/ffbuild/common.mak
-+++ FFmpeg/ffbuild/common.mak
-@@ -53,6 +53,7 @@ ASFLAGS    := $(CPPFLAGS) $(ASFLAGS)
+--- jellyfin-ffmpeg.orig/ffbuild/common.mak
++++ jellyfin-ffmpeg/ffbuild/common.mak
+@@ -45,6 +45,7 @@ ASFLAGS    := $(CPPFLAGS) $(ASFLAGS)
  # end up in CXXFLAGS.
  $(call PREPEND,CXXFLAGS, CPPFLAGS)
  X86ASMFLAGS += $(IFLAGS:%=%/) -I$(<D)/ -Pconfig.asm
@@ -56,11 +56,11 @@ Index: FFmpeg/ffbuild/common.mak
  
  HOSTCCFLAGS = $(IFLAGS) $(HOSTCPPFLAGS) $(HOSTCFLAGS)
  LDFLAGS    := $(ALLFFLIBS:%=$(LD_PATH)lib%) $(LDFLAGS)
-Index: FFmpeg/libavfilter/Makefile
+Index: jellyfin-ffmpeg/libavfilter/Makefile
 ===================================================================
---- FFmpeg.orig/libavfilter/Makefile
-+++ FFmpeg/libavfilter/Makefile
-@@ -539,6 +539,8 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
+--- jellyfin-ffmpeg.orig/libavfilter/Makefile
++++ jellyfin-ffmpeg/libavfilter/Makefile
+@@ -541,6 +541,8 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
  OBJS-$(CONFIG_TMIDEQUALIZER_FILTER)          += vf_tmidequalizer.o
  OBJS-$(CONFIG_TMIX_FILTER)                   += vf_mix.o framesync.o
  OBJS-$(CONFIG_TONEMAP_FILTER)                += vf_tonemap.o
@@ -69,11 +69,11 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o opencl.o \
                                                  opencl/tonemap.o opencl/colorspace_common.o
  OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
-Index: FFmpeg/libavfilter/allfilters.c
+Index: jellyfin-ffmpeg/libavfilter/allfilters.c
 ===================================================================
---- FFmpeg.orig/libavfilter/allfilters.c
-+++ FFmpeg/libavfilter/allfilters.c
-@@ -507,6 +507,7 @@ extern const FFFilter ff_vf_tmedian;
+--- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
++++ jellyfin-ffmpeg/libavfilter/allfilters.c
+@@ -509,6 +509,7 @@ extern const FFFilter ff_vf_tmedian;
  extern const FFFilter ff_vf_tmidequalizer;
  extern const FFFilter ff_vf_tmix;
  extern const FFFilter ff_vf_tonemap;
@@ -81,10 +81,10 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_tonemap_opencl;
  extern const FFFilter ff_vf_tonemap_vaapi;
  extern const FFFilter ff_vf_tpad;
-Index: FFmpeg/libavfilter/colorspace.c
+Index: jellyfin-ffmpeg/libavfilter/colorspace.c
 ===================================================================
---- FFmpeg.orig/libavfilter/colorspace.c
-+++ FFmpeg/libavfilter/colorspace.c
+--- jellyfin-ffmpeg.orig/libavfilter/colorspace.c
++++ jellyfin-ffmpeg/libavfilter/colorspace.c
 @@ -51,6 +51,18 @@ void ff_matrix_invert_3x3(const double i
      }
  }
@@ -264,10 +264,10 @@ Index: FFmpeg/libavfilter/colorspace.c
 +float inverse_eotf_bt1886(float x) {
 +    return x > 0.0f ? powf(x, 1.0f / 2.4f) : 0.0f;
 +}
-Index: FFmpeg/libavfilter/colorspace.h
+Index: jellyfin-ffmpeg/libavfilter/colorspace.h
 ===================================================================
---- FFmpeg.orig/libavfilter/colorspace.h
-+++ FFmpeg/libavfilter/colorspace.h
+--- jellyfin-ffmpeg.orig/libavfilter/colorspace.h
++++ jellyfin-ffmpeg/libavfilter/colorspace.h
 @@ -23,10 +23,67 @@
  #include "libavutil/csp.h"
  #include "libavutil/frame.h"
@@ -356,10 +356,10 @@ Index: FFmpeg/libavfilter/colorspace.h
 +float inverse_eotf_bt1886(float x);
 +
  #endif
-Index: FFmpeg/libavfilter/cuda/colorspace_common.h
+Index: jellyfin-ffmpeg/libavfilter/cuda/colorspace_common.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/cuda/colorspace_common.h
++++ jellyfin-ffmpeg/libavfilter/cuda/colorspace_common.h
 @@ -0,0 +1,341 @@
 +/*
 + * This file is part of FFmpeg.
@@ -702,10 +702,10 @@ Index: FFmpeg/libavfilter/cuda/colorspace_common.h
 +}
 +
 +#endif /* AVFILTER_CUDA_COLORSPACE_COMMON_H */
-Index: FFmpeg/libavfilter/cuda/host_util.c
+Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/cuda/host_util.c
++++ jellyfin-ffmpeg/libavfilter/cuda/host_util.c
 @@ -0,0 +1,77 @@
 +/*
 + * This file is part of FFmpeg.
@@ -784,10 +784,10 @@ Index: FFmpeg/libavfilter/cuda/host_util.c
 +
 +    return ret;
 +}
-Index: FFmpeg/libavfilter/cuda/host_util.h
+Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/cuda/host_util.h
++++ jellyfin-ffmpeg/libavfilter/cuda/host_util.h
 @@ -0,0 +1,30 @@
 +/*
 + * This file is part of FFmpeg.
@@ -819,10 +819,10 @@ Index: FFmpeg/libavfilter/cuda/host_util.h
 +                       FFCUDAFrame *dst, const AVFrame *src, const AVPixFmtDescriptor *src_desc);
 +
 +#endif /* AVFILTER_CUDA_HOST_UTIL_H */
-Index: FFmpeg/libavfilter/cuda/load_helper.c
+Index: jellyfin-ffmpeg/libavfilter/cuda/load_helper.c
 ===================================================================
---- FFmpeg.orig/libavfilter/cuda/load_helper.c
-+++ FFmpeg/libavfilter/cuda/load_helper.c
+--- jellyfin-ffmpeg.orig/libavfilter/cuda/load_helper.c
++++ jellyfin-ffmpeg/libavfilter/cuda/load_helper.c
 @@ -51,3 +51,29 @@ int ff_cuda_load_module(void *avctx, AVC
      return CHECK_CU(cu->cuModuleLoadData(cu_module, data));
  #endif
@@ -853,10 +853,10 @@ Index: FFmpeg/libavfilter/cuda/load_helper.c
 +                                     name, 0, NULL, NULL));
 +#endif
 +}
-Index: FFmpeg/libavfilter/cuda/load_helper.h
+Index: jellyfin-ffmpeg/libavfilter/cuda/load_helper.h
 ===================================================================
---- FFmpeg.orig/libavfilter/cuda/load_helper.h
-+++ FFmpeg/libavfilter/cuda/load_helper.h
+--- jellyfin-ffmpeg.orig/libavfilter/cuda/load_helper.h
++++ jellyfin-ffmpeg/libavfilter/cuda/load_helper.h
 @@ -25,4 +25,11 @@
  int ff_cuda_load_module(void *avctx, AVCUDADeviceContext *hwctx, CUmodule *cu_module,
                          const unsigned char *data, const unsigned int length);
@@ -869,10 +869,10 @@ Index: FFmpeg/libavfilter/cuda/load_helper.h
 +                          const unsigned char *data, const unsigned int length);
 +
  #endif /* AVFILTER_CUDA_LOAD_HELPER_H */
-Index: FFmpeg/libavfilter/cuda/pixfmt.h
+Index: jellyfin-ffmpeg/libavfilter/cuda/pixfmt.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/cuda/pixfmt.h
++++ jellyfin-ffmpeg/libavfilter/cuda/pixfmt.h
 @@ -0,0 +1,225 @@
 +/*
 + * This file is part of FFmpeg.
@@ -1099,10 +1099,10 @@ Index: FFmpeg/libavfilter/cuda/pixfmt.h
 +}
 +
 +#endif /* AVFILTER_CUDA_PIXFMT_H */
-Index: FFmpeg/libavfilter/cuda/shared.h
+Index: jellyfin-ffmpeg/libavfilter/cuda/shared.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/cuda/shared.h
++++ jellyfin-ffmpeg/libavfilter/cuda/shared.h
 @@ -0,0 +1,33 @@
 +/*
 + * This file is part of FFmpeg.
@@ -1137,10 +1137,10 @@ Index: FFmpeg/libavfilter/cuda/shared.h
 +} FFCUDAFrame;
 +
 +#endif /* AVFILTER_CUDA_SHARED_H */
-Index: FFmpeg/libavfilter/cuda/tonemap.cu
+Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/cuda/tonemap.cu
++++ jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
 @@ -0,0 +1,661 @@
 +/*
 + * This file is part of FFmpeg.
@@ -1803,10 +1803,10 @@ Index: FFmpeg/libavfilter/cuda/tonemap.cu
 +TONEMAP_LUT_VARIANT(_dovi, _READER, _RESHAPE, _LUT3D, _WRITER)
 +
 +}
-Index: FFmpeg/libavfilter/cuda/tonemap.h
+Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/cuda/tonemap.h
++++ jellyfin-ffmpeg/libavfilter/cuda/tonemap.h
 @@ -0,0 +1,43 @@
 +/*
 + * This file is part of FFmpeg.
@@ -1851,10 +1851,10 @@ Index: FFmpeg/libavfilter/cuda/tonemap.h
 +};
 +
 +#endif /* AVFILTER_CUDA_TONEMAP_H */
-Index: FFmpeg/libavfilter/cuda/util.h
+Index: jellyfin-ffmpeg/libavfilter/cuda/util.h
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/cuda/util.h
++++ jellyfin-ffmpeg/libavfilter/cuda/util.h
 @@ -0,0 +1,102 @@
 +/*
 + * This file is part of FFmpeg.
@@ -1958,10 +1958,10 @@ Index: FFmpeg/libavfilter/cuda/util.h
 +}
 +
 +#endif /* AVFILTER_CUDA_UTIL_H */
-Index: FFmpeg/libavfilter/vf_tonemap_cuda.c
+Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/vf_tonemap_cuda.c
++++ jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
 @@ -0,0 +1,1273 @@
 +/*
 + * This file is part of FFmpeg.

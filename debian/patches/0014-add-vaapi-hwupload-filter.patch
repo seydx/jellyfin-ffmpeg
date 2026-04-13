@@ -1,8 +1,8 @@
-Index: FFmpeg/configure
+Index: jellyfin-ffmpeg/configure
 ===================================================================
---- FFmpeg.orig/configure
-+++ FFmpeg/configure
-@@ -4092,6 +4092,7 @@ gblur_vulkan_filter_deps="vulkan spirv_l
+--- jellyfin-ffmpeg.orig/configure
++++ jellyfin-ffmpeg/configure
+@@ -4198,6 +4198,7 @@ gblur_vulkan_filter_deps="vulkan spirv_l
  hflip_vulkan_filter_deps="vulkan spirv_library"
  histeq_filter_deps="gpl"
  hqdn3d_filter_deps="gpl"
@@ -10,11 +10,11 @@ Index: FFmpeg/configure
  iccdetect_filter_deps="lcms2"
  iccgen_filter_deps="lcms2"
  identity_filter_select="scene_sad"
-Index: FFmpeg/libavfilter/Makefile
+Index: jellyfin-ffmpeg/libavfilter/Makefile
 ===================================================================
---- FFmpeg.orig/libavfilter/Makefile
-+++ FFmpeg/libavfilter/Makefile
-@@ -354,6 +354,7 @@ OBJS-$(CONFIG_HUESATURATION_FILTER)
+--- jellyfin-ffmpeg.orig/libavfilter/Makefile
++++ jellyfin-ffmpeg/libavfilter/Makefile
+@@ -355,6 +355,7 @@ OBJS-$(CONFIG_HUESATURATION_FILTER)
  OBJS-$(CONFIG_HWDOWNLOAD_FILTER)             += vf_hwdownload.o
  OBJS-$(CONFIG_HWMAP_FILTER)                  += vf_hwmap.o
  OBJS-$(CONFIG_HWUPLOAD_CUDA_FILTER)          += vf_hwupload_cuda.o
@@ -22,11 +22,11 @@ Index: FFmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_HWUPLOAD_FILTER)               += vf_hwupload.o
  OBJS-$(CONFIG_HYSTERESIS_FILTER)             += vf_hysteresis.o framesync.o
  OBJS-$(CONFIG_ICCDETECT_FILTER)              += vf_iccdetect.o fflcms2.o
-Index: FFmpeg/libavfilter/allfilters.c
+Index: jellyfin-ffmpeg/libavfilter/allfilters.c
 ===================================================================
---- FFmpeg.orig/libavfilter/allfilters.c
-+++ FFmpeg/libavfilter/allfilters.c
-@@ -329,6 +329,7 @@ extern const FFFilter ff_vf_hwdownload;
+--- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
++++ jellyfin-ffmpeg/libavfilter/allfilters.c
+@@ -330,6 +330,7 @@ extern const FFFilter ff_vf_hwdownload;
  extern const FFFilter ff_vf_hwmap;
  extern const FFFilter ff_vf_hwupload;
  extern const FFFilter ff_vf_hwupload_cuda;
@@ -34,10 +34,10 @@ Index: FFmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_hysteresis;
  extern const FFFilter ff_vf_iccdetect;
  extern const FFFilter ff_vf_iccgen;
-Index: FFmpeg/libavfilter/vf_hwupload_vaapi.c
+Index: jellyfin-ffmpeg/libavfilter/vf_hwupload_vaapi.c
 ===================================================================
 --- /dev/null
-+++ FFmpeg/libavfilter/vf_hwupload_vaapi.c
++++ jellyfin-ffmpeg/libavfilter/vf_hwupload_vaapi.c
 @@ -0,0 +1,191 @@
 +/*
 + * This file is part of FFmpeg.
