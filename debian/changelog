@@ -1,3 +1,7 @@
+jellyfin-ffmpeg (8.1.0) unstable; urgency=medium
+
+  * New upstream version 8.1
+
 jellyfin-ffmpeg (8.0.0-1) unstable; urgency=medium
 
   * New upstream version 8.0
