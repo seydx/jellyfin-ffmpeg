@@ -7,8 +7,8 @@ concurrency:
 on:
   push:
     branches:
-      - jellyfin
       - ffmpeg-master
+      - ffmpeg-upstream
     paths-ignore:
       - '**/*.md'
 
