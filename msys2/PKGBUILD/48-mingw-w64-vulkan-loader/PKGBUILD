@@ -16,7 +16,7 @@ makedepends=(
     "${MINGW_PACKAGE_PREFIX}-cc"
     "git"
 )
-_commit="9657ca8e395ef16c79b57c8bd3f4c1aebb319137"
+_commit="65b3936528cd92eb4ea3de485d03f858a3850484"
 source=("${_realname}::git+https://github.com/BtbN/Vulkan-Shim-Loader.git#commit=${_commit}")
 sha256sums=('SKIP')
 

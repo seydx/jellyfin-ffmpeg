@@ -3,7 +3,7 @@
 _realname=shaderc
 pkgbase=mingw-w64-jellyfin-${_realname}
 pkgname=${MINGW_PACKAGE_PREFIX}-jellyfin-${_realname}
-pkgver=2025.0.0
+pkgver=2026.1
 pkgrel=1
 pkgdesc='Collection of tools, libraries and tests for shader compilation (mingw-w64)'
 arch=('any')
@@ -20,7 +20,7 @@ makedepends=(
 depends=(
     "${MINGW_PACKAGE_PREFIX}-jellyfin-vulkan-headers"
 )
-_commit="73743588fe9c39f2f1c780a087d94afac691a189"
+_commit="301b4ede53d59b68bf55f95bb26412d9233c8187"
 source=("${_realname}::git+https://github.com/google/shaderc.git#commit=${_commit}")
 sha256sums=('SKIP')
 

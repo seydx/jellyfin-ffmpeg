@@ -28,8 +28,8 @@ done
 cd "$BUILDER_ROOT"
 cd ..
 if [[ -f "debian/patches/series" ]]; then
-    ln -s debian/patches patches
-    quilt push -a
+    ln -sf debian/patches patches
+    quilt push -a || true
 fi
 
 PKG_CONFIG_PATH=/clang64/ffbuild/lib/pkgconfig ./configure --cc=clang --cxx=clang++ \
@@ -63,6 +63,7 @@ PKG_CONFIG_PATH=/clang64/ffbuild/lib/pkgconfig ./configure --cc=clang --cxx=clan
     --enable-libtheora \
     --enable-libvorbis \
     --enable-libopenmpt \
+    --enable-libjxl \
     --enable-libwebp \
     --enable-libvpx \
     --enable-libzimg \

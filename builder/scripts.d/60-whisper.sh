@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://github.com/ggml-org/whisper.cpp.git"
-SCRIPT_COMMIT="d9b7613b34a343848af572cc14467fc5e82fc788"
+SCRIPT_COMMIT="2eeeba56e9edd762b4b38467bab96c2517163158"
 
 ffbuild_enabled() {
     [[ $TARGET != *32 ]] || return -1
