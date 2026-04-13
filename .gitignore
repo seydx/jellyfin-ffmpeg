@@ -15,6 +15,7 @@
 *.h.c
 *.ilk
 *.lib
+*.DS_Store
 *.pc
 *.pdb
 *.so
