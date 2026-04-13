@@ -87,6 +87,8 @@ struct representation {
     char *id;
     char *lang;
     int bandwidth;
+    char *dependencyid;
+    char *codecs;
     AVRational framerate;
     AVStream *assoc_stream; /* demuxer stream associated with this representation */
 
@@ -154,6 +156,7 @@ typedef struct DASHContext {
     AVDictionary *avio_opts;
     int max_url_size;
     char *cenc_decryption_key;
+    char *cenc_decryption_keys;
 
     /* Flags for init section*/
     int is_init_section_common_video;
@@ -364,6 +367,8 @@ static void free_representation(struct representation *pls)
 
     av_freep(&pls->url_template);
     av_freep(&pls->lang);
+    av_freep(&pls->dependencyid);
+    av_freep(&pls->codecs);
     av_freep(&pls->id);
     av_freep(&pls);
 }
@@ -907,6 +912,8 @@ static int parse_manifest_representation(AVFormatContext *s, const char *url,
     xmlNodePtr baseurl_nodes[4];
     xmlNodePtr representation_node = node;
     char *rep_bandwidth_val;
+    char *rep_codecs_val;
+    char *rep_dependencyid_val;
     enum AVMediaType type = AVMEDIA_TYPE_UNKNOWN;
 
     // try get information from representation
@@ -941,6 +948,10 @@ static int parse_manifest_representation(AVFormatContext *s, const char *url,
     representation_baseurl_node = find_child_node_by_name(representation_node, "BaseURL");
     representation_segmentlist_node = find_child_node_by_name(representation_node, "SegmentList");
     rep_bandwidth_val = xmlGetProp(representation_node, "bandwidth");
+    rep_dependencyid_val = xmlGetProp(representation_node, "dependencyId");
+    rep_codecs_val = xmlGetProp(representation_node, "codecs");
+    if (!rep_codecs_val)
+        rep_codecs_val = xmlGetProp(adaptionset_node, "codecs");
     val               = xmlGetProp(representation_node, "id");
     if (val) {
         rep->id = av_strdup(val);
@@ -1093,6 +1104,20 @@ static int parse_manifest_representation(AVFormatContext *s, const char *url,
     if (rep->fragment_duration > 0 && !rep->fragment_timescale)
         rep->fragment_timescale = 1;
     rep->bandwidth = rep_bandwidth_val ? atoi(rep_bandwidth_val) : 0;
+    if (rep_dependencyid_val) {
+        rep->dependencyid = av_strdup(rep_dependencyid_val);
+        if (!rep->dependencyid) {
+            xmlFree(rep_dependencyid_val);
+            goto enomem;
+        }
+    }
+    if (rep_codecs_val) {
+        rep->codecs = av_strdup(rep_codecs_val);
+        if (!rep->codecs) {
+            xmlFree(rep_codecs_val);
+            goto enomem;
+        }
+    }
     rep->framerate = av_make_q(0, 0);
     if (type == AVMEDIA_TYPE_VIDEO) {
         char *rep_framerate_val = xmlGetProp(representation_node, "frameRate");
@@ -1121,6 +1146,10 @@ static int parse_manifest_representation(AVFormatContext *s, const char *url,
 end:
     if (rep_bandwidth_val)
         xmlFree(rep_bandwidth_val);
+    if (rep_dependencyid_val)
+        xmlFree(rep_dependencyid_val);
+    if (rep_codecs_val)
+        xmlFree(rep_codecs_val);
 
     return ret;
 enomem:
@@ -1933,6 +1962,8 @@ static int reopen_demux_for_component(AVFormatContext *s, struct representation 
 
     if (c->cenc_decryption_key)
         av_dict_set(&in_fmt_opts, "decryption_key", c->cenc_decryption_key, 0);
+    if (c->cenc_decryption_keys)
+        av_dict_set(&in_fmt_opts, "decryption_keys", c->cenc_decryption_keys, 0);
 
     // provide additional information from mpd if available
     ret = avformat_open_input(&pls->ctx, "", in_fmt, &in_fmt_opts); //pls->init_section->url
@@ -2048,7 +2079,7 @@ static int dash_read_header(AVFormatContext *s)
     AVProgram *program;
     int ret = 0;
     int stream_index = 0;
-    int i;
+    int i, j;
 
     c->interrupt_callback = &s->interrupt_callback;
 
@@ -2152,6 +2183,38 @@ static int dash_read_header(AVFormatContext *s)
         rep->assoc_stream = s->streams[rep->stream_index];
         move_metadata(rep->assoc_stream, "id", &rep->id);
         move_metadata(rep->assoc_stream, "language", &rep->lang);
+    }
+
+    /* Create stream groups if needed */
+    for (i = 0; i < c->n_videos; i++) {
+        struct representation *ref;
+        rep = c->videos[i];
+        if (!rep->dependencyid)
+            continue;
+        for (j = 0; j < c->n_videos; j++) {
+            if (j == i)
+                continue;
+            ref = c->videos[j];
+            const AVDictionaryEntry *id = av_dict_get(ref->assoc_stream->metadata, "id", NULL, AV_DICT_MATCH_CASE);
+            if (!strcmp(rep->dependencyid, id->value))
+                break;
+        }
+        if (j >= c->n_videos || !av_strstart(rep->codecs, "lvc1", NULL) ||
+            rep->assoc_stream->codecpar->codec_id != AV_CODEC_ID_LCEVC)
+            continue;
+        AVStreamGroup *stg = avformat_stream_group_create(s, AV_STREAM_GROUP_PARAMS_LCEVC, NULL);
+        if (!stg)
+            return AVERROR(ENOMEM);
+        stg->params.lcevc->width  = rep->assoc_stream->codecpar->width;
+        stg->params.lcevc->height = rep->assoc_stream->codecpar->height;
+        ret = avformat_stream_group_add_stream(stg, ref->assoc_stream);
+        if (ret < 0)
+            return ret;
+        ret = avformat_stream_group_add_stream(stg, rep->assoc_stream);
+        if (ret < 0)
+            return ret;
+        stg->id = stg->index;
+        stg->params.lcevc->lcevc_index = stg->nb_streams - 1;
     }
 
     return 0;
@@ -2374,7 +2437,8 @@ static const AVOption dash_options[] = {
         OFFSET(allowed_extensions), AV_OPT_TYPE_STRING,
         {.str = "aac,m4a,m4s,m4v,mov,mp4,webm,ts"},
         INT_MIN, INT_MAX, FLAGS},
-    { "cenc_decryption_key", "Media decryption key (hex)", OFFSET(cenc_decryption_key), AV_OPT_TYPE_STRING, {.str = NULL}, INT_MIN, INT_MAX, .flags = FLAGS },
+    { "cenc_decryption_key", "Media default decryption key (hex)", OFFSET(cenc_decryption_key), AV_OPT_TYPE_STRING, {.str = NULL}, INT_MIN, INT_MAX, .flags = FLAGS },
+    { "cenc_decryption_keys", "Media decryption keys by KID (hex)", OFFSET(cenc_decryption_keys), AV_OPT_TYPE_STRING, {.str = NULL}, INT_MIN, INT_MAX, .flags = FLAGS },
     {NULL}
 };
 

@@ -29,6 +29,8 @@
 *.spv
 *.spv.c
 *.spv.gz
+*.gen.c
+*.gen.S
 *.ptx
 *.ptx.c
 *.ptx.gz

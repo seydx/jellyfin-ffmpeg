@@ -30,9 +30,11 @@ FATE_CHECKASM = fate-checkasm-aacencdsp                                 \
                 fate-checkasm-hevc_dequant                              \
                 fate-checkasm-hevc_idct                                 \
                 fate-checkasm-hevc_pel                                  \
+                fate-checkasm-hevc_pred                                 \
                 fate-checkasm-hevc_sao                                  \
                 fate-checkasm-hpeldsp                                   \
                 fate-checkasm-huffyuvdsp                                \
+                fate-checkasm-huffyuvencdsp                             \
                 fate-checkasm-idctdsp                                   \
                 fate-checkasm-jpeg2000dsp                               \
                 fate-checkasm-llauddsp                                  \
@@ -41,15 +43,20 @@ FATE_CHECKASM = fate-checkasm-aacencdsp                                 \
                 fate-checkasm-llvidencdsp                               \
                 fate-checkasm-lpc                                       \
                 fate-checkasm-motion                                    \
+                fate-checkasm-mpeg4videodsp                             \
                 fate-checkasm-mpegvideo_unquantize                      \
                 fate-checkasm-mpegvideoencdsp                           \
                 fate-checkasm-opusdsp                                   \
                 fate-checkasm-pixblockdsp                               \
+                fate-checkasm-pixelutils                                \
+                fate-checkasm-png                                       \
                 fate-checkasm-qpeldsp                                   \
                 fate-checkasm-sbrdsp                                    \
                 fate-checkasm-rv34dsp                                   \
                 fate-checkasm-rv40dsp                                   \
+                fate-checkasm-sbcdsp                                    \
                 fate-checkasm-scene_sad                                 \
+                fate-checkasm-snowdsp                                   \
                 fate-checkasm-svq1enc                                   \
                 fate-checkasm-synth_filter                              \
                 fate-checkasm-sw_gbrp                                   \

@@ -88,9 +88,10 @@ OBJS-$(CONFIG_CABAC)                   += cabac.o
 OBJS-$(CONFIG_CBS)                     += cbs.o cbs_bsf.o
 OBJS-$(CONFIG_CBS_APV)                 += cbs_apv.o
 OBJS-$(CONFIG_CBS_AV1)                 += cbs_av1.o
-OBJS-$(CONFIG_CBS_H264)                += cbs_h2645.o cbs_sei.o h2645_parse.o
-OBJS-$(CONFIG_CBS_H265)                += cbs_h2645.o cbs_sei.o h2645_parse.o
-OBJS-$(CONFIG_CBS_H266)                += cbs_h2645.o cbs_sei.o h2645_parse.o
+OBJS-$(CONFIG_CBS_H264)                += cbs_h264.o cbs_h2645.o cbs_sei.o h2645_parse.o
+OBJS-$(CONFIG_CBS_H265)                += cbs_h265.o cbs_h2645.o cbs_sei.o h2645_parse.o
+OBJS-$(CONFIG_CBS_H266)                += cbs_h266.o cbs_h2645.o cbs_sei.o h2645_parse.o
+OBJS-$(CONFIG_CBS_LCEVC)               += cbs_lcevc.o cbs_h2645.o cbs_sei.o h2645_parse.o
 OBJS-$(CONFIG_CBS_JPEG)                += cbs_jpeg.o
 OBJS-$(CONFIG_CBS_MPEG2)               += cbs_mpeg2.o
 OBJS-$(CONFIG_CBS_VP8)                 += cbs_vp8.o vp8data.o
@@ -129,7 +130,7 @@ OBJS-$(CONFIG_IVIDSP)                  += ivi_dsp.o
 OBJS-$(CONFIG_JNI)                     += ffjni.o jni.o
 OBJS-$(CONFIG_JPEGTABLES)              += jpegtables.o
 OBJS-$(CONFIG_LCMS2)                   += fflcms2.o
-OBJS-$(CONFIG_LIBLCEVC_DEC)            += lcevcdec.o
+OBJS-$(CONFIG_LIBLCEVC_DEC)            += lcevcdec.o lcevctab.o
 OBJS-$(CONFIG_LLAUDDSP)                += lossless_audiodsp.o
 OBJS-$(CONFIG_LLVIDDSP)                += lossless_videodsp.o
 OBJS-$(CONFIG_LLVIDENCDSP)             += lossless_videoencdsp.o
@@ -625,6 +626,7 @@ OBJS-$(CONFIG_PBM_ENCODER)             += pnmenc.o
 OBJS-$(CONFIG_PCX_DECODER)             += pcx.o
 OBJS-$(CONFIG_PCX_ENCODER)             += pcxenc.o
 OBJS-$(CONFIG_PDV_DECODER)             += pdvdec.o
+OBJS-$(CONFIG_PDV_ENCODER)             += pdvenc.o
 OBJS-$(CONFIG_PFM_DECODER)             += pnmdec.o pnm.o
 OBJS-$(CONFIG_PFM_ENCODER)             += pnmenc.o
 OBJS-$(CONFIG_PGM_DECODER)             += pnmdec.o pnm.o
@@ -646,7 +648,8 @@ OBJS-$(CONFIG_PPM_ENCODER)             += pnmenc.o
 OBJS-$(CONFIG_PRORES_DECODER)          += proresdec.o proresdsp.o proresdata.o
 OBJS-$(CONFIG_PRORES_ENCODER)          += proresenc_anatoliy.o proresdata.o
 OBJS-$(CONFIG_PRORES_AW_ENCODER)       += proresenc_anatoliy.o proresdata.o
-OBJS-$(CONFIG_PRORES_KS_ENCODER)       += proresenc_kostya.o proresdata.o
+OBJS-$(CONFIG_PRORES_KS_ENCODER)       += proresenc_kostya.o proresdata.o proresenc_kostya_common.o
+OBJS-$(CONFIG_PRORES_KS_VULKAN_ENCODER) += proresenc_kostya_vulkan.o proresdata.o proresenc_kostya_common.o
 OBJS-$(CONFIG_PRORES_RAW_DECODER)      += prores_raw.o proresdsp.o proresdata.o
 OBJS-$(CONFIG_PRORES_VIDEOTOOLBOX_ENCODER) += videotoolboxenc.o
 OBJS-$(CONFIG_PROSUMER_DECODER)        += prosumer.o
@@ -1125,7 +1128,7 @@ OBJS-$(CONFIG_FITS_DEMUXER)            += fits.o
 OBJS-$(CONFIG_TAK_DEMUXER)             += tak.o
 
 # libavformat dependencies for static builds
-STLIBOBJS-$(CONFIG_AVFORMAT)           += to_upper4.o
+STLIBOBJS-$(CONFIG_AVFORMAT)           += h2645_parse.o lcevctab.o to_upper4.o
 STLIBOBJS-$(CONFIG_ISO_MEDIA)          += mpegaudiotabs.o
 STLIBOBJS-$(CONFIG_FLV_MUXER)          += mpeg4audio_sample_rates.o
 STLIBOBJS-$(CONFIG_HLS_DEMUXER)        += ac3_channel_layout_tab.o
@@ -1275,6 +1278,7 @@ OBJS-$(CONFIG_IPU_PARSER)              += ipu_parser.o
 OBJS-$(CONFIG_JPEG2000_PARSER)         += jpeg2000_parser.o
 OBJS-$(CONFIG_JPEGXL_PARSER)           += jpegxl_parser.o jpegxl_parse.o
 OBJS-$(CONFIG_JPEGXS_PARSER)           += jpegxs_parser.o
+OBJS-$(CONFIG_LCEVC_PARSER)            += lcevc_parser.o lcevctab.o
 OBJS-$(CONFIG_MISC4_PARSER)            += misc4_parser.o
 OBJS-$(CONFIG_MJPEG_PARSER)            += mjpeg_parser.o
 OBJS-$(CONFIG_MLP_PARSER)              += mlp_parse.o mlp_parser.o mlp.o
@@ -1319,10 +1323,6 @@ OBJS-$(HAVE_LIBC_MSVCRT)               += file_open.o
 OBJS-$(HAVE_THREADS)                   += pthread.o pthread_slice.o pthread_frame.o
 
 OBJS-$(CONFIG_FRAME_THREAD_ENCODER)    += frame_thread_encoder.o
-
-# vulkan libs
-OBJS-$(CONFIG_LIBGLSLANG)              += vulkan_glslang.o
-OBJS-$(CONFIG_LIBSHADERC)              += vulkan_shaderc.o
 
 # Windows resource file
 SHLIBOBJS-$(HAVE_GNU_WINDRES)           += avcodecres.o
@@ -1380,7 +1380,6 @@ TESTPROGS-$(CONFIG_GOLOMB)                += golomb
 TESTPROGS-$(CONFIG_IDCTDSP)               += dct
 TESTPROGS-$(CONFIG_DXV_ENCODER)           += hashtable
 TESTPROGS-$(CONFIG_MJPEG_ENCODER)         += mjpegenc_huffman
-TESTPROGS-$(HAVE_MMX)                     += motion
 TESTPROGS-$(CONFIG_MPEGVIDEO)             += mpeg12framerate
 TESTPROGS-$(CONFIG_H264_METADATA_BSF)     += h264_levels
 TESTPROGS-$(CONFIG_HEVC_METADATA_BSF)     += h265_levels

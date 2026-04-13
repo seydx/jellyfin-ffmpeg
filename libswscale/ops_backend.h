@@ -44,9 +44,12 @@
  * directly incremented by the corresponding read/write functions.
  */
 typedef struct SwsOpIter {
-    const uint8_t *in[4];
-    uint8_t *out[4];
+    uintptr_t in[4];
+    uintptr_t out[4];
     int x, y;
+
+    /* Link back to per-slice execution context */
+    const SwsOpExec *exec;
 } SwsOpIter;
 
 #ifdef __clang__
@@ -68,6 +71,7 @@ typedef struct SwsOpIter {
 #define fn(name)  bitfn(name, FN_SUFFIX)
 
 #define av_q2pixel(q) ((q).den ? (pixel_t) (q).num / (q).den : 0)
+#define bump_ptr(ptr, bump) ((pixel_t *) ((uintptr_t) (ptr) + (bump)))
 
 /* Helper macros to make writing common function signatures less painful */
 #define DECL_FUNC(NAME, ...)                                                    \
@@ -78,13 +82,9 @@ typedef struct SwsOpIter {
                                           __VA_ARGS__)
 
 #define DECL_READ(NAME, ...)                                                    \
-    static av_always_inline void fn(NAME)(SwsOpIter *restrict iter,             \
-                                          const SwsOpImpl *restrict impl,       \
-                                          const pixel_t *restrict in0,          \
-                                          const pixel_t *restrict in1,          \
-                                          const pixel_t *restrict in2,          \
-                                          const pixel_t *restrict in3,          \
-                                          __VA_ARGS__)
+    DECL_FUNC(NAME, const pixel_t *restrict in0, const pixel_t *restrict in1,   \
+                    const pixel_t *restrict in2, const pixel_t *restrict in3,   \
+                    __VA_ARGS__)
 
 #define DECL_WRITE(NAME, ...)                                                   \
     DECL_FUNC(NAME, pixel_t *restrict out0, pixel_t *restrict out1,             \
@@ -96,10 +96,9 @@ typedef struct SwsOpIter {
     fn(FUNC)(iter, impl, x, y, z, w, __VA_ARGS__)
 
 #define CALL_READ(FUNC, ...)                                                    \
-    fn(FUNC)(iter, impl, (const pixel_t *) iter->in[0],                         \
-                         (const pixel_t *) iter->in[1],                         \
-                         (const pixel_t *) iter->in[2],                         \
-                         (const pixel_t *) iter->in[3], __VA_ARGS__)
+    CALL(FUNC, (const pixel_t *) iter->in[0], (const pixel_t *) iter->in[1],    \
+               (const pixel_t *) iter->in[2], (const pixel_t *) iter->in[3],    \
+               __VA_ARGS__)
 
 #define CALL_WRITE(FUNC, ...)                                                   \
     CALL(FUNC, (pixel_t *) iter->out[0], (pixel_t *) iter->out[1],              \
@@ -112,10 +111,6 @@ typedef struct SwsOpIter {
                                   block_t x, block_t y,                         \
                                   block_t z, block_t w)
 
-#define DECL_IMPL_READ(NAME)                                                    \
-    static SWS_FUNC void fn(NAME)(SwsOpIter *restrict iter,                     \
-                                  const SwsOpImpl *restrict impl)
-
 /* Helper macro to call into the next continuation with a given type */
 #define CONTINUE(TYPE, ...)                                                     \
     ((void (*)(SwsOpIter *, const SwsOpImpl *,                                  \
@@ -123,14 +118,15 @@ typedef struct SwsOpIter {
         (iter, &impl[1], __VA_ARGS__)
 
 /* Helper macros for common op setup code */
-#define DECL_SETUP(NAME)                                                        \
-    static int fn(NAME)(const SwsOp *op, SwsOpPriv *out)
+#define DECL_SETUP(NAME, PARAMS, OUT)                                           \
+    static int fn(NAME)(const SwsImplParams *PARAMS, SwsImplResult *OUT)
 
-#define SETUP_MEMDUP(c) ff_setup_memdup(&(c), sizeof(c), out)
-static inline int ff_setup_memdup(const void *c, size_t size, SwsOpPriv *out)
+#define SETUP_MEMDUP(c, out) ff_setup_memdup(&(c), sizeof(c), out)
+static inline int ff_setup_memdup(const void *c, size_t size, SwsImplResult *out)
 {
-    out->ptr = av_memdup(c, size);
-    return out->ptr ? 0 : AVERROR(ENOMEM);
+    out->priv.ptr = av_memdup(c, size);
+    out->free = ff_op_priv_free;
+    return out->priv.ptr ? 0 : AVERROR(ENOMEM);
 }
 
 /* Helper macro for declaring op table entries */

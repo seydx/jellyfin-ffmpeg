@@ -113,9 +113,11 @@ void checkasm_check_hevc_deblock(void);
 void checkasm_check_hevc_dequant(void);
 void checkasm_check_hevc_idct(void);
 void checkasm_check_hevc_pel(void);
+void checkasm_check_hevc_pred(void);
 void checkasm_check_hevc_sao(void);
 void checkasm_check_hpeldsp(void);
 void checkasm_check_huffyuvdsp(void);
+void checkasm_check_huffyuvencdsp(void);
 void checkasm_check_idctdsp(void);
 void checkasm_check_idet(void);
 void checkasm_check_jpeg2000dsp(void);
@@ -125,16 +127,21 @@ void checkasm_check_llviddsp(void);
 void checkasm_check_llvidencdsp(void);
 void checkasm_check_lpc(void);
 void checkasm_check_motion(void);
+void checkasm_check_mpeg4videodsp(void);
 void checkasm_check_mpegvideo_unquantize(void);
 void checkasm_check_mpegvideoencdsp(void);
 void checkasm_check_nlmeans(void);
 void checkasm_check_opusdsp(void);
 void checkasm_check_pixblockdsp(void);
+void checkasm_check_pixelutils(void);
+void checkasm_check_png(void);
 void checkasm_check_qpeldsp(void);
+void checkasm_check_sbcdsp(void);
 void checkasm_check_sbrdsp(void);
 void checkasm_check_rv34dsp(void);
 void checkasm_check_rv40dsp(void);
 void checkasm_check_scene_sad(void);
+void checkasm_check_snowdsp(void);
 void checkasm_check_svq1enc(void);
 void checkasm_check_synth_filter(void);
 void checkasm_check_sw_gbrp(void);
@@ -479,7 +486,7 @@ int checkasm_check_float_ulp(const char *file, int line,
  * For tests that don't have that and only operate on a single
  * bitdepth, just call checkasm_check(uint8_t, ...) directly. */
 #define checkasm_check_pixel2(buf1, stride1, buf2, stride2, ...) \
-    ((bit_depth > 8) ?                                          \
+    ((bit_depth > 8) ?                                           \
      checkasm_check2(uint16_t, (const uint16_t*)buf1, stride1,   \
                                (const uint16_t*)buf2, stride2,   \
                                __VA_ARGS__) :                    \

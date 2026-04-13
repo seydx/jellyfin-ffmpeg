@@ -480,7 +480,7 @@ static av_cold int codecctl_int(AVCodecContext *avctx,
         return AVERROR(EINVAL);
     }
 
-    if (ctx->is_alpha) {
+    if (ctx->is_alpha && id != VP9E_SET_COLOR_SPACE) {
         int res_alpha = vpx_codec_control(&ctx->encoder_alpha, id, val);
         if (res_alpha != VPX_CODEC_OK) {
             snprintf(buf, sizeof(buf), "Failed to set %s alpha codec control",
@@ -825,6 +825,7 @@ static int set_pix_fmt(AVCodecContext *avctx, vpx_codec_caps_t codec_caps,
         *img_fmt = VPX_IMG_FMT_I420;
         return 0;
     case AV_PIX_FMT_YUV422P:
+    case AV_PIX_FMT_YUVA422P:
         enccfg->g_profile = 1;
         *img_fmt = VPX_IMG_FMT_I422;
         return 0;
@@ -833,12 +834,17 @@ static int set_pix_fmt(AVCodecContext *avctx, vpx_codec_caps_t codec_caps,
         *img_fmt = VPX_IMG_FMT_I440;
         return 0;
     case AV_PIX_FMT_GBRP:
+    case AV_PIX_FMT_GBRAP:
         ctx->vpx_cs = VPX_CS_SRGB;
     case AV_PIX_FMT_YUV444P:
+    case AV_PIX_FMT_YUVA444P:
+        if (avctx->colorspace == AVCOL_SPC_RGB)
+            ctx->vpx_cs = VPX_CS_SRGB;
         enccfg->g_profile = 1;
         *img_fmt = VPX_IMG_FMT_I444;
         return 0;
     case AV_PIX_FMT_YUV420P10:
+    case AV_PIX_FMT_YUVA420P10:
     case AV_PIX_FMT_YUV420P12:
         if (codec_caps & VPX_CODEC_CAP_HIGHBITDEPTH) {
             enccfg->g_profile = 2;
@@ -848,6 +854,7 @@ static int set_pix_fmt(AVCodecContext *avctx, vpx_codec_caps_t codec_caps,
         }
         break;
     case AV_PIX_FMT_YUV422P10:
+    case AV_PIX_FMT_YUVA422P10:
     case AV_PIX_FMT_YUV422P12:
         if (codec_caps & VPX_CODEC_CAP_HIGHBITDEPTH) {
             enccfg->g_profile = 3;
@@ -866,10 +873,16 @@ static int set_pix_fmt(AVCodecContext *avctx, vpx_codec_caps_t codec_caps,
         }
         break;
     case AV_PIX_FMT_GBRP10:
+    case AV_PIX_FMT_GBRAP10:
     case AV_PIX_FMT_GBRP12:
+    case AV_PIX_FMT_GBRAP12:
         ctx->vpx_cs = VPX_CS_SRGB;
     case AV_PIX_FMT_YUV444P10:
+    case AV_PIX_FMT_YUVA444P10:
     case AV_PIX_FMT_YUV444P12:
+    case AV_PIX_FMT_YUVA444P12:
+        if (avctx->colorspace == AVCOL_SPC_RGB)
+            ctx->vpx_cs = VPX_CS_SRGB;
         if (codec_caps & VPX_CODEC_CAP_HIGHBITDEPTH) {
             enccfg->g_profile = 3;
             *img_fmt = VPX_IMG_FMT_I44416;
@@ -884,7 +897,7 @@ static int set_pix_fmt(AVCodecContext *avctx, vpx_codec_caps_t codec_caps,
     return AVERROR_INVALIDDATA;
 }
 
-static void set_colorspace(AVCodecContext *avctx)
+static int set_colorspace(AVCodecContext *avctx)
 {
     enum vpx_color_space vpx_cs;
     VPxContext *ctx = avctx->priv_data;
@@ -893,7 +906,11 @@ static void set_colorspace(AVCodecContext *avctx)
         vpx_cs = ctx->vpx_cs;
     } else {
         switch (avctx->colorspace) {
-        case AVCOL_SPC_RGB:         vpx_cs = VPX_CS_SRGB;      break;
+        case AVCOL_SPC_RGB:
+            av_log(avctx, AV_LOG_ERROR,
+                   "RGB colorspace is not compatible with pixel format %s.\n",
+                   av_get_pix_fmt_name(avctx->pix_fmt));
+            return AVERROR(EINVAL);
         case AVCOL_SPC_BT709:       vpx_cs = VPX_CS_BT_709;    break;
         case AVCOL_SPC_UNSPECIFIED: vpx_cs = VPX_CS_UNKNOWN;   break;
         case AVCOL_SPC_RESERVED:    vpx_cs = VPX_CS_RESERVED;  break;
@@ -904,10 +921,11 @@ static void set_colorspace(AVCodecContext *avctx)
         default:
             av_log(avctx, AV_LOG_WARNING, "Unsupported colorspace (%d)\n",
                    avctx->colorspace);
-            return;
+            return 0;
         }
     }
     codecctl_int(avctx, VP9E_SET_COLOR_SPACE, vpx_cs);
+    return 0;
 }
 
 #if VPX_ENCODER_ABI_VERSION >= 11
@@ -1004,12 +1022,21 @@ static av_cold int vpx_init(AVCodecContext *avctx,
     vpx_svc_extra_cfg_t svc_params;
 #endif
     const AVDictionaryEntry* en = NULL;
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(avctx->pix_fmt);
 
     av_log(avctx, AV_LOG_INFO, "%s\n", vpx_codec_version_str());
     av_log(avctx, AV_LOG_VERBOSE, "%s\n", vpx_codec_build_config());
 
-    if (avctx->pix_fmt == AV_PIX_FMT_YUVA420P)
+    if (desc && (desc->flags & AV_PIX_FMT_FLAG_ALPHA)) {
         ctx->is_alpha = 1;
+        if (avctx->pix_fmt != AV_PIX_FMT_YUVA420P && avctx->strict_std_compliance > FF_COMPLIANCE_EXPERIMENTAL) {
+            av_log(avctx, AV_LOG_ERROR,
+                   "Pixel format '%s' is not widely supported. "
+                   "Use -strict experimental to use it anyway, or use 'yuva420p' pixel format instead.\n",
+                   av_get_pix_fmt_name(avctx->pix_fmt));
+            return AVERROR(EINVAL);
+        }
+    }
 
     if ((res = vpx_codec_enc_config_default(iface, &enccfg, 0)) != VPX_CODEC_OK) {
         av_log(avctx, AV_LOG_ERROR, "Failed to get config: %s\n",
@@ -1204,6 +1231,7 @@ static av_cold int vpx_init(AVCodecContext *avctx,
 #endif
     if (ctx->is_alpha) {
         enccfg_alpha = enccfg;
+        enccfg_alpha.g_profile = (flags & VPX_CODEC_USE_HIGHBITDEPTH) ? 2 : 0;
         res = vpx_codec_enc_init(&ctx->encoder_alpha, iface, &enccfg_alpha, flags);
         if (res != VPX_CODEC_OK) {
             log_encoder_error(avctx, &ctx->encoder_alpha, "Failed to initialize alpha encoder");
@@ -1258,7 +1286,9 @@ static av_cold int vpx_init(AVCodecContext *avctx,
             codecctl_int(avctx, VP9E_SET_FRAME_PARALLEL_DECODING, ctx->frame_parallel);
         if (ctx->aq_mode >= 0)
             codecctl_int(avctx, VP9E_SET_AQ_MODE, ctx->aq_mode);
-        set_colorspace(avctx);
+        res = set_colorspace(avctx);
+        if (res < 0)
+            return res;
 #if VPX_ENCODER_ABI_VERSION >= 11
         set_color_range(avctx);
 #endif
@@ -1692,18 +1722,28 @@ static int realloc_alpha_uv(AVCodecContext *avctx, int width, int height)
         !planes[VPX_PLANE_V] ||
         width  != (int)rawimg_alpha->d_w ||
         height != (int)rawimg_alpha->d_h) {
+        vpx_img_fmt_t alpha_fmt = ctx->rawimg.bit_depth > 8 ?
+                                  VPX_IMG_FMT_I42016 : VPX_IMG_FMT_I420;
         av_freep(&planes[VPX_PLANE_U]);
         av_freep(&planes[VPX_PLANE_V]);
 
-        vpx_img_wrap(rawimg_alpha, VPX_IMG_FMT_I420, width, height, 1,
+        vpx_img_wrap(rawimg_alpha, alpha_fmt, width, height, 1,
                      (unsigned char*)1);
         planes[VPX_PLANE_U] = av_malloc_array(stride[VPX_PLANE_U], height);
         planes[VPX_PLANE_V] = av_malloc_array(stride[VPX_PLANE_V], height);
         if (!planes[VPX_PLANE_U] || !planes[VPX_PLANE_V])
             return AVERROR(ENOMEM);
 
-        memset(planes[VPX_PLANE_U], 0x80, stride[VPX_PLANE_U] * height);
-        memset(planes[VPX_PLANE_V], 0x80, stride[VPX_PLANE_V] * height);
+        if (ctx->rawimg.bit_depth > 8) {
+            int val = 0x80 << (ctx->rawimg.bit_depth - 8);
+            AV_WN16(planes[VPX_PLANE_U], val);
+            AV_WN16(planes[VPX_PLANE_V], val);
+            av_memcpy_backptr(planes[VPX_PLANE_U] + 2, 2, stride[VPX_PLANE_U] * height - 2);
+            av_memcpy_backptr(planes[VPX_PLANE_V] + 2, 2, stride[VPX_PLANE_V] * height - 2);
+        } else {
+            memset(planes[VPX_PLANE_U], 0x80, stride[VPX_PLANE_U] * height);
+            memset(planes[VPX_PLANE_V], 0x80, stride[VPX_PLANE_V] * height);
+        }
     }
 
     return 0;
@@ -2085,9 +2125,12 @@ static const enum AVPixelFormat vp9_pix_fmts_highcol[] = {
     AV_PIX_FMT_YUV420P,
     AV_PIX_FMT_YUVA420P,
     AV_PIX_FMT_YUV422P,
+    AV_PIX_FMT_YUVA422P,
     AV_PIX_FMT_YUV440P,
     AV_PIX_FMT_YUV444P,
+    AV_PIX_FMT_YUVA444P,
     AV_PIX_FMT_GBRP,
+    AV_PIX_FMT_GBRAP,
     AV_PIX_FMT_NONE
 };
 
@@ -2095,19 +2138,28 @@ static const enum AVPixelFormat vp9_pix_fmts_highbd[] = {
     AV_PIX_FMT_YUV420P,
     AV_PIX_FMT_YUVA420P,
     AV_PIX_FMT_YUV422P,
+    AV_PIX_FMT_YUVA422P,
     AV_PIX_FMT_YUV440P,
     AV_PIX_FMT_YUV444P,
+    AV_PIX_FMT_YUVA444P,
     AV_PIX_FMT_YUV420P10,
+    AV_PIX_FMT_YUVA420P10,
     AV_PIX_FMT_YUV422P10,
+    AV_PIX_FMT_YUVA422P10,
     AV_PIX_FMT_YUV440P10,
     AV_PIX_FMT_YUV444P10,
+    AV_PIX_FMT_YUVA444P10,
     AV_PIX_FMT_YUV420P12,
     AV_PIX_FMT_YUV422P12,
     AV_PIX_FMT_YUV440P12,
     AV_PIX_FMT_YUV444P12,
+    AV_PIX_FMT_YUVA444P12,
     AV_PIX_FMT_GBRP,
+    AV_PIX_FMT_GBRAP,
     AV_PIX_FMT_GBRP10,
+    AV_PIX_FMT_GBRAP10,
     AV_PIX_FMT_GBRP12,
+    AV_PIX_FMT_GBRAP12,
     AV_PIX_FMT_NONE
 };
 

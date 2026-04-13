@@ -218,6 +218,8 @@ typedef struct OptionsContext {
     SpecifierOptList display_rotations;
     SpecifierOptList display_hflips;
     SpecifierOptList display_vflips;
+    SpecifierOptList mastering_displays;
+    SpecifierOptList content_lights;
     SpecifierOptList rc_overrides;
     SpecifierOptList intra_matrices;
     SpecifierOptList inter_matrices;
@@ -258,6 +260,8 @@ typedef struct OptionsContext {
     SpecifierOptList enc_stats_pre_fmt;
     SpecifierOptList enc_stats_post_fmt;
     SpecifierOptList mux_stats_fmt;
+
+    int depth;
 } OptionsContext;
 
 enum IFilterFlags {
