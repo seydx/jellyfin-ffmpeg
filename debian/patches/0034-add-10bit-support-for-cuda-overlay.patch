@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.c
+Index: FFmpeg/libavfilter/vf_overlay_cuda.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/vf_overlay_cuda.c
-+++ jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.c
+--- FFmpeg.orig/libavfilter/vf_overlay_cuda.c
++++ FFmpeg/libavfilter/vf_overlay_cuda.c
 @@ -49,6 +49,8 @@
  static const enum AVPixelFormat supported_main_formats[] = {
      AV_PIX_FMT_NV12,
@@ -224,10 +224,10 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.c
      { "eof_action", "Action to take when encountering EOF from secondary input ",
          OFFSET(fs.opt_eof_action), AV_OPT_TYPE_INT, { .i64 = EOF_ACTION_REPEAT },
          EOF_ACTION_REPEAT, EOF_ACTION_PASS, .flags = FLAGS, .unit = "eof_action" },
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.cu
+Index: FFmpeg/libavfilter/vf_overlay_cuda.cu
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/vf_overlay_cuda.cu
-+++ jellyfin-ffmpeg/libavfilter/vf_overlay_cuda.cu
+--- FFmpeg.orig/libavfilter/vf_overlay_cuda.cu
++++ FFmpeg/libavfilter/vf_overlay_cuda.cu
 @@ -18,15 +18,17 @@
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
   */

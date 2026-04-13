@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
+Index: FFmpeg/libavutil/hwcontext_d3d11va.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext_d3d11va.c
-+++ jellyfin-ffmpeg/libavutil/hwcontext_d3d11va.c
+--- FFmpeg.orig/libavutil/hwcontext_d3d11va.c
++++ FFmpeg/libavutil/hwcontext_d3d11va.c
 @@ -651,6 +651,8 @@ static int d3d11va_device_create(AVHWDev
          adapter = atoi(device);
      } else {

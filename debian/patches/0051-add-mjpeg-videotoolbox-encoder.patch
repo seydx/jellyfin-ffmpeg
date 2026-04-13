@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/configure
+Index: FFmpeg/configure
 ===================================================================
---- jellyfin-ffmpeg.orig/configure
-+++ jellyfin-ffmpeg/configure
+--- FFmpeg.orig/configure
++++ FFmpeg/configure
 @@ -3821,6 +3821,8 @@ h264_videotoolbox_encoder_deps="pthreads
  h264_videotoolbox_encoder_select="atsc_a53 videotoolbox_encoder"
  hevc_videotoolbox_encoder_deps="pthreads"
@@ -11,10 +11,10 @@ Index: jellyfin-ffmpeg/configure
  prores_videotoolbox_encoder_deps="pthreads"
  prores_videotoolbox_encoder_select="videotoolbox_encoder"
  libaom_av1_decoder_deps="libaom"
-Index: jellyfin-ffmpeg/libavcodec/Makefile
+Index: FFmpeg/libavcodec/Makefile
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/Makefile
-+++ jellyfin-ffmpeg/libavcodec/Makefile
+--- FFmpeg.orig/libavcodec/Makefile
++++ FFmpeg/libavcodec/Makefile
 @@ -542,6 +542,7 @@ OBJS-$(CONFIG_MJPEGB_DECODER)          +
  OBJS-$(CONFIG_MJPEG_CUVID_DECODER)     += cuviddec.o
  OBJS-$(CONFIG_MJPEG_QSV_ENCODER)       += qsvenc_jpeg.o
@@ -23,10 +23,10 @@ Index: jellyfin-ffmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_MJPEG_RKMPP_DECODER)     += rkmppdec.o
  OBJS-$(CONFIG_MJPEG_RKMPP_ENCODER)     += rkmppenc.o
  OBJS-$(CONFIG_MLP_DECODER)             += mlpdec.o mlpdsp.o
-Index: jellyfin-ffmpeg/libavcodec/allcodecs.c
+Index: FFmpeg/libavcodec/allcodecs.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/allcodecs.c
-+++ jellyfin-ffmpeg/libavcodec/allcodecs.c
+--- FFmpeg.orig/libavcodec/allcodecs.c
++++ FFmpeg/libavcodec/allcodecs.c
 @@ -917,6 +917,7 @@ extern const FFCodec ff_mjpeg_cuvid_deco
  extern const FFCodec ff_mjpeg_qsv_encoder;
  extern const FFCodec ff_mjpeg_qsv_decoder;
@@ -35,10 +35,10 @@ Index: jellyfin-ffmpeg/libavcodec/allcodecs.c
  extern const FFCodec ff_mjpeg_rkmpp_decoder;
  extern const FFCodec ff_mjpeg_rkmpp_encoder;
  extern const FFCodec ff_mp3_mediacodec_decoder;
-Index: jellyfin-ffmpeg/libavcodec/videotoolboxenc.c
+Index: FFmpeg/libavcodec/videotoolboxenc.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/videotoolboxenc.c
-+++ jellyfin-ffmpeg/libavcodec/videotoolboxenc.c
+--- FFmpeg.orig/libavcodec/videotoolboxenc.c
++++ FFmpeg/libavcodec/videotoolboxenc.c
 @@ -556,6 +556,7 @@ static CMVideoCodecType get_cm_codec_typ
              else
                  return MKBETAG('a','p','c','n'); // kCMVideoCodecType_AppleProRes422

@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavformat/rtsp.c
+Index: FFmpeg/libavformat/rtsp.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavformat/rtsp.c
-+++ jellyfin-ffmpeg/libavformat/rtsp.c
+--- FFmpeg.orig/libavformat/rtsp.c
++++ FFmpeg/libavformat/rtsp.c
 @@ -290,6 +290,7 @@ static int init_satip_stream(AVFormatCon
                   &rt->nb_rtsp_streams, rtsp_st);
  
@@ -45,10 +45,10 @@ Index: jellyfin-ffmpeg/libavformat/rtsp.c
          } else if (av_strstart(p, "IsRealDataType:integer;",&p)) {
              if (atoi(p) == 1)
                  rt->transport = RTSP_TRANSPORT_RDT;
-Index: jellyfin-ffmpeg/libavformat/rtsp.h
+Index: FFmpeg/libavformat/rtsp.h
 ===================================================================
---- jellyfin-ffmpeg.orig/libavformat/rtsp.h
-+++ jellyfin-ffmpeg/libavformat/rtsp.h
+--- FFmpeg.orig/libavformat/rtsp.h
++++ FFmpeg/libavformat/rtsp.h
 @@ -469,6 +469,16 @@ typedef struct RTSPSource {
  } RTSPSource;
  

@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/configure
+Index: FFmpeg/configure
 ===================================================================
---- jellyfin-ffmpeg.orig/configure
-+++ jellyfin-ffmpeg/configure
+--- FFmpeg.orig/configure
++++ FFmpeg/configure
 @@ -4298,7 +4298,7 @@ tonemap_vaapi_filter_deps="vaapi VAProcF
  tonemap_opencl_filter_deps="opencl const_nan"
  transpose_opencl_filter_deps="opencl"
@@ -11,9 +11,9 @@ Index: jellyfin-ffmpeg/configure
  transpose_vulkan_filter_deps="vulkan spirv_library"
  unsharp_opencl_filter_deps="opencl"
  uspp_filter_deps="gpl avcodec"
-Index: jellyfin-ffmpeg/libavfilter/vf_transpose_vt.c
+Index: FFmpeg/libavfilter/vf_transpose_vt.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/vf_transpose_vt.c
+--- FFmpeg.orig/libavfilter/vf_transpose_vt.c
 +++ /dev/null
 @@ -1,291 +0,0 @@
 -/*
@@ -307,10 +307,10 @@ Index: jellyfin-ffmpeg/libavfilter/vf_transpose_vt.c
 -    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_VIDEOTOOLBOX),
 -    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 -};
-Index: jellyfin-ffmpeg/libavfilter/vf_transpose_vt.m
+Index: FFmpeg/libavfilter/vf_transpose_vt.m
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/vf_transpose_vt.m
++++ FFmpeg/libavfilter/vf_transpose_vt.m
 @@ -0,0 +1,384 @@
 +/*
 + * Copyright (c) 2023 Zhao Zhili <zhilizhao@tencent.com>

@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavcodec/decode.c
+Index: FFmpeg/libavcodec/decode.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/decode.c
-+++ jellyfin-ffmpeg/libavcodec/decode.c
+--- FFmpeg.orig/libavcodec/decode.c
++++ FFmpeg/libavcodec/decode.c
 @@ -212,6 +212,9 @@ static int decode_bsfs_init(AVCodecConte
      ret = av_bsf_init(avci->bsf);
      if (ret < 0)

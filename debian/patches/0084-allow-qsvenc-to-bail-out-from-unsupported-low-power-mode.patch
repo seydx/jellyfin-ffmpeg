@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavcodec/qsvenc.c
+Index: FFmpeg/libavcodec/qsvenc.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/qsvenc.c
-+++ jellyfin-ffmpeg/libavcodec/qsvenc.c
+--- FFmpeg.orig/libavcodec/qsvenc.c
++++ FFmpeg/libavcodec/qsvenc.c
 @@ -699,6 +699,13 @@ static int check_enc_param(AVCodecContex
                av_log(avctx, AV_LOG_ERROR, "Current resolution is unsupported\n");
          if (UNMATCH(FrameInfo.FourCC))

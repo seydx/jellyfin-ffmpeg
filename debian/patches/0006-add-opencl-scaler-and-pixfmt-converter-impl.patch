@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/configure
+Index: FFmpeg/configure
 ===================================================================
---- jellyfin-ffmpeg.orig/configure
-+++ jellyfin-ffmpeg/configure
+--- FFmpeg.orig/configure
++++ FFmpeg/configure
 @@ -4252,6 +4252,7 @@ rubberband_filter_deps="librubberband"
  sab_filter_deps="gpl swscale"
  scale2ref_filter_deps="swscale"
@@ -10,10 +10,10 @@ Index: jellyfin-ffmpeg/configure
  sr_amf_filter_deps="amf"
  vpp_amf_filter_deps="amf"
  scale_qsv_filter_deps="libmfx"
-Index: jellyfin-ffmpeg/libavfilter/Makefile
+Index: FFmpeg/libavfilter/Makefile
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/Makefile
-+++ jellyfin-ffmpeg/libavfilter/Makefile
+--- FFmpeg.orig/libavfilter/Makefile
++++ FFmpeg/libavfilter/Makefile
 @@ -476,6 +476,7 @@ OBJS-$(CONFIG_SCALE_D3D12_FILTER)
  OBJS-$(CONFIG_SCALE_CUDA_FILTER)             += vf_scale_cuda.o scale_eval.o \
                                                  vf_scale_cuda.ptx.o cuda/load_helper.o
@@ -22,10 +22,10 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_SCALE_QSV_FILTER)              += vf_vpp_qsv.o
  OBJS-$(CONFIG_SCALE_VAAPI_FILTER)            += vf_scale_vaapi.o scale_eval.o vaapi_vpp.o
  OBJS-$(CONFIG_SCALE_VT_FILTER)               += vf_scale_vt.o scale_eval.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
+Index: FFmpeg/libavfilter/allfilters.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
-+++ jellyfin-ffmpeg/libavfilter/allfilters.c
+--- FFmpeg.orig/libavfilter/allfilters.c
++++ FFmpeg/libavfilter/allfilters.c
 @@ -447,6 +447,7 @@ extern const FFFilter ff_vf_scale_cuda;
  extern const FFFilter ff_vf_scale_d3d11;
  extern const FFFilter ff_vf_scale_d3d12;
@@ -34,10 +34,10 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_scale_qsv;
  extern const FFFilter ff_vf_scale_vaapi;
  extern const FFFilter ff_vf_scale_vt;
-Index: jellyfin-ffmpeg/libavfilter/opencl/scale.cl
+Index: FFmpeg/libavfilter/opencl/scale.cl
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/opencl/scale.cl
++++ FFmpeg/libavfilter/opencl/scale.cl
 @@ -0,0 +1,318 @@
 +/*
 + * Copyright (c) 2018 Gabriel Machado
@@ -357,10 +357,10 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/scale.cl
 +  #endif
 +}
 +#endif
-Index: jellyfin-ffmpeg/libavfilter/opencl_source.h
+Index: FFmpeg/libavfilter/opencl_source.h
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/opencl_source.h
-+++ jellyfin-ffmpeg/libavfilter/opencl_source.h
+--- FFmpeg.orig/libavfilter/opencl_source.h
++++ FFmpeg/libavfilter/opencl_source.h
 @@ -29,6 +29,7 @@ extern const char *ff_source_nlmeans_cl;
  extern const char *ff_source_overlay_cl;
  extern const char *ff_source_pad_cl;
@@ -369,10 +369,10 @@ Index: jellyfin-ffmpeg/libavfilter/opencl_source.h
  extern const char *ff_source_tonemap_cl;
  extern const char *ff_source_transpose_cl;
  extern const char *ff_source_unsharp_cl;
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
+Index: FFmpeg/libavfilter/vf_scale_opencl.c
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
++++ FFmpeg/libavfilter/vf_scale_opencl.c
 @@ -0,0 +1,931 @@
 +/*
 + * Copyright (c) 2018 Gabriel Machado

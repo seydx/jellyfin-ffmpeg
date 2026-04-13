@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavformat/rtsp.c
+Index: FFmpeg/libavformat/rtsp.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavformat/rtsp.c
-+++ jellyfin-ffmpeg/libavformat/rtsp.c
+--- FFmpeg.orig/libavformat/rtsp.c
++++ FFmpeg/libavformat/rtsp.c
 @@ -631,14 +631,47 @@ static void sdp_parse_line(AVFormatConte
              if (rtsp_st->stream_index >= 0) {
                  st = s->streams[rtsp_st->stream_index];
@@ -53,10 +53,10 @@ Index: jellyfin-ffmpeg/libavformat/rtsp.c
              get_word(buf1, sizeof(buf1), &p);
              payload_type = atoi(buf1);
              if (s1->seen_rtpmap) {
-Index: jellyfin-ffmpeg/libavformat/rtsp.h
+Index: FFmpeg/libavformat/rtsp.h
 ===================================================================
---- jellyfin-ffmpeg.orig/libavformat/rtsp.h
-+++ jellyfin-ffmpeg/libavformat/rtsp.h
+--- FFmpeg.orig/libavformat/rtsp.h
++++ FFmpeg/libavformat/rtsp.h
 @@ -508,6 +508,8 @@ typedef struct RTSPStream {
      int sdp_ttl;              /**< IP Time-To-Live (from SDP content) */
      int sdp_payload_type;     /**< payload type */

@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavcodec/hw_base_encode.h
+Index: FFmpeg/libavcodec/hw_base_encode.h
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/hw_base_encode.h
-+++ jellyfin-ffmpeg/libavcodec/hw_base_encode.h
+--- FFmpeg.orig/libavcodec/hw_base_encode.h
++++ FFmpeg/libavcodec/hw_base_encode.h
 @@ -252,6 +252,6 @@ int ff_hw_base_encode_close(FFHWBaseEnco
      { "async_depth", "Maximum processing parallelism. " \
        "Increase this to improve single channel performance.", \

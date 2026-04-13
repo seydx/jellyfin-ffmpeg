@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/compat/cuda/cuda_runtime.h
+Index: FFmpeg/compat/cuda/cuda_runtime.h
 ===================================================================
---- jellyfin-ffmpeg.orig/compat/cuda/cuda_runtime.h
-+++ jellyfin-ffmpeg/compat/cuda/cuda_runtime.h
+--- FFmpeg.orig/compat/cuda/cuda_runtime.h
++++ FFmpeg/compat/cuda/cuda_runtime.h
 @@ -24,6 +24,7 @@
  #define COMPAT_CUDA_CUDA_RUNTIME_H
  

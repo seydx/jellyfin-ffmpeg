@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavcodec/hevc/hevcdec.c
+Index: FFmpeg/libavcodec/hevc/hevcdec.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/hevc/hevcdec.c
-+++ jellyfin-ffmpeg/libavcodec/hevc/hevcdec.c
+--- FFmpeg.orig/libavcodec/hevc/hevcdec.c
++++ FFmpeg/libavcodec/hevc/hevcdec.c
 @@ -719,6 +719,9 @@ static enum AVPixelFormat get_format(HEV
  #if CONFIG_HEVC_NVDEC_HWACCEL
          *fmt++ = AV_PIX_FMT_CUDA;

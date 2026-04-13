@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavfilter/opencl/scale.cl
+Index: FFmpeg/libavfilter/opencl/scale.cl
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/opencl/scale.cl
-+++ jellyfin-ffmpeg/libavfilter/opencl/scale.cl
+--- FFmpeg.orig/libavfilter/opencl/scale.cl
++++ FFmpeg/libavfilter/opencl/scale.cl
 @@ -145,12 +145,15 @@ __kernel void scale_builtin(__write_only
    #ifdef ENABLE_DITHER
                              __read_only  image2d_t dither,
@@ -70,10 +70,10 @@ Index: jellyfin-ffmpeg/libavfilter/opencl/scale.cl
      int2 src_pos = convert_int2(floor(src_coord - 0.5f));
  
      int i, j;
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
+Index: FFmpeg/libavfilter/vf_scale_opencl.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/vf_scale_opencl.c
-+++ jellyfin-ffmpeg/libavfilter/vf_scale_opencl.c
+--- FFmpeg.orig/libavfilter/vf_scale_opencl.c
++++ FFmpeg/libavfilter/vf_scale_opencl.c
 @@ -87,6 +87,8 @@ typedef struct ScaleOpenCLContext {
      char *w_expr,  *h_expr;
      int   dst_w,    dst_h;

@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/fftools/ffmpeg_filter.c
+Index: FFmpeg/fftools/ffmpeg_filter.c
 ===================================================================
---- jellyfin-ffmpeg.orig/fftools/ffmpeg_filter.c
-+++ jellyfin-ffmpeg/fftools/ffmpeg_filter.c
+--- FFmpeg.orig/fftools/ffmpeg_filter.c
++++ FFmpeg/fftools/ffmpeg_filter.c
 @@ -1711,8 +1711,21 @@ static int configure_output_video_filter
                 ofp->format != AV_PIX_FMT_NONE || !ofp->pix_fmts);
      av_bprint_init(&bprint, 0, AV_BPRINT_SIZE_UNLIMITED);

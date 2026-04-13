@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
+Index: FFmpeg/libavutil/hwcontext_vaapi.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext_vaapi.c
-+++ jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
+--- FFmpeg.orig/libavutil/hwcontext_vaapi.c
++++ FFmpeg/libavutil/hwcontext_vaapi.c
 @@ -171,6 +171,9 @@ static const VAAPIFormatDescriptor vaapi
  #ifdef VA_FOURCC_X2R10G10B10
      MAP(X2R10G10B10, RGB32_10, X2RGB10, 0),

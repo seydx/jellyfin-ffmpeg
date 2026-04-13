@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/configure
+Index: FFmpeg/configure
 ===================================================================
---- jellyfin-ffmpeg.orig/configure
-+++ jellyfin-ffmpeg/configure
+--- FFmpeg.orig/configure
++++ FFmpeg/configure
 @@ -4245,6 +4245,7 @@ overlay_opencl_filter_deps="opencl"
  overlay_qsv_filter_deps="libmfx"
  overlay_qsv_filter_select="qsvvpp"
@@ -10,10 +10,10 @@ Index: jellyfin-ffmpeg/configure
  overlay_vulkan_filter_deps="vulkan spirv_library"
  overlay_rkrga_filter_deps="rkrga"
  owdenoise_filter_deps="gpl"
-Index: jellyfin-ffmpeg/doc/filters.texi
+Index: FFmpeg/doc/filters.texi
 ===================================================================
---- jellyfin-ffmpeg.orig/doc/filters.texi
-+++ jellyfin-ffmpeg/doc/filters.texi
+--- FFmpeg.orig/doc/filters.texi
++++ FFmpeg/doc/filters.texi
 @@ -19417,6 +19417,58 @@ testsrc=s=100x100, split=4 [in0][in1][in
  
  @end itemize
@@ -73,10 +73,10 @@ Index: jellyfin-ffmpeg/doc/filters.texi
  @section owdenoise
  
  Apply Overcomplete Wavelet denoiser.
-Index: jellyfin-ffmpeg/libavfilter/Makefile
+Index: FFmpeg/libavfilter/Makefile
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/Makefile
-+++ jellyfin-ffmpeg/libavfilter/Makefile
+--- FFmpeg.orig/libavfilter/Makefile
++++ FFmpeg/libavfilter/Makefile
 @@ -428,6 +428,9 @@ OBJS-$(CONFIG_OVERLAY_OPENCL_FILTER)
                                                  opencl/overlay.o framesync.o
  OBJS-$(CONFIG_OVERLAY_QSV_FILTER)            += vf_overlay_qsv.o framesync.o
@@ -87,10 +87,10 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_OVERLAY_VULKAN_FILTER)         += vf_overlay_vulkan.o vulkan.o vulkan_filter.o
  OBJS-$(CONFIG_OVERLAY_RKRGA_FILTER)          += vf_overlay_rkrga.o framesync.o
  OBJS-$(CONFIG_OWDENOISE_FILTER)              += vf_owdenoise.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
+Index: FFmpeg/libavfilter/allfilters.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
-+++ jellyfin-ffmpeg/libavfilter/allfilters.c
+--- FFmpeg.orig/libavfilter/allfilters.c
++++ FFmpeg/libavfilter/allfilters.c
 @@ -398,6 +398,7 @@ extern const FFFilter ff_vf_overlay;
  extern const FFFilter ff_vf_overlay_opencl;
  extern const FFFilter ff_vf_overlay_qsv;
@@ -99,10 +99,10 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_overlay_vulkan;
  extern const FFFilter ff_vf_overlay_cuda;
  extern const FFFilter ff_vf_overlay_rkrga;
-Index: jellyfin-ffmpeg/libavfilter/metal/utils.m
+Index: FFmpeg/libavfilter/metal/utils.m
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/metal/utils.m
-+++ jellyfin-ffmpeg/libavfilter/metal/utils.m
+--- FFmpeg.orig/libavfilter/metal/utils.m
++++ FFmpeg/libavfilter/metal/utils.m
 @@ -56,6 +56,9 @@ CVMetalTextureRef ff_metal_texture_from_
  {
      CVMetalTextureRef tex = NULL;
@@ -124,10 +124,10 @@ Index: jellyfin-ffmpeg/libavfilter/metal/utils.m
          plane,
          &tex
      );
-Index: jellyfin-ffmpeg/libavfilter/metal/vf_overlay_videotoolbox.metal
+Index: FFmpeg/libavfilter/metal/vf_overlay_videotoolbox.metal
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/metal/vf_overlay_videotoolbox.metal
++++ FFmpeg/libavfilter/metal/vf_overlay_videotoolbox.metal
 @@ -0,0 +1,99 @@
 +/*
 + * Copyright (C) 2024 Gnattu OC <gnattuoc@me.com>
@@ -228,10 +228,10 @@ Index: jellyfin-ffmpeg/libavfilter/metal/vf_overlay_videotoolbox.metal
 +        dest_uv.write(float4(result_color.y, result_color.z, 0.0f, 1.0f), loc_uv);
 +    }
 +}
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_videotoolbox.m
+Index: FFmpeg/libavfilter/vf_overlay_videotoolbox.m
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/vf_overlay_videotoolbox.m
++++ FFmpeg/libavfilter/vf_overlay_videotoolbox.m
 @@ -0,0 +1,758 @@
 +/*
 + * Copyright (C) 2024 Gnattu OC <gnattuoc@me.com>

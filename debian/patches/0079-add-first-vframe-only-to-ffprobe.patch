@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/fftools/ffprobe.c
+Index: FFmpeg/fftools/ffprobe.c
 ===================================================================
---- jellyfin-ffmpeg.orig/fftools/ffprobe.c
-+++ jellyfin-ffmpeg/fftools/ffprobe.c
+--- FFmpeg.orig/fftools/ffprobe.c
++++ FFmpeg/fftools/ffprobe.c
 @@ -141,6 +141,8 @@ static const char *video_codec_name = NU
  #define SHOW_OPTIONAL_FIELDS_ALWAYS      1
  static int show_optional_fields = SHOW_OPTIONAL_FIELDS_AUTO;

@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/fftools/ffmpeg_filter.c
+Index: FFmpeg/fftools/ffmpeg_filter.c
 ===================================================================
---- jellyfin-ffmpeg.orig/fftools/ffmpeg_filter.c
-+++ jellyfin-ffmpeg/fftools/ffmpeg_filter.c
+--- FFmpeg.orig/fftools/ffmpeg_filter.c
++++ FFmpeg/fftools/ffmpeg_filter.c
 @@ -2669,10 +2669,21 @@ static int close_output(OutputFilterPriv
      if (!fgt->got_frame) {
          AVFrame *frame = fgt->frame;

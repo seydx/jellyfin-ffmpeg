@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/configure
+Index: FFmpeg/configure
 ===================================================================
---- jellyfin-ffmpeg.orig/configure
-+++ jellyfin-ffmpeg/configure
+--- FFmpeg.orig/configure
++++ FFmpeg/configure
 @@ -2048,7 +2048,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="

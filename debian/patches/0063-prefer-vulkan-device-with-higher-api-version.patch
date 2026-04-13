@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_vulkan.c
+Index: FFmpeg/libavutil/hwcontext_vulkan.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext_vulkan.c
-+++ jellyfin-ffmpeg/libavutil/hwcontext_vulkan.c
+--- FFmpeg.orig/libavutil/hwcontext_vulkan.c
++++ FFmpeg/libavutil/hwcontext_vulkan.c
 @@ -1339,7 +1339,7 @@ static const char *vk_dev_type(enum VkPh
  static int find_device(AVHWDeviceContext *ctx, VulkanDeviceSelection *select)
  {

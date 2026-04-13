@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavcodec/videotoolbox.c
+Index: FFmpeg/libavcodec/videotoolbox.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/videotoolbox.c
-+++ jellyfin-ffmpeg/libavcodec/videotoolbox.c
+--- FFmpeg.orig/libavcodec/videotoolbox.c
++++ FFmpeg/libavcodec/videotoolbox.c
 @@ -817,11 +817,6 @@ static CFDictionaryRef videotoolbox_buff
      CFDictionarySetValue(buffer_attributes, kCVPixelBufferIOSurfacePropertiesKey, io_surface_properties);
      CFDictionarySetValue(buffer_attributes, kCVPixelBufferWidthKey, w);

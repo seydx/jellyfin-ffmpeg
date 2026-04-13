@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavformat/segment.c
+Index: FFmpeg/libavformat/segment.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavformat/segment.c
-+++ jellyfin-ffmpeg/libavformat/segment.c
+--- FFmpeg.orig/libavformat/segment.c
++++ FFmpeg/libavformat/segment.c
 @@ -90,6 +90,7 @@ typedef struct SegmentContext {
      int64_t last_val;      ///< remember last time for wrap around detection
      int cut_pending;

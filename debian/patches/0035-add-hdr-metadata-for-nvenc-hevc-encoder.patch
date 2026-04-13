@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavcodec/nvenc.c
+Index: FFmpeg/libavcodec/nvenc.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/nvenc.c
-+++ jellyfin-ffmpeg/libavcodec/nvenc.c
+--- FFmpeg.orig/libavcodec/nvenc.c
++++ FFmpeg/libavcodec/nvenc.c
 @@ -24,6 +24,7 @@
  
  #include "nvenc.h"

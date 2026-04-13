@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_videotoolbox.c
+Index: FFmpeg/libavutil/hwcontext_videotoolbox.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext_videotoolbox.c
-+++ jellyfin-ffmpeg/libavutil/hwcontext_videotoolbox.c
+--- FFmpeg.orig/libavutil/hwcontext_videotoolbox.c
++++ FFmpeg/libavutil/hwcontext_videotoolbox.c
 @@ -831,6 +831,14 @@ static int vt_device_create(AVHWDeviceCo
      return 0;
  }

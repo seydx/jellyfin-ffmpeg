@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_vt.c
+Index: FFmpeg/libavfilter/vf_scale_vt.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/vf_scale_vt.c
-+++ jellyfin-ffmpeg/libavfilter/vf_scale_vt.c
+--- FFmpeg.orig/libavfilter/vf_scale_vt.c
++++ FFmpeg/libavfilter/vf_scale_vt.c
 @@ -41,11 +41,26 @@ typedef struct ScaleVtContext {
      enum AVColorPrimaries colour_primaries;
      enum AVColorTransferCharacteristic colour_transfer;

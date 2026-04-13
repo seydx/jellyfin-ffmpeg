@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/fftools/ffmpeg.c
+Index: FFmpeg/fftools/ffmpeg.c
 ===================================================================
---- jellyfin-ffmpeg.orig/fftools/ffmpeg.c
-+++ jellyfin-ffmpeg/fftools/ffmpeg.c
+--- FFmpeg.orig/fftools/ffmpeg.c
++++ FFmpeg/fftools/ffmpeg.c
 @@ -99,6 +99,9 @@ typedef struct BenchmarkTimeStamps {
  
  static BenchmarkTimeStamps get_benchmark_time_stamps(void);
@@ -109,10 +109,10 @@ Index: jellyfin-ffmpeg/fftools/ffmpeg.c
  static BenchmarkTimeStamps get_benchmark_time_stamps(void)
  {
      BenchmarkTimeStamps time_stamps = { av_gettime_relative() };
-Index: jellyfin-ffmpeg/fftools/ffmpeg.h
+Index: FFmpeg/fftools/ffmpeg.h
 ===================================================================
---- jellyfin-ffmpeg.orig/fftools/ffmpeg.h
-+++ jellyfin-ffmpeg/fftools/ffmpeg.h
+--- FFmpeg.orig/fftools/ffmpeg.h
++++ FFmpeg/fftools/ffmpeg.h
 @@ -804,6 +804,9 @@ extern int recast_media;
  
  extern FILE *vstats_file;
@@ -123,10 +123,10 @@ Index: jellyfin-ffmpeg/fftools/ffmpeg.h
  void term_init(void);
  void term_exit(void);
  
-Index: jellyfin-ffmpeg/fftools/ffmpeg_demux.c
+Index: FFmpeg/fftools/ffmpeg_demux.c
 ===================================================================
---- jellyfin-ffmpeg.orig/fftools/ffmpeg_demux.c
-+++ jellyfin-ffmpeg/fftools/ffmpeg_demux.c
+--- FFmpeg.orig/fftools/ffmpeg_demux.c
++++ FFmpeg/fftools/ffmpeg_demux.c
 @@ -751,6 +751,11 @@ static int input_thread(void *arg)
          DemuxStream *ds;
          unsigned send_flags = 0;

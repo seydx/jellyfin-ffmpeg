@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
+Index: FFmpeg/libavutil/hwcontext_opencl.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext_opencl.c
-+++ jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
+--- FFmpeg.orig/libavutil/hwcontext_opencl.c
++++ FFmpeg/libavutil/hwcontext_opencl.c
 @@ -64,6 +64,16 @@
  #if HAVE_OPENCL_D3D11
  #include <CL/cl_d3d11.h>

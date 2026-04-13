@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavfilter/dither_matrix.h
+Index: FFmpeg/libavfilter/dither_matrix.h
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/dither_matrix.h
++++ FFmpeg/libavfilter/dither_matrix.h
 @@ -0,0 +1,272 @@
 +/*
 + * Dither matrix data
@@ -275,10 +275,10 @@ Index: jellyfin-ffmpeg/libavfilter/dither_matrix.h
 +};
 +
 +#endif /* AVFILTER_DITHER_MATRIX_H */
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_cuda.c
+Index: FFmpeg/libavfilter/vf_scale_cuda.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/vf_scale_cuda.c
-+++ jellyfin-ffmpeg/libavfilter/vf_scale_cuda.c
+--- FFmpeg.orig/libavfilter/vf_scale_cuda.c
++++ FFmpeg/libavfilter/vf_scale_cuda.c
 @@ -23,6 +23,7 @@
  #include <float.h>
  #include <stdio.h>
@@ -433,10 +433,10 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_cuda.c
              .filterMode = s->interp_use_linear ?
                            CU_TR_FILTER_MODE_LINEAR :
                            CU_TR_FILTER_MODE_POINT,
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_cuda.cu
+Index: FFmpeg/libavfilter/vf_scale_cuda.cu
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/vf_scale_cuda.cu
-+++ jellyfin-ffmpeg/libavfilter/vf_scale_cuda.cu
+--- FFmpeg.orig/libavfilter/vf_scale_cuda.cu
++++ FFmpeg/libavfilter/vf_scale_cuda.cu
 @@ -30,6 +30,19 @@ using subsample_function_t = T (*)(cudaT
                                     int src_width, int src_height,
                                     int bit_depth, float param);
@@ -586,10 +586,10 @@ Index: jellyfin-ffmpeg/libavfilter/vf_scale_cuda.cu
  
  extern "C" {
  
-Index: jellyfin-ffmpeg/libavfilter/vf_scale_cuda.h
+Index: FFmpeg/libavfilter/vf_scale_cuda.h
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/vf_scale_cuda.h
-+++ jellyfin-ffmpeg/libavfilter/vf_scale_cuda.h
+--- FFmpeg.orig/libavfilter/vf_scale_cuda.h
++++ FFmpeg/libavfilter/vf_scale_cuda.h
 @@ -45,6 +45,9 @@ typedef struct {
      int src_height;
      float param;

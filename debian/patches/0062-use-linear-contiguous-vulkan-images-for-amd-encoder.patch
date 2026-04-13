@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_vulkan.c
+Index: FFmpeg/libavutil/hwcontext_vulkan.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext_vulkan.c
-+++ jellyfin-ffmpeg/libavutil/hwcontext_vulkan.c
+--- FFmpeg.orig/libavutil/hwcontext_vulkan.c
++++ FFmpeg/libavutil/hwcontext_vulkan.c
 @@ -64,6 +64,13 @@
  #if HAVE_LINUX_DMA_BUF_H
  #include <sys/ioctl.h>

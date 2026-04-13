@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavcodec/videotoolbox.c
+Index: FFmpeg/libavcodec/videotoolbox.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/videotoolbox.c
-+++ jellyfin-ffmpeg/libavcodec/videotoolbox.c
+--- FFmpeg.orig/libavcodec/videotoolbox.c
++++ FFmpeg/libavcodec/videotoolbox.c
 @@ -843,9 +843,7 @@ static CFDictionaryRef videotoolbox_deco
                                                                     &kCFTypeDictionaryValueCallBacks);
  

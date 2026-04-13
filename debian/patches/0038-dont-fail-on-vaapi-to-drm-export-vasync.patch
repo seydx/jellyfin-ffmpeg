@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
+Index: FFmpeg/libavutil/hwcontext_vaapi.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext_vaapi.c
-+++ jellyfin-ffmpeg/libavutil/hwcontext_vaapi.c
+--- FFmpeg.orig/libavutil/hwcontext_vaapi.c
++++ FFmpeg/libavutil/hwcontext_vaapi.c
 @@ -1376,9 +1376,8 @@ static int vaapi_map_to_drm_esh(AVHWFram
  
          vas = vaSyncSurface(hwctx->display, surface_id);

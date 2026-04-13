@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/fftools/ffmpeg_filter.c
+Index: FFmpeg/fftools/ffmpeg_filter.c
 ===================================================================
---- jellyfin-ffmpeg.orig/fftools/ffmpeg_filter.c
-+++ jellyfin-ffmpeg/fftools/ffmpeg_filter.c
+--- FFmpeg.orig/fftools/ffmpeg_filter.c
++++ FFmpeg/fftools/ffmpeg_filter.c
 @@ -2951,7 +2951,8 @@ static void sub2video_heartbeat(InputFil
             or if we need to initialize the system, update the
             overlaid subpicture and its start/end times */
@@ -12,10 +12,10 @@ Index: jellyfin-ffmpeg/fftools/ffmpeg_filter.c
          sub2video_push_ref(ifp, pts2);
  }
  
-Index: jellyfin-ffmpeg/tests/ref/fate/filter-overlay-dvdsub-2397
+Index: FFmpeg/tests/ref/fate/filter-overlay-dvdsub-2397
 ===================================================================
---- jellyfin-ffmpeg.orig/tests/ref/fate/filter-overlay-dvdsub-2397
-+++ jellyfin-ffmpeg/tests/ref/fate/filter-overlay-dvdsub-2397
+--- FFmpeg.orig/tests/ref/fate/filter-overlay-dvdsub-2397
++++ FFmpeg/tests/ref/fate/filter-overlay-dvdsub-2397
 @@ -489,12 +489,12 @@
  1,       3877,       3877,       10,     2013, 0x95a39f9c
  1,       3887,       3887,       10,     2013, 0x4f7ea123
@@ -31,10 +31,10 @@ Index: jellyfin-ffmpeg/tests/ref/fate/filter-overlay-dvdsub-2397
  1,       3952,       3952,       10,     2013, 0x0e5db67e
  1,       3962,       3962,       10,     2013, 0xfc9baf97
  0,        119,        119,        1,   518400, 0x588534fc
-Index: jellyfin-ffmpeg/tests/ref/fate/sub2video
+Index: FFmpeg/tests/ref/fate/sub2video
 ===================================================================
---- jellyfin-ffmpeg.orig/tests/ref/fate/sub2video
-+++ jellyfin-ffmpeg/tests/ref/fate/sub2video
+--- FFmpeg.orig/tests/ref/fate/sub2video
++++ FFmpeg/tests/ref/fate/sub2video
 @@ -68,8 +68,7 @@
  0,        258,        258,        1,   518400, 0x34cdddee
  0,        269,        269,        1,   518400, 0xbab197ea

@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/configure
+Index: FFmpeg/configure
 ===================================================================
---- jellyfin-ffmpeg.orig/configure
-+++ jellyfin-ffmpeg/configure
+--- FFmpeg.orig/configure
++++ FFmpeg/configure
 @@ -4295,6 +4295,7 @@ tinterlace_merge_test_deps="tinterlace_f
  tinterlace_pad_test_deps="tinterlace_filter"
  tonemap_filter_deps="const_nan"
@@ -10,10 +10,10 @@ Index: jellyfin-ffmpeg/configure
  tonemap_opencl_filter_deps="opencl const_nan"
  transpose_opencl_filter_deps="opencl"
  transpose_vaapi_filter_deps="vaapi VAProcPipelineCaps_rotation_flags"
-Index: jellyfin-ffmpeg/libavfilter/Makefile
+Index: FFmpeg/libavfilter/Makefile
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/Makefile
-+++ jellyfin-ffmpeg/libavfilter/Makefile
+--- FFmpeg.orig/libavfilter/Makefile
++++ FFmpeg/libavfilter/Makefile
 @@ -554,6 +554,9 @@ OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)
  OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o opencl.o \
                                                  opencl/tonemap.o opencl/colorspace_common.o
@@ -24,10 +24,10 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  OBJS-$(CONFIG_TPAD_FILTER)                   += vf_tpad.o
  OBJS-$(CONFIG_TRANSPOSE_FILTER)              += vf_transpose.o
  OBJS-$(CONFIG_TRANSPOSE_NPP_FILTER)          += vf_transpose_npp.o
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
+Index: FFmpeg/libavfilter/allfilters.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
-+++ jellyfin-ffmpeg/libavfilter/allfilters.c
+--- FFmpeg.orig/libavfilter/allfilters.c
++++ FFmpeg/libavfilter/allfilters.c
 @@ -517,6 +517,7 @@ extern const FFFilter ff_vf_tonemap;
  extern const FFFilter ff_vf_tonemap_cuda;
  extern const FFFilter ff_vf_tonemap_opencl;
@@ -36,10 +36,10 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_tpad;
  extern const FFFilter ff_vf_transpose;
  extern const FFFilter ff_vf_transpose_npp;
-Index: jellyfin-ffmpeg/libavfilter/metal/vf_tonemap_videotoolbox.metal
+Index: FFmpeg/libavfilter/metal/vf_tonemap_videotoolbox.metal
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/metal/vf_tonemap_videotoolbox.metal
++++ FFmpeg/libavfilter/metal/vf_tonemap_videotoolbox.metal
 @@ -0,0 +1,921 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>
@@ -962,10 +962,10 @@ Index: jellyfin-ffmpeg/libavfilter/metal/vf_tonemap_videotoolbox.metal
 +        dst2.write(float4(chroma.y, chroma.z, 0.0f, 1.0f), uint2(xi, yi));
 +    }
 +}
-Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_videotoolbox.m
+Index: FFmpeg/libavfilter/vf_tonemap_videotoolbox.m
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/vf_tonemap_videotoolbox.m
++++ FFmpeg/libavfilter/vf_tonemap_videotoolbox.m
 @@ -0,0 +1,1211 @@
 +/*
 + * Copyright (c) 2024 Gnattu OC <gnattuoc@me.com>

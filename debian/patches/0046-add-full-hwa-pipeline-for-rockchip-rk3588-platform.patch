@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/configure
+Index: FFmpeg/configure
 ===================================================================
---- jellyfin-ffmpeg.orig/configure
-+++ jellyfin-ffmpeg/configure
+--- FFmpeg.orig/configure
++++ FFmpeg/configure
 @@ -367,6 +367,7 @@ External library support:
    --enable-omx             enable OpenMAX IL code [no]
    --enable-omx-rpi         enable OpenMAX IL code for Raspberry Pi [no]
@@ -154,10 +154,10 @@ Index: jellyfin-ffmpeg/configure
          enable opencl_drm_arm
  fi
  
-Index: jellyfin-ffmpeg/libavcodec/Makefile
+Index: FFmpeg/libavcodec/Makefile
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/Makefile
-+++ jellyfin-ffmpeg/libavcodec/Makefile
+--- FFmpeg.orig/libavcodec/Makefile
++++ FFmpeg/libavcodec/Makefile
 @@ -282,6 +282,7 @@ OBJS-$(CONFIG_AV1_QSV_ENCODER)         +
  OBJS-$(CONFIG_AV1_VAAPI_ENCODER)       += vaapi_encode_av1.o av1_levels.o
  OBJS-$(CONFIG_AV1_VULKAN_ENCODER)      += vulkan_encode.o vulkan_encode_av1.o \
@@ -207,10 +207,10 @@ Index: jellyfin-ffmpeg/libavcodec/Makefile
  OBJS-$(CONFIG_MPL2_DECODER)            += mpl2dec.o ass.o
  OBJS-$(CONFIG_MSA1_DECODER)            += mss3.o
  OBJS-$(CONFIG_MSCC_DECODER)            += mscc.o
-Index: jellyfin-ffmpeg/libavcodec/allcodecs.c
+Index: FFmpeg/libavcodec/allcodecs.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/allcodecs.c
-+++ jellyfin-ffmpeg/libavcodec/allcodecs.c
+--- FFmpeg.orig/libavcodec/allcodecs.c
++++ FFmpeg/libavcodec/allcodecs.c
 @@ -151,6 +151,7 @@ extern const FFCodec ff_h263i_decoder;
  extern const FFCodec ff_h263p_encoder;
  extern const FFCodec ff_h263p_decoder;
@@ -266,10 +266,10 @@ Index: jellyfin-ffmpeg/libavcodec/allcodecs.c
  extern const FFCodec ff_mp3_mediacodec_decoder;
  extern const FFCodec ff_mp3_mf_encoder;
  extern const FFCodec ff_mpeg1_cuvid_decoder;
-Index: jellyfin-ffmpeg/libavcodec/rkmppdec.c
+Index: FFmpeg/libavcodec/rkmppdec.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/rkmppdec.c
-+++ jellyfin-ffmpeg/libavcodec/rkmppdec.c
+--- FFmpeg.orig/libavcodec/rkmppdec.c
++++ FFmpeg/libavcodec/rkmppdec.c
 @@ -1,6 +1,7 @@
  /*
 - * RockChip MPP Video Decoder
@@ -1945,10 +1945,10 @@ Index: jellyfin-ffmpeg/libavcodec/rkmppdec.c
 +#if CONFIG_MJPEG_RKMPP_DECODER
 +DEFINE_RKMPP_DECODER(mjpeg, MJPEG, NULL)
 +#endif
-Index: jellyfin-ffmpeg/libavcodec/rkmppdec.h
+Index: FFmpeg/libavcodec/rkmppdec.h
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavcodec/rkmppdec.h
++++ FFmpeg/libavcodec/rkmppdec.h
 @@ -0,0 +1,149 @@
 +/*
 + * Copyright (c) 2017 Lionel CHAZALLON
@@ -2099,10 +2099,10 @@ Index: jellyfin-ffmpeg/libavcodec/rkmppdec.h
 +};
 +
 +#endif /* AVCODEC_RKMPPDEC_H */
-Index: jellyfin-ffmpeg/libavcodec/rkmppenc.c
+Index: FFmpeg/libavcodec/rkmppenc.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/rkmppenc.c
-+++ jellyfin-ffmpeg/libavcodec/rkmppenc.c
+--- FFmpeg.orig/libavcodec/rkmppenc.c
++++ FFmpeg/libavcodec/rkmppenc.c
 @@ -1,10 +1,9 @@
  /*
 - * RockChip MPP Video Encoder
@@ -3827,10 +3827,10 @@ Index: jellyfin-ffmpeg/libavcodec/rkmppenc.c
 +#if CONFIG_MJPEG_RKMPP_ENCODER
 +DEFINE_RKMPP_ENCODER(mjpeg, MJPEG, mjpeg)
  #endif
-Index: jellyfin-ffmpeg/libavcodec/rkmppenc.h
+Index: FFmpeg/libavcodec/rkmppenc.h
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavcodec/rkmppenc.h
++++ FFmpeg/libavcodec/rkmppenc.h
 @@ -0,0 +1,322 @@
 +/*
 + * Copyright (c) 2023 Huseyin BIYIK
@@ -4154,10 +4154,10 @@ Index: jellyfin-ffmpeg/libavcodec/rkmppenc.h
 +};
 +
 +#endif /* AVCODEC_RKMPPENC_H */
-Index: jellyfin-ffmpeg/libavfilter/Makefile
+Index: FFmpeg/libavfilter/Makefile
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/Makefile
-+++ jellyfin-ffmpeg/libavfilter/Makefile
+--- FFmpeg.orig/libavfilter/Makefile
++++ FFmpeg/libavfilter/Makefile
 @@ -32,6 +32,7 @@ OBJS-$(HAVE_THREADS)
  
  # subsystems
@@ -4198,10 +4198,10 @@ Index: jellyfin-ffmpeg/libavfilter/Makefile
  SKIPHEADERS-$(CONFIG_OPENCL)                 += opencl.h
  SKIPHEADERS-$(CONFIG_VAAPI)                  += vaapi_vpp.h stack_internal.h
  SKIPHEADERS-$(CONFIG_VULKAN)                 += vulkan_filter.h
-Index: jellyfin-ffmpeg/libavfilter/allfilters.c
+Index: FFmpeg/libavfilter/allfilters.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
-+++ jellyfin-ffmpeg/libavfilter/allfilters.c
+--- FFmpeg.orig/libavfilter/allfilters.c
++++ FFmpeg/libavfilter/allfilters.c
 @@ -400,6 +400,7 @@ extern const FFFilter ff_vf_overlay_qsv;
  extern const FFFilter ff_vf_overlay_vaapi;
  extern const FFFilter ff_vf_overlay_vulkan;
@@ -4226,10 +4226,10 @@ Index: jellyfin-ffmpeg/libavfilter/allfilters.c
  extern const FFFilter ff_vf_vstack;
  extern const FFFilter ff_vf_w3fdif;
  extern const FFFilter ff_vf_waveform;
-Index: jellyfin-ffmpeg/libavfilter/rkrga_common.c
+Index: FFmpeg/libavfilter/rkrga_common.c
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/rkrga_common.c
++++ FFmpeg/libavfilter/rkrga_common.c
 @@ -0,0 +1,1425 @@
 +/*
 + * Copyright (c) 2023 NyanMisaka
@@ -5656,10 +5656,10 @@ Index: jellyfin-ffmpeg/libavfilter/rkrga_common.c
 +
 +    return 0;
 +}
-Index: jellyfin-ffmpeg/libavfilter/rkrga_common.h
+Index: FFmpeg/libavfilter/rkrga_common.h
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/rkrga_common.h
++++ FFmpeg/libavfilter/rkrga_common.h
 @@ -0,0 +1,131 @@
 +/*
 + * Copyright (c) 2023 NyanMisaka
@@ -5792,10 +5792,10 @@ Index: jellyfin-ffmpeg/libavfilter/rkrga_common.h
 +                          AVFilterLink *inlink_pat, AVFrame *picref_pat);
 +
 +#endif /* AVFILTER_RKRGA_COMMON_H */
-Index: jellyfin-ffmpeg/libavfilter/vf_overlay_rkrga.c
+Index: FFmpeg/libavfilter/vf_overlay_rkrga.c
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/vf_overlay_rkrga.c
++++ FFmpeg/libavfilter/vf_overlay_rkrga.c
 @@ -0,0 +1,377 @@
 +/*
 + * Copyright (c) 2023 NyanMisaka
@@ -6174,10 +6174,10 @@ Index: jellyfin-ffmpeg/libavfilter/vf_overlay_rkrga.c
 +    .preinit        = rgaoverlay_framesync_preinit,
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};
-Index: jellyfin-ffmpeg/libavfilter/vf_vpp_rkrga.c
+Index: FFmpeg/libavfilter/vf_vpp_rkrga.c
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavfilter/vf_vpp_rkrga.c
++++ FFmpeg/libavfilter/vf_vpp_rkrga.c
 @@ -0,0 +1,582 @@
 +/*
 + * Copyright (c) 2023 NyanMisaka
@@ -6761,10 +6761,10 @@ Index: jellyfin-ffmpeg/libavfilter/vf_vpp_rkrga.c
 +};
 +
 +#endif
-Index: jellyfin-ffmpeg/libavutil/Makefile
+Index: FFmpeg/libavutil/Makefile
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/Makefile
-+++ jellyfin-ffmpeg/libavutil/Makefile
+--- FFmpeg.orig/libavutil/Makefile
++++ FFmpeg/libavutil/Makefile
 @@ -56,6 +56,7 @@ HEADERS = adler32.h
            hwcontext_videotoolbox.h                                      \
            hwcontext_vdpau.h                                             \
@@ -6789,10 +6789,10 @@ Index: jellyfin-ffmpeg/libavutil/Makefile
  SKIPHEADERS-$(CONFIG_SHADER_COMPRESSION) += zlib_utils.h
  
  TESTPROGS = adler32                                                     \
-Index: jellyfin-ffmpeg/libavutil/hwcontext.c
+Index: FFmpeg/libavutil/hwcontext.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext.c
-+++ jellyfin-ffmpeg/libavutil/hwcontext.c
+--- FFmpeg.orig/libavutil/hwcontext.c
++++ FFmpeg/libavutil/hwcontext.c
 @@ -72,6 +72,9 @@ static const HWContextType * const hw_ta
  #if CONFIG_OHCODEC
      &ff_hwcontext_type_oh,
@@ -6811,10 +6811,10 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext.c
      [AV_HWDEVICE_TYPE_AMF] = "amf",
      [AV_HWDEVICE_TYPE_OHCODEC] = "ohcodec",
  };
-Index: jellyfin-ffmpeg/libavutil/hwcontext.h
+Index: FFmpeg/libavutil/hwcontext.h
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext.h
-+++ jellyfin-ffmpeg/libavutil/hwcontext.h
+--- FFmpeg.orig/libavutil/hwcontext.h
++++ FFmpeg/libavutil/hwcontext.h
 @@ -38,6 +38,7 @@ enum AVHWDeviceType {
      AV_HWDEVICE_TYPE_MEDIACODEC,
      AV_HWDEVICE_TYPE_VULKAN,
@@ -6823,10 +6823,10 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext.h
      AV_HWDEVICE_TYPE_AMF,
      /* OpenHarmony Codec device */
      AV_HWDEVICE_TYPE_OHCODEC,
-Index: jellyfin-ffmpeg/libavutil/hwcontext_internal.h
+Index: FFmpeg/libavutil/hwcontext_internal.h
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext_internal.h
-+++ jellyfin-ffmpeg/libavutil/hwcontext_internal.h
+--- FFmpeg.orig/libavutil/hwcontext_internal.h
++++ FFmpeg/libavutil/hwcontext_internal.h
 @@ -163,6 +163,7 @@ extern const HWContextType ff_hwcontext_
  extern const HWContextType ff_hwcontext_type_videotoolbox;
  extern const HWContextType ff_hwcontext_type_mediacodec;
@@ -6835,10 +6835,10 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_internal.h
  extern const HWContextType ff_hwcontext_type_amf;
  extern const HWContextType ff_hwcontext_type_oh;
  
-Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
+Index: FFmpeg/libavutil/hwcontext_opencl.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/hwcontext_opencl.c
-+++ jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
+--- FFmpeg.orig/libavutil/hwcontext_opencl.c
++++ FFmpeg/libavutil/hwcontext_opencl.c
 @@ -83,6 +83,16 @@ typedef CL_API_ENTRY cl_mem(CL_API_CALL
  #include <CL/cl_ext.h>
  #include <drm_fourcc.h>
@@ -6938,10 +6938,10 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_opencl.c
  
              region.origin = plane->offset;
              region.size   = image_desc.image_row_pitch *
-Index: jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.c
+Index: FFmpeg/libavutil/hwcontext_rkmpp.c
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.c
++++ FFmpeg/libavutil/hwcontext_rkmpp.c
 @@ -0,0 +1,603 @@
 +/*
 + * This file is part of FFmpeg.
@@ -7546,10 +7546,10 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.c
 +        AV_PIX_FMT_NONE
 +    },
 +};
-Index: jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.h
+Index: FFmpeg/libavutil/hwcontext_rkmpp.h
 ===================================================================
 --- /dev/null
-+++ jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.h
++++ FFmpeg/libavutil/hwcontext_rkmpp.h
 @@ -0,0 +1,153 @@
 +/*
 + * This file is part of FFmpeg.
@@ -7704,10 +7704,10 @@ Index: jellyfin-ffmpeg/libavutil/hwcontext_rkmpp.h
 +} AVRKMPPDeviceContext;
 +
 +#endif /* AVUTIL_HWCONTEXT_RKMPP_H */
-Index: jellyfin-ffmpeg/libavutil/pixdesc.c
+Index: FFmpeg/libavutil/pixdesc.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/pixdesc.c
-+++ jellyfin-ffmpeg/libavutil/pixdesc.c
+--- FFmpeg.orig/libavutil/pixdesc.c
++++ FFmpeg/libavutil/pixdesc.c
 @@ -3267,6 +3267,30 @@ static const AVPixFmtDescriptor av_pix_f
          .name = "ohcodec",
          .flags = AV_PIX_FMT_FLAG_HWACCEL,
@@ -7739,10 +7739,10 @@ Index: jellyfin-ffmpeg/libavutil/pixdesc.c
  };
  
  static const char * const color_range_names[] = {
-Index: jellyfin-ffmpeg/libavutil/pixfmt.h
+Index: FFmpeg/libavutil/pixfmt.h
 ===================================================================
---- jellyfin-ffmpeg.orig/libavutil/pixfmt.h
-+++ jellyfin-ffmpeg/libavutil/pixfmt.h
+--- FFmpeg.orig/libavutil/pixfmt.h
++++ FFmpeg/libavutil/pixfmt.h
 @@ -196,8 +196,8 @@ enum AVPixelFormat {
      AV_PIX_FMT_XYZ12LE,      ///< packed XYZ 4:4:4, 36 bpp, (msb) 12X, 12Y, 12Z (lsb), the 2-byte value for each X/Y/Z is stored as little-endian, the 4 lower bits are set to 0
      AV_PIX_FMT_XYZ12BE,      ///< packed XYZ 4:4:4, 36 bpp, (msb) 12X, 12Y, 12Z (lsb), the 2-byte value for each X/Y/Z is stored as big-endian, the 4 lower bits are set to 0
@@ -7772,10 +7772,10 @@ Index: jellyfin-ffmpeg/libavutil/pixfmt.h
  #define AV_PIX_FMT_AYUV64     AV_PIX_FMT_NE(AYUV64BE, AYUV64LE)
  #define AV_PIX_FMT_P010       AV_PIX_FMT_NE(P010BE,  P010LE)
  #define AV_PIX_FMT_P012       AV_PIX_FMT_NE(P012BE,  P012LE)
-Index: jellyfin-ffmpeg/libswscale/format.c
+Index: FFmpeg/libswscale/format.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libswscale/format.c
-+++ jellyfin-ffmpeg/libswscale/format.c
+--- FFmpeg.orig/libswscale/format.c
++++ FFmpeg/libswscale/format.c
 @@ -228,6 +228,8 @@ static const LegacyFormatEntry legacy_fo
      [AV_PIX_FMT_XYZ12LE]        = { 1, 1, 1 },
      [AV_PIX_FMT_AYUV64LE]       = { 1, 1},
@@ -7785,10 +7785,10 @@ Index: jellyfin-ffmpeg/libswscale/format.c
      [AV_PIX_FMT_P010LE]         = { 1, 1 },
      [AV_PIX_FMT_P010BE]         = { 1, 1 },
      [AV_PIX_FMT_P012LE]         = { 1, 1 },
-Index: jellyfin-ffmpeg/libswscale/input.c
+Index: FFmpeg/libswscale/input.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libswscale/input.c
-+++ jellyfin-ffmpeg/libswscale/input.c
+--- FFmpeg.orig/libswscale/input.c
++++ FFmpeg/libswscale/input.c
 @@ -946,6 +946,39 @@ static void nv21ToUV_c(uint8_t *dstU, ui
      nvXXtoUV_c(dstV, dstU, src1, width);
  }
@@ -7851,10 +7851,10 @@ Index: jellyfin-ffmpeg/libswscale/input.c
      case AV_PIX_FMT_P010LE:
      case AV_PIX_FMT_P210LE:
      case AV_PIX_FMT_P410LE:
-Index: jellyfin-ffmpeg/libswscale/swscale_unscaled.c
+Index: FFmpeg/libswscale/swscale_unscaled.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libswscale/swscale_unscaled.c
-+++ jellyfin-ffmpeg/libswscale/swscale_unscaled.c
+--- FFmpeg.orig/libswscale/swscale_unscaled.c
++++ FFmpeg/libswscale/swscale_unscaled.c
 @@ -265,6 +265,62 @@ static int nv24ToYuv420Wrapper(SwsIntern
      return srcSliceH;
  }
@@ -7938,10 +7938,10 @@ Index: jellyfin-ffmpeg/libswscale/swscale_unscaled.c
      /* yuv2bgr */
      if ((srcFormat == AV_PIX_FMT_YUV420P || srcFormat == AV_PIX_FMT_YUV422P ||
           srcFormat == AV_PIX_FMT_YUVA420P) && isAnyRGB(dstFormat) &&
-Index: jellyfin-ffmpeg/tests/ref/fate/imgutils
+Index: FFmpeg/tests/ref/fate/imgutils
 ===================================================================
---- jellyfin-ffmpeg.orig/tests/ref/fate/imgutils
-+++ jellyfin-ffmpeg/tests/ref/fate/imgutils
+--- FFmpeg.orig/tests/ref/fate/imgutils
++++ FFmpeg/tests/ref/fate/imgutils
 @@ -154,6 +154,8 @@ yuva444p16le    planes: 4, linesizes: 12
  xyz12le         planes: 1, linesizes: 384   0   0   0, plane_sizes: 18432     0     0     0, plane_offsets:     0     0     0, total_size: 18432
  xyz12be         planes: 1, linesizes: 384   0   0   0, plane_sizes: 18432     0     0     0, plane_offsets:     0     0     0, total_size: 18432
@@ -7960,10 +7960,10 @@ Index: jellyfin-ffmpeg/tests/ref/fate/imgutils
  nv20le          total_size:  12288,  black_unknown_crc: 0x2ef977dc,  black_tv_crc: 0x2ef977dc,  black_pc_crc: 0x5a944de0
  nv20be          total_size:  12288,  black_unknown_crc: 0x7cb8d0b6,  black_tv_crc: 0x7cb8d0b6,  black_pc_crc: 0xa0507635
  rgba64be        total_size:  24576,  black_unknown_crc: 0x0ab5caf6,  black_tv_crc: 0x0ab5caf6,  black_pc_crc: 0x0ab5caf6
-Index: jellyfin-ffmpeg/tests/ref/fate/sws-pixdesc-query
+Index: FFmpeg/tests/ref/fate/sws-pixdesc-query
 ===================================================================
---- jellyfin-ffmpeg.orig/tests/ref/fate/sws-pixdesc-query
-+++ jellyfin-ffmpeg/tests/ref/fate/sws-pixdesc-query
+--- FFmpeg.orig/tests/ref/fate/sws-pixdesc-query
++++ FFmpeg/tests/ref/fate/sws-pixdesc-query
 @@ -79,6 +79,8 @@ isNBPS:
    gray14le
    gray9be

@@ -1,7 +1,7 @@
-Index: jellyfin-ffmpeg/libavcodec/amfenc_av1.c
+Index: FFmpeg/libavcodec/amfenc_av1.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/amfenc_av1.c
-+++ jellyfin-ffmpeg/libavcodec/amfenc_av1.c
+--- FFmpeg.orig/libavcodec/amfenc_av1.c
++++ FFmpeg/libavcodec/amfenc_av1.c
 @@ -28,6 +28,22 @@
  
  #define OFFSET(x) offsetof(AMFEncoderContext, x)
@@ -43,10 +43,10 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc_av1.c
  
      { "align",                  "alignment mode",                           OFFSET(align),                          AV_OPT_TYPE_INT,     {.i64 = AMF_VIDEO_ENCODER_AV1_ALIGNMENT_MODE_NO_RESTRICTIONS },         AMF_VIDEO_ENCODER_AV1_ALIGNMENT_MODE_64X16_ONLY, AMF_VIDEO_ENCODER_AV1_ALIGNMENT_MODE_NO_RESTRICTIONS, VE, .unit = "align" },
      { "64x16",                  "", 0, AV_OPT_TYPE_CONST, {.i64 = AMF_VIDEO_ENCODER_AV1_ALIGNMENT_MODE_64X16_ONLY               }, 0, 0, VE, .unit = "align" },
-Index: jellyfin-ffmpeg/libavcodec/amfenc_h264.c
+Index: FFmpeg/libavcodec/amfenc_h264.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/amfenc_h264.c
-+++ jellyfin-ffmpeg/libavcodec/amfenc_h264.c
+--- FFmpeg.orig/libavcodec/amfenc_h264.c
++++ FFmpeg/libavcodec/amfenc_h264.c
 @@ -29,6 +29,20 @@
  #define OFFSET(x) offsetof(AMFEncoderContext, x)
  #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
@@ -110,10 +110,10 @@ Index: jellyfin-ffmpeg/libavcodec/amfenc_h264.c
          if (avctx->qmin != -1) {
              int qval = avctx->qmin > 51 ? 51 : avctx->qmin;
              AMF_ASSIGN_PROPERTY_INT64(res, ctx->encoder, AMF_VIDEO_ENCODER_MIN_QP, qval);
-Index: jellyfin-ffmpeg/libavcodec/amfenc_hevc.c
+Index: FFmpeg/libavcodec/amfenc_hevc.c
 ===================================================================
---- jellyfin-ffmpeg.orig/libavcodec/amfenc_hevc.c
-+++ jellyfin-ffmpeg/libavcodec/amfenc_hevc.c
+--- FFmpeg.orig/libavcodec/amfenc_hevc.c
++++ FFmpeg/libavcodec/amfenc_hevc.c
 @@ -29,6 +29,21 @@
  #define OFFSET(x) offsetof(AMFEncoderContext, x)
  #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
