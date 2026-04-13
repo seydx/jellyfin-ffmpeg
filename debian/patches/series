@@ -1,3 +1,4 @@
+0091-fix-whisper-skip-gpu-backends-when-disabled.patch
 0001-add-fixes-for-segment-muxer.patch
 0002-update-cuda-func-header.patch
 0003-add-enhanced-cuda-pixfmt-converter-impl.patch
