@@ -120,17 +120,17 @@ typedef struct SwsOpEntry {
     /* Kernel metadata; reduced size subset of SwsOp */
     SwsOpType op;
     SwsPixelType type;
+    SwsCompMask mask; /* mask of active components (after operation) */
     bool flexible; /* if true, only the type and op are matched */
-    bool unused[4]; /* for kernels which operate on a subset of components */
 
     union { /* extra data defining the operation, unless `flexible` is true */
         SwsReadWriteOp rw;
         SwsPackOp      pack;
         SwsSwizzleOp   swizzle;
         SwsConvertOp   convert;
+        SwsClearOp     clear;
         uint32_t       linear_mask; /* subset of SwsLinearOp */
         int            dither_size; /* subset of SwsDitherOp */
-        int            clear_value; /* clear value for integer clears */
         AVRational     scale;       /* scale factor for SWS_OP_SCALE */
     };
 
@@ -169,7 +169,7 @@ struct SwsOpTable {
  * Returns 0 or a negative error code.
  */
 int ff_sws_op_compile_tables(SwsContext *ctx, const SwsOpTable *const tables[],
-                             int num_tables, SwsOpList *ops, int ops_index,
+                             int num_tables, const SwsOp *op,
                              const int block_size, SwsOpChain *chain);
 
 #endif

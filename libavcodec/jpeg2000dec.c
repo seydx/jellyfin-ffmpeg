@@ -147,14 +147,17 @@ static int pix_fmt_match(enum AVPixelFormat pix_fmt, int components,
         match = match && desc->comp[3].depth >= bpc &&
                          (log2_chroma_wh >> 14 & 3) == 0 &&
                          (log2_chroma_wh >> 12 & 3) == 0;
+        av_fallthrough;
     case 3:
         match = match && desc->comp[2].depth >= bpc &&
                          (log2_chroma_wh >> 10 & 3) == desc->log2_chroma_w &&
                          (log2_chroma_wh >>  8 & 3) == desc->log2_chroma_h;
+        av_fallthrough;
     case 2:
         match = match && desc->comp[1].depth >= bpc &&
                          (log2_chroma_wh >>  6 & 3) == desc->log2_chroma_w &&
                          (log2_chroma_wh >>  4 & 3) == desc->log2_chroma_h;
+        av_fallthrough;
 
     case 1:
         match = match && desc->comp[0].depth >= bpc &&
@@ -1957,7 +1960,7 @@ static void decode_clnpass(const Jpeg2000DecoderContext *s, Jpeg2000T1Context *t
                            int width, int height, int bpno, int bandno,
                            int seg_symbols, int vert_causal_ctx_csty_symbol)
 {
-    int mask = 3 << (bpno - 1), y0, x, y, runlen, dec;
+    int mask = (3u << bpno)>>1, y0, x, y, runlen, dec;
 
     for (y0 = 0; y0 < height; y0 += 4) {
         for (x = 0; x < width; x++) {

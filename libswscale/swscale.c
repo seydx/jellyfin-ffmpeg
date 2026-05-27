@@ -357,7 +357,6 @@ int ff_swscale(SwsInternal *c, const uint8_t *const src[], const int srcStride[]
 #if ARCH_X86
     if (   (uintptr_t) dst[0]&15 || (uintptr_t) dst[1]&15 || (uintptr_t) dst[2]&15
         || (uintptr_t)src2[0]&15 || (uintptr_t)src2[1]&15 || (uintptr_t)src2[2]&15
-        ||  dstStride[0]&15 ||  dstStride[1]&15 ||  dstStride[2]&15 ||  dstStride[3]&15
         || srcStride2[0]&15 || srcStride2[1]&15 || srcStride2[2]&15 || srcStride2[3]&15
     ) {
         SwsInternal *const ctx = c->parent ? sws_internal(c->parent) : c;
@@ -513,7 +512,7 @@ int ff_swscale(SwsInternal *c, const uint8_t *const src[], const int srcStride[]
         if (!enough_lines)
             break;  // we can't output a dstY line so let's try with the next slice
 
-#if HAVE_MMX_INLINE
+#if ARCH_X86 && HAVE_MMX
         ff_updateMMXDitherTables(c, dstY);
         c->dstW_mmx = c->opts.dst_w;
 #endif
@@ -1037,6 +1036,8 @@ static int scale_internal(SwsContext *sws,
     if ((srcSliceY  & (macro_height_src - 1)) ||
         ((srcSliceH & (macro_height_src - 1)) && srcSliceY + srcSliceH != sws->src_h) ||
         srcSliceY + srcSliceH > sws->src_h ||
+        srcSliceY < 0 ||
+        srcSliceH < 0 ||
         (isBayer(sws->src_format) && srcSliceH <= 1)) {
         av_log(c, AV_LOG_ERROR, "Slice parameters %d, %d are invalid\n", srcSliceY, srcSliceH);
         return AVERROR(EINVAL);
@@ -1225,8 +1226,10 @@ static int frame_alloc_buffers(SwsContext *sws, AVFrame *frame)
     for (int i = 0; i < nb_planes; i++) {
         frame->linesize[i] = pool->linesize[i];
         frame->buf[i] = av_buffer_pool_get(pool->pools[i]);
-        if (!frame->buf[i])
+        if (!frame->buf[i]) {
+            av_frame_unref(frame);
             return AVERROR(ENOMEM);
+        }
         frame->data[i] = frame->buf[i]->data;
     }
 
@@ -1501,7 +1504,16 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
             goto fail;
         }
 
-        ret = ff_sws_graph_reinit(ctx, &dst_fmt, &src_fmt, field, &s->graph[field]);
+        if (!s->graph[field]) {
+            s->graph[field] = ff_sws_graph_alloc();
+            if (!s->graph[field]) {
+                err_msg = "Failed allocating scaling graph";
+                ret = AVERROR(ENOMEM);
+                goto fail;
+            }
+        }
+
+        ret = ff_sws_graph_reinit(s->graph[field], ctx, &dst_fmt, &src_fmt, field);
         if (ret < 0) {
             err_msg = "Failed initializing scaling graph";
             goto fail;

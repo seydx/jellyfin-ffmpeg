@@ -20,6 +20,18 @@
 
 #include "ops_backend.h"
 
+/**
+ * We want to disable FP contraction because this is a reference backend that
+ * establishes a bit-exact reference result.
+ */
+#ifdef __clang__
+#pragma STDC FP_CONTRACT OFF
+#elif AV_GCC_VERSION_AT_LEAST(4, 8)
+#pragma GCC optimize ("fp-contract=off")
+#elif defined(_MSC_VER)
+#pragma fp_contract (off)
+#endif
+
 #if AV_GCC_VERSION_AT_LEAST(4, 4)
 #pragma GCC optimize ("finite-math-only")
 #endif
@@ -68,7 +80,7 @@ static int compile(SwsContext *ctx, SwsOpList *ops, SwsCompiledOp *out)
 
     for (int i = 0; i < ops->num_ops; i++) {
         ret = ff_sws_op_compile_tables(ctx, tables, FF_ARRAY_ELEMS(tables),
-                                       ops, i, SWS_BLOCK_SIZE, chain);
+                                       &ops->ops[i], SWS_BLOCK_SIZE, chain);
         if (ret < 0) {
             av_log(ctx, AV_LOG_TRACE, "Failed to compile op %d\n", i);
             ff_sws_op_chain_free(chain);
