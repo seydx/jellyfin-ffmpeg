@@ -225,6 +225,25 @@ AVStream *stream;
 AVStream* stream;
 @end example
 
+@item
+When sensible, prefer a narrow variable scope, especially in for loops:
+
+@example c, good
+// Good
+for (unsigned i = 0; i < submix->nb_elements; i++) @{
+    // Do something...
+@}
+@end example
+
+@example c, bad
+// Bad style
+unsigned i;
+//...
+for (i = 0; i < submix->nb_elements; i++) @{
+    // Do something...
+@}
+@end example
+
 @end itemize
 
 If you work on a file that does not follow these guidelines consistently,
@@ -368,7 +387,7 @@ symbols. If in doubt, just avoid names starting with @code{_} altogether.
 Casts should be used only when necessary. Unneeded parentheses
 should also be avoided if they don't make the code easier to understand.
 @item
-Where applicable, SI units shall be used. For example timeouts should use seconds as the fundamental unit not micro seconds.
+Where applicable, SI units shall be used. For example timeouts should use seconds as the fundamental unit not microseconds.
 That means a bare value like @samp{1.0} must mean 1 second, @samp{50m} means 50 milliseconds. For weight, gram shall be used.
 @end itemize
 

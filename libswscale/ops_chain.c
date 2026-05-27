@@ -64,14 +64,6 @@ int ff_sws_op_chain_append(SwsOpChain *chain, SwsFuncPtr func,
  * Match an operation against a reference operation. Returns a score for how
  * well the reference matches the operation, or 0 if there is no match.
  *
- * If `ref->comps` has any flags set, they must be set in `op` as well.
- * Likewise, if `ref->comps` has any components marked as unused, they must be
- * marked as unused in `ops` as well.
- *
- * For SWS_OP_LINEAR, `ref->linear.mask` must be a strict superset of
- * `op->linear.mask`, but may not contain any columns explicitly ignored by
- * `op->comps.unused`.
- *
  * For unfiltered SWS_OP_READ/SWS_OP_WRITE, SWS_OP_SWAP_BYTES and
  * SWS_OP_SWIZZLE, the exact type is not checked, just the size.
  *
@@ -90,7 +82,7 @@ static int op_match(const SwsOp *op, const SwsOpEntry *entry)
     case SWS_OP_WRITE:
         if (op->rw.filter && op->type != entry->type)
             return 0;
-        /* fall through */;
+        av_fallthrough;
     case SWS_OP_SWAP_BYTES:
     case SWS_OP_SWIZZLE:
         /* Only the size matters for these operations */
@@ -103,24 +95,12 @@ static int op_match(const SwsOp *op, const SwsOpEntry *entry)
         break;
     }
 
-    for (int i = 0; i < 4; i++) {
-        if (entry->unused[i]) {
-            if (op->comps.unused[i])
-                score += 1; /* Operating on fewer components is better .. */
-            else
-                return 0; /* .. but not too few! */
-        }
-    }
+    const SwsCompMask needed = ff_sws_comp_mask_needed(op);
+    if (needed & ~entry->mask)
+        return 0; /* Entry doesn't compute all needed components */
 
-    if (op->op == SWS_OP_CLEAR) {
-        /* Clear pattern must match exactly, regardless of `entry->flexible` */
-        for (int i = 0; i < 4; i++) {
-            if (!SWS_OP_NEEDED(op, i))
-                continue;
-            if (entry->unused[i] != !!op->clear.value[i].den)
-                return 0;
-        }
-    }
+    /* Otherwise, operating on fewer components is better */
+    score += av_popcount(SWS_COMP_INV(entry->mask));
 
     /* Flexible variants always match, but lower the score to prioritize more
      * specific implementations if they exist */
@@ -148,10 +128,15 @@ static int op_match(const SwsOp *op, const SwsOpEntry *entry)
         }
         return score;
     case SWS_OP_CLEAR:
+        /* Clear mask must match exactly */
+        if (op->clear.mask != entry->clear.mask)
+            return 0;
         for (int i = 0; i < 4; i++) {
-            if (!op->clear.value[i].den || !SWS_OP_NEEDED(op, i))
+            if (!SWS_COMP_TEST(op->clear.mask, i) || !SWS_OP_NEEDED(op, i))
                 continue;
-            if (av_cmp_q(op->clear.value[i], Q(entry->clear_value)))
+            else if (!entry->clear.value[i].den)
+                continue; /* Any clear value supported */
+            else if (av_cmp_q(op->clear.value[i], entry->clear.value[i]))
                 return 0;
         }
         return score;
@@ -174,20 +159,10 @@ static int op_match(const SwsOp *op, const SwsOpEntry *entry)
         return op->dither.size_log2 == entry->dither_size ? score : 0;
     case SWS_OP_MIN:
     case SWS_OP_MAX:
-        av_assert1(entry->flexible);
-        break;
+        return score;
     case SWS_OP_LINEAR:
-        /* All required elements must be present */
-        if (op->lin.mask & ~entry->linear_mask)
+        if (op->lin.mask != entry->linear_mask)
             return 0;
-        /* To avoid operating on possibly undefined memory, filter out
-         * implementations that operate on more input components */
-        for (int i = 0; i < 4; i++) {
-            if ((entry->linear_mask & SWS_MASK_COL(i)) && op->comps.unused[i])
-                return 0;
-        }
-        /* Prioritize smaller implementations */
-        score += av_popcount(SWS_MASK_ALL ^ entry->linear_mask);
         return score;
     case SWS_OP_SCALE:
         return av_cmp_q(op->scale.factor, entry->scale) ? 0 : score;
@@ -203,10 +178,9 @@ static int op_match(const SwsOp *op, const SwsOpEntry *entry)
 }
 
 int ff_sws_op_compile_tables(SwsContext *ctx, const SwsOpTable *const tables[],
-                             int num_tables, SwsOpList *ops, int ops_index,
+                             int num_tables, const SwsOp *op,
                              const int block_size, SwsOpChain *chain)
 {
-    const SwsOp *op = &ops->ops[ops_index];
     const unsigned cpu_flags = av_get_cpu_flags();
     const SwsOpEntry *best = NULL;
     const SwsOpTable *best_table = NULL;
