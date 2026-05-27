@@ -65,3 +65,4 @@
 /refresh*.sh
 /builder/build/*
 /upstream.txt
+/changes.txt
