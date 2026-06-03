@@ -390,20 +390,6 @@ static const AVClass layered_video_class = {
     .option     = layered_video_options,
 };
 
-#define OFFSET(x) offsetof(AVStreamGroupTREF, x)
-static const AVOption tref_options[] = {
-    { "metadata_index", "Index of the data stream within the group", OFFSET(metadata_index),
-        AV_OPT_TYPE_UINT, { .i64 = 0 }, 0, UINT_MAX, FLAGS },
-    { NULL },
-};
-#undef OFFSET
-
-static const AVClass tref_class = {
-    .class_name = "AVStreamGroupTREF",
-    .version    = LIBAVUTIL_VERSION_INT,
-    .option     = tref_options,
-};
-
 static void *stream_group_child_next(void *obj, void *prev)
 {
     AVStreamGroup *stg = obj;
@@ -453,9 +439,6 @@ static const AVClass *stream_group_child_iterate(void **opaque)
     case AV_STREAM_GROUP_PARAMS_LCEVC:
     case AV_STREAM_GROUP_PARAMS_DOLBY_VISION:
         ret = &layered_video_class;
-        break;
-    case AV_STREAM_GROUP_PARAMS_TREF:
-        ret = &tref_class;
         break;
     default:
         break;
@@ -540,13 +523,6 @@ AVStreamGroup *avformat_stream_group_create(AVFormatContext *s,
             goto fail;
         stg->params.layered_video->av_class = &layered_video_class;
         av_opt_set_defaults(stg->params.layered_video);
-        break;
-    case AV_STREAM_GROUP_PARAMS_TREF:
-        stg->params.tref = av_mallocz(sizeof(*stg->params.tref));
-        if (!stg->params.tref)
-            goto fail;
-        stg->params.tref->av_class = &tref_class;
-        av_opt_set_defaults(stg->params.tref);
         break;
     default:
         goto fail;
