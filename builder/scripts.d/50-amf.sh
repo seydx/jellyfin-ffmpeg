@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git"
-SCRIPT_COMMIT="afed28d37aca1938da2eedc50599bb3535a987ec"
+SCRIPT_COMMIT="eadd00804d5f7e5cd8c85d540073198312870776"
 
 ffbuild_enabled() {
     [[ $TARGET == mac* ]] && return -1
