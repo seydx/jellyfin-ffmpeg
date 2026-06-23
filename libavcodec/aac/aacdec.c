@@ -948,7 +948,7 @@ static int decode_pce(AVCodecContext *avctx, MPEG4AudioConfig *m4ac,
                         memcpy(layout_map + height_tags, &tag[AAC_CHANNEL_LFE][j], sizeof(*layout_map));
                         height_tags++;
                     }
-                    for (int j = 0; j < num_cc; j++, height_tags++) {
+                    for (int j = 0; j < num_cc; j++) {
                         memcpy(layout_map + height_tags, &tag[AAC_CHANNEL_CC][j], sizeof(*layout_map));
                         height_tags++;
                     }
@@ -2647,6 +2647,9 @@ static const AVOption options[] = {
         { .i64 = CHANNEL_ORDER_DEFAULT }, .flags = AACDEC_FLAGS, .unit = "channel_order" },
       { "coded",    "order in which the channels are coded in the bitstream",
         0, AV_OPT_TYPE_CONST, { .i64 = CHANNEL_ORDER_CODED }, .flags = AACDEC_FLAGS, .unit = "channel_order" },
+
+    { "target_level", "Target output loudness in dBFS for xHE-AAC normalization (0 = disabled)",
+        OFF(target_level), AV_OPT_TYPE_INT, { .i64 = 0 }, -70, 0, AACDEC_FLAGS },
 
     {NULL},
 };
