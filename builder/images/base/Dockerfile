@@ -26,9 +26,15 @@ RUN \
     git config --global user.name "Builder" && \
     git config --global advice.detachedHead false
 
-ENV CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/rustup" PATH="/opt/cargo/bin:${PATH}"
+ENV CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/rustup" PATH="/opt/cargo/bin:${PATH}" \
+    CARGO_NET_RETRY=10 \
+    CARGO_HTTP_MULTIPLEXING=false
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y --no-modify-path
-RUN cargo install --locked cargo-c && rm -rf "${CARGO_HOME}"/registry "${CARGO_HOME}"/git
+# Retry loop: crates.io occasionally drops HTTP2 streams mid-download
+# ("HTTP2 framing layer" errors). Combined with the env vars above this
+# makes the install resilient to transient network flakes.
+RUN for i in 1 2 3 4 5; do cargo install --locked cargo-c && break || { echo "attempt $i failed; retrying in 10s..."; sleep 10; }; done \
+ && rm -rf "${CARGO_HOME}"/registry "${CARGO_HOME}"/git
 
 RUN --mount=src=.,dst=/input \
     for s in /input/*.sh; do cp $s /usr/bin/$(echo $s | sed -e 's|.*/||' -e 's/\.sh$//'); done
