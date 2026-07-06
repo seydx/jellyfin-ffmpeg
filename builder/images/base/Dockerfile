@@ -2,13 +2,11 @@ FROM ubuntu:noble
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Use more reliable mirrors for Ubuntu packages
-RUN mkdir -p /etc/apt/sources.list.d/ \
- && touch /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources \
- && sed -i 's|archive.ubuntu.com/ubuntu/|mirrors.kernel.org/ubuntu/|g' \
-    /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources \
- && sed -i 's|security.ubuntu.com/ubuntu/|mirrors.kernel.org/ubuntu/|g' \
-    /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources
+# NOTE: intentionally no apt mirror rewrite (upstream doesn't have one either).
+# A previous mirrors.kernel.org redirect broke builds whenever the mirror was
+# mid-sync: version-locked -dev packages then can't match their runtime lib,
+# e.g. "libssl-dev : Depends: libssl3t64 (= ...3.9) but ...3.11 is to be
+# installed". The default Ubuntu archives are always consistent.
 
 RUN \
     apt-get -y update && \
