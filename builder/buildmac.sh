@@ -52,6 +52,14 @@ else
     exit 1
 fi
 
+# The Metal Toolchain is a separate download since Xcode 26. Without it,
+# configure (--enable-metal) fails late - surface the fix right away.
+if ! xcrun -sdk macosx metal -v >/dev/null 2>&1; then
+    echo "ERROR: Metal compiler not available - Metal-based filters (overlay_videotoolbox, ...) need it."
+    echo "Install it with: xcodebuild -downloadComponent MetalToolchain"
+    exit 1
+fi
+
 source "variants/${TARGET}-gpl.sh"
 
 for addin in ${ADDINS[*]}; do

@@ -37,6 +37,15 @@ jobs:
           sudo mkdir /opt/ffbuild
           sudo chmod 777 /opt/ffbuild
 
+      - name: Ensure Metal Toolchain
+        run: |
+          # Since Xcode 26 the Metal Toolchain is a separate download. Without it,
+          # FFmpeg drops its Metal-based filters (overlay_videotoolbox, ...) - the
+          # build requires it now via --enable-metal, so install it up front.
+          if ! xcrun -sdk macosx metal -v >/dev/null 2>&1; then
+            sudo xcodebuild -downloadComponent MetalToolchain
+          fi
+
       - name: Build Portable
         run: ./builder/buildmac.sh ${{ matrix.os.arch }}
 
