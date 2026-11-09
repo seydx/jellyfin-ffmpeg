@@ -105,3 +105,16 @@
 0105-skip-oversized-a53-caption-sei-in-qsv-h264-encoder.patch
 0106-unref-the-last-frame-on-filter-graph-cleanup.patch
 0107-backport-fixes-to-preserve-display-matrix-in-filter-graph.patch
+1001-add-avframe-crop-support-to-qsv-scale.patch
+1003-add-avframe-crop-support-to-rkrga-scale.patch
+1004-add-avframe-crop-support-to-libplacebo.patch
+1005-change-ffmpeg-version-file.patch
+1007-add-sdp-direction-attribute-support.patch
+1008-add-sdp-fmtp-and-mimetype-support.patch
+1009-hevc-parameter-sets.patch
+1011-check-vaapi-drm-availability.patch
+1012-avfoundation-device-capture.patch
+1013-fix-whisper-skip-gpu-backends-when-disabled.patch
+1015-add-passthrough-option-to-vaapi-scale.patch
+1016-clear-consumed-crop-metadata-on-hw-scaler-output.patch
+1017-export-rtp-timestamp-side-data.patch
