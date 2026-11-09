@@ -45,11 +45,9 @@ ffbuild_dockerbuild() {
 }
 
 ffbuild_configure() {
-    return 0
-    echo --enable-libxcb
+    echo --enable-libxcb --enable-indev=xcbgrab
 }
 
 ffbuild_unconfigure() {
-    return 0
-    echo --disable-libxcb
+    echo --disable-libxcb --disable-indev=xcbgrab
 }

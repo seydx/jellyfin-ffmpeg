@@ -5,6 +5,11 @@ FF_LDFLAGS=""
 GIT_BRANCH="jellyfin"
 LICENSE_FILE="COPYING.GPLv3"
 
-[[ $TARGET == linux* ]] && FF_CONFIGURE+=" --disable-libxcb --disable-xlib --enable-lto=auto" || true
+[[ $TARGET == linux* ]] && FF_CONFIGURE+=" --enable-lto=auto" || true
 # [[ $TARGET == win* ]] && FF_CONFIGURE+=" --enable-lto=auto" || true
 [[ $TARGET == mac* ]] && FF_CONFIGURE+=" --enable-lto=thin" || true
+
+# Input devices for webcam, microphone and screen capture
+[[ $TARGET == linux* ]] && FF_CONFIGURE+=" --enable-indev=v4l2" || true
+[[ $TARGET == win* ]] && FF_CONFIGURE+=" --enable-indev=dshow --enable-indev=gdigrab" || true
+[[ $TARGET == mac* ]] && FF_CONFIGURE+=" --enable-indev=avfoundation" || true
