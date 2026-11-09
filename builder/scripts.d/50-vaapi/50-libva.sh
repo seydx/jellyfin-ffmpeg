@@ -1,7 +1,10 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://github.com/intel/libva.git"
-SCRIPT_COMMIT="710eb465c6277ee2cac3e6948767b01eebe7e77a"
+# Pinned to libva 2.20 (VA-API 1.20). Built against 1.21+, FFmpeg calls vaMapBuffer2,
+# which the libva of Debian 12 (2.17) and Ubuntu 22.04 (2.14) lacks, and the implib stub
+# then jumps to NULL.
+SCRIPT_COMMIT="b4870fdfe2d41b579036dae280dfc7a5e732127f"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1

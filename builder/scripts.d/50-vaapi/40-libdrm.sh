@@ -1,7 +1,8 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/mesa/drm.git"
-SCRIPT_COMMIT="6bfcfc725fbe0ece0918535556d61ee567b1ffff"
+# Pinned to libdrm 2.4.116 alongside libva 2.20, see 50-libva.sh.
+SCRIPT_COMMIT="7bdb135f0c8e6ae2c0ed6d4bd6a8423eb1df5c26"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1

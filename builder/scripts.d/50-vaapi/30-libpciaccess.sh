@@ -1,7 +1,8 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git"
-SCRIPT_COMMIT="38e6f15f839fba2c49982e7ad61cde681fd5d4d6"
+# Pinned to libpciaccess 0.17 alongside libva 2.20, see 50-libva.sh.
+SCRIPT_COMMIT="03d0b467804bf033c2be259be3f091231f74cff9"
 
 ffbuild_enabled() {
     [[ $TARGET != linux* ]] && return -1
