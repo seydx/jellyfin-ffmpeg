@@ -1,0 +1,120 @@
+diff --git a/arch/common/init.c.tpl b/arch/common/init.c.tpl
+index bfb303f..04bf03f 100644
+--- a/arch/common/init.c.tpl
++++ b/arch/common/init.c.tpl
+@@ -5,6 +5,9 @@
+  *
+  * Use of this source code is governed by MIT license that can be
+  * found in the LICENSE.txt file.
++ *
++ * PATCHED by node-av: Modified to return gracefully when library
++ * cannot be loaded instead of crashing with assert/abort.
+  */
+ 
+ #ifndef _GNU_SOURCE
+@@ -46,8 +49,19 @@ extern "C" {
+     } \
+   } while(0)
+ 
++// PATCHED: Graceful check that returns 0 instead of crashing
++#define CHECK_GRACEFUL(cond, fmt, ...) do { \
++    if(!(cond)) { \
++      if (getenv("IMPLIB_DEBUG")) { \
++        fprintf(stderr, "implib-gen: $load_name: " fmt " (graceful)\n", ##__VA_ARGS__); \
++      } \
++      return 0; \
++    } \
++  } while(0)
++
+ static void *lib_handle;
+ static int dlopened;
++static int load_failed;  // PATCHED: Track if load already failed
+ 
+ #if ! NO_DLOPEN
+ 
+@@ -108,6 +122,12 @@ static void unlock(void) {}
+ static int load_library(void) {
+   int publish = lock();
+ 
++  // PATCHED: Return early if we already know loading failed
++  if (load_failed) {
++    unlock();
++    return 0;
++  }
++
+   if (lib_handle) {
+     unlock();
+     return publish;
+@@ -116,10 +136,26 @@ static int load_library(void) {
+ #if HAS_DLOPEN_CALLBACK
+   extern void *$dlopen_callback(const char *lib_name);
+   lib_handle = $dlopen_callback("$load_name");
+-  CHECK(lib_handle, "failed to load library '$load_name' via callback '$dlopen_callback'");
++  // PATCHED: Graceful handling instead of CHECK/abort
++  if (!lib_handle) {
++    if (getenv("IMPLIB_DEBUG")) {
++      fprintf(stderr, "implib-gen: $load_name: failed to load library via callback '$dlopen_callback' (graceful)\n");
++    }
++    load_failed = 1;
++    unlock();
++    return 0;
++  }
+ #else
+   lib_handle = dlopen("$load_name", RTLD_LAZY | RTLD_GLOBAL);
+-  CHECK(lib_handle, "failed to load library '$load_name' via dlopen: %s", dlerror());
++  // PATCHED: Graceful handling instead of CHECK/abort
++  if (!lib_handle) {
++    if (getenv("IMPLIB_DEBUG")) {
++      fprintf(stderr, "implib-gen: $load_name: failed to load library via dlopen: %s (graceful)\n", dlerror());
++    }
++    load_failed = 1;
++    unlock();
++    return 0;
++  }
+ #endif
+ 
+   // With (non-default) IMPLIB_EXPORT_SHIMS we may call dlopen more than once
+@@ -189,18 +225,24 @@ void *_${lib_suffix}_tramp_resolve(size_t i) {
+ #else
+   publish = load_library();
+   h = lib_handle;
+-  CHECK(h, "failed to resolve symbol '%s', library failed to load", sym_names[i]);
++  // PATCHED: Graceful handling - return NULL if library failed to load
++  if (!h) {
++    if (getenv("IMPLIB_DEBUG")) {
++      fprintf(stderr, "implib-gen: $load_name: failed to resolve symbol '%s', library not available (graceful)\n", sym_names[i]);
++    }
++    return 0;
++  }
+ #endif
+ 
+   void *addr;
+ #if HAS_DLSYM_CALLBACK
+   extern void *$dlsym_callback(void *handle, const char *sym_name);
+   addr = $dlsym_callback(h, sym_names[i]);
+-  CHECK(addr, "failed to resolve symbol '%s' via callback $dlsym_callback", sym_names[i]);
++  CHECK_GRACEFUL(addr, "failed to resolve symbol '%s' via callback $dlsym_callback", sym_names[i]);
+ #else
+   // Dlsym is thread-safe so don't need to protect it.
+   addr = dlsym(h, sym_names[i]);
+-  CHECK(addr, "failed to resolve symbol '%s' via dlsym: %s", sym_names[i], dlerror());
++  CHECK_GRACEFUL(addr, "failed to resolve symbol '%s' via dlsym: %s", sym_names[i], dlerror());
+ #endif
+ 
+   if (publish) {
+@@ -229,6 +271,7 @@ void _${lib_suffix}_tramp_set_handle(void *handle) {
+   // TODO: call unload_lib ?
+   lib_handle = handle;
+   dlopened = 0;
++  load_failed = 0;  // PATCHED: Reset failure state
+ }
+ 
+ // Resets all resolved symbols. This is needed in case
+@@ -238,6 +281,7 @@ void _${lib_suffix}_tramp_reset(void) {
+   memset(_${lib_suffix}_tramp_table, 0, SYM_COUNT * sizeof(_${lib_suffix}_tramp_table[0]));
+   lib_handle = 0;
+   dlopened = 0;
++  load_failed = 0;  // PATCHED: Reset failure state
+ }
+ 
+ #ifdef __cplusplus

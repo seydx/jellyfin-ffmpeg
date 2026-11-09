@@ -40,7 +40,13 @@ ADD toolchain.cmake /toolchain.cmake
 ADD cross.meson /cross.meson
 
 ADD gen-implib.sh /usr/bin/gen-implib
-RUN git clone --filter=blob:none --depth=1 https://github.com/yugr/Implib.so /opt/implib
+ADD implib-graceful-callback.c /usr/bin/implib-graceful-callback.c
+# The stubs return instead of aborting when a library is missing, node-av runs FFmpeg
+# inside the host process. Pinned so the patch keeps matching Implib.so's template.
+RUN --mount=src=implib-graceful.patch,dst=/implib-graceful.patch \
+    git clone --filter=blob:none https://github.com/yugr/Implib.so /opt/implib && \
+    git -C /opt/implib checkout -q a3e167cf978a5b8a38ec0f710d8c4331e8dcdd9a && \
+    git -C /opt/implib apply /implib-graceful.patch
 
 ENV FFBUILD_TOOLCHAIN=aarch64-ffbuild-linux-gnu
 ENV PATH="/opt/ct-ng/bin:${PATH}" \
