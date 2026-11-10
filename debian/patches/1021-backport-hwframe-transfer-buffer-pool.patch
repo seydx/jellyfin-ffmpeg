@@ -1,0 +1,232 @@
+Backport of FFmpeg master commits:
+  501d815ec4 avutil/frame: let libavutil allocate a video frame's buffer with its own allocator
+  b8249f73a7 avutil/hwcontext: add av_hwframe_get_transfer_buffer()
+  5ac6d116e7 avutil/hwcontext: pool the frames av_hwframe_transfer_data() allocates
+
+Index: FFmpeg/libavutil/frame.c
+===================================================================
+--- FFmpeg.orig/libavutil/frame.c
++++ FFmpeg/libavutil/frame.c
+@@ -21,6 +21,7 @@
+ #include "buffer.h"
+ #include "dict.h"
+ #include "frame.h"
++#include "frame_internal.h"
+ #include "imgutils.h"
+ #include "mem.h"
+ #include "refstruct.h"
+@@ -72,7 +73,9 @@ void av_frame_free(AVFrame **frame)
+ 
+ #define ALIGN (HAVE_SIMD_ALIGN_64 ? 64 : 32)
+ 
+-static int get_video_buffer(AVFrame *frame, int align)
++int ff_frame_get_video_buffer(AVFrame *frame, int align,
++                              AVBufferRef *(*alloc)(void *opaque, size_t size),
++                              void *opaque)
+ {
+     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
+     int ret, padded_height;
+@@ -119,7 +122,7 @@ static int get_video_buffer(AVFrame *fra
+         total_size += sizes[i];
+     }
+ 
+-    frame->buf[0] = av_buffer_alloc(total_size);
++    frame->buf[0] = alloc ? alloc(opaque, total_size) : av_buffer_alloc(total_size);
+     if (!frame->buf[0]) {
+         ret = AVERROR(ENOMEM);
+         goto fail;
+@@ -209,7 +212,7 @@ int av_frame_get_buffer(AVFrame *frame,
+         return AVERROR(EINVAL);
+ 
+     if (frame->width > 0 && frame->height > 0)
+-        return get_video_buffer(frame, align);
++        return ff_frame_get_video_buffer(frame, align, NULL, NULL);
+     else if (frame->nb_samples > 0 &&
+              (av_channel_layout_check(&frame->ch_layout)))
+         return get_audio_buffer(frame, align);
+Index: FFmpeg/libavutil/frame_internal.h
+===================================================================
+--- /dev/null
++++ FFmpeg/libavutil/frame_internal.h
+@@ -0,0 +1,37 @@
++/*
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef AVUTIL_FRAME_INTERNAL_H
++#define AVUTIL_FRAME_INTERNAL_H
++
++#include <stddef.h>
++
++#include "buffer.h"
++#include "frame.h"
++
++/**
++ * Allocate the buffer of a video frame like av_frame_get_buffer().
++ *
++ * @param alloc  allocates the buffer, av_buffer_alloc() is used if NULL
++ * @param opaque passed to alloc
++ */
++int ff_frame_get_video_buffer(AVFrame *frame, int align,
++                              AVBufferRef *(*alloc)(void *opaque, size_t size),
++                              void *opaque);
++
++#endif /* AVUTIL_FRAME_INTERNAL_H */
+Index: FFmpeg/libavutil/hwcontext.c
+===================================================================
+--- FFmpeg.orig/libavutil/hwcontext.c
++++ FFmpeg/libavutil/hwcontext.c
+@@ -21,6 +21,7 @@
+ #include "avassert.h"
+ #include "buffer.h"
+ #include "common.h"
++#include "frame_internal.h"
+ #include "hwcontext.h"
+ #include "hwcontext_internal.h"
+ #include "imgutils.h"
+@@ -238,6 +239,9 @@ static void hwframe_ctx_free(void *opaqu
+     if (ctxi->pool_internal)
+         av_buffer_pool_uninit(&ctxi->pool_internal);
+ 
++    av_buffer_pool_uninit(&ctxi->transfer_pool);
++    ff_mutex_destroy(&ctxi->transfer_pool_lock);
++
+     if (ctxi->hw_type->frames_uninit)
+         ctxi->hw_type->frames_uninit(ctx);
+ 
+@@ -265,6 +269,11 @@ AVBufferRef *av_hwframe_ctx_alloc(AVBuff
+         return NULL;
+     ctx  = &ctxi->p;
+ 
++    if (ff_mutex_init(&ctxi->transfer_pool_lock, NULL)) {
++        av_free(ctxi);
++        return NULL;
++    }
++
+     if (hw_type->frames_hwctx_size) {
+         ctx->hwctx = av_mallocz(hw_type->frames_hwctx_size);
+         if (!ctx->hwctx)
+@@ -293,6 +302,7 @@ AVBufferRef *av_hwframe_ctx_alloc(AVBuff
+ 
+ fail:
+     av_buffer_unref(&device_ref);
++    ff_mutex_destroy(&ctxi->transfer_pool_lock);
+     av_freep(&ctx->hwctx);
+     av_freep(&ctx);
+     return NULL;
+@@ -387,6 +397,30 @@ int av_hwframe_transfer_get_formats(AVBu
+     return ctxi->hw_type->transfer_get_formats(&ctxi->p, dir, formats);
+ }
+ 
++static AVBufferRef *transfer_buffer_alloc(void *opaque, size_t size)
++{
++    FFHWFramesContext *ctxi = opaque;
++    AVBufferRef *buf = NULL;
++
++    ff_mutex_lock(&ctxi->transfer_pool_lock);
++    if (ctxi->transfer_pool_size != size) {
++        av_buffer_pool_uninit(&ctxi->transfer_pool);
++        ctxi->transfer_pool      = av_buffer_pool_init(size, NULL);
++        ctxi->transfer_pool_size = ctxi->transfer_pool ? size : 0;
++    }
++    if (ctxi->transfer_pool)
++        buf = av_buffer_pool_get(ctxi->transfer_pool);
++    ff_mutex_unlock(&ctxi->transfer_pool_lock);
++
++    return buf;
++}
++
++int av_hwframe_get_transfer_buffer(AVBufferRef *hwframe_ctx, AVFrame *frame)
++{
++    return ff_frame_get_video_buffer(frame, 0, transfer_buffer_alloc,
++                                     hwframe_ctx->data);
++}
++
+ static int transfer_data_alloc(AVFrame *dst, const AVFrame *src, int flags)
+ {
+     AVHWFramesContext *ctx;
+@@ -419,7 +453,7 @@ static int transfer_data_alloc(AVFrame *
+     frame_tmp->width  = ctx->width;
+     frame_tmp->height = ctx->height;
+ 
+-    ret = av_frame_get_buffer(frame_tmp, 0);
++    ret = av_hwframe_get_transfer_buffer(src->hw_frames_ctx, frame_tmp);
+     if (ret < 0)
+         goto fail;
+ 
+Index: FFmpeg/libavutil/hwcontext.h
+===================================================================
+--- FFmpeg.orig/libavutil/hwcontext.h
++++ FFmpeg/libavutil/hwcontext.h
+@@ -375,6 +375,21 @@ int av_hwframe_ctx_init(AVBufferRef *ref
+ int av_hwframe_get_buffer(AVBufferRef *hwframe_ctx, AVFrame *frame, int flags);
+ 
+ /**
++ * Allocate the buffers of a software frame that data is transferred to or
++ * from frames of the given AVHWFramesContext.
++ *
++ * Frames allocated otherwise can be transferred as well, as described for
++ * av_hwframe_transfer_data(). The buffers allocated here are pooled, and may be
++ * in memory that the device transfers faster.
++ *
++ * @param hwframe_ctx a reference to an AVHWFramesContext
++ * @param frame       a video frame with format, width and height set and no
++ *                    data buffers
++ * @return 0 on success, a negative AVERROR code on failure
++ */
++int av_hwframe_get_transfer_buffer(AVBufferRef *hwframe_ctx, AVFrame *frame);
++
++/**
+  * Copy data to or from a hw surface. At least one of dst/src must have an
+  * AVHWFramesContext attached.
+  *
+@@ -386,7 +401,7 @@ int av_hwframe_get_buffer(AVBufferRef *h
+  * AV_HWFRAME_TRANSFER_DIRECTION_TO)
+  *
+  * dst may be "clean" (i.e. with data/buf pointers unset), in which case the
+- * data buffers will be allocated by this function using av_frame_get_buffer().
++ * data buffers will be allocated by this function.
+  * If dst->format is set, then this format will be used, otherwise (when
+  * dst->format is AV_PIX_FMT_NONE) the first acceptable format will be chosen.
+  *
+Index: FFmpeg/libavutil/hwcontext_internal.h
+===================================================================
+--- FFmpeg.orig/libavutil/hwcontext_internal.h
++++ FFmpeg/libavutil/hwcontext_internal.h
+@@ -23,6 +23,7 @@
+ 
+ #include "buffer.h"
+ #include "hwcontext.h"
++#include "thread.h"
+ #include "frame.h"
+ #include "pixfmt.h"
+ 
+@@ -101,6 +102,14 @@ typedef struct FFHWFramesContext {
+     AVBufferPool *pool_internal;
+ 
+     /**
++     * Buffers of transfer_pool_size bytes for av_hwframe_get_transfer_buffer(),
++     * both guarded by transfer_pool_lock.
++     */
++    AVBufferPool *transfer_pool;
++    size_t        transfer_pool_size;
++    AVMutex       transfer_pool_lock;
++
++    /**
+      * For a derived context, a reference to the original frames
+      * context it was derived from.
+      */

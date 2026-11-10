@@ -121,3 +121,4 @@
 1018-backport-rtsp-teardown-on-close.patch
 1019-backport-rtsp-rtp-depacketizer-fixes.patch
 1020-backport-h264-frame-num-gap-hwaccel.patch
+1021-backport-hwframe-transfer-buffer-pool.patch
