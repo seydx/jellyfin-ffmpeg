@@ -5,7 +5,7 @@ MACOS_SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
 
 FF_CFLAGS+="-I"$FFBUILD_PREFIX"/include"
 FF_LDFLAGS+="-L"$FFBUILD_PREFIX"/lib"
-FF_CONFIGURE+=" --disable-unstable --disable-libjack --disable-indev=jack --disable-libxcb --disable-xlib --enable-neon --enable-runtime-cpudetect --enable-audiotoolbox --enable-videotoolbox"
+FF_CONFIGURE+=" --disable-unstable --disable-libjack --disable-indev=jack --disable-libxcb --disable-xlib --enable-neon --enable-runtime-cpudetect --enable-audiotoolbox --enable-videotoolbox --enable-metal"
 FFBUILD_TARGET_FLAGS="--disable-shared --enable-static --pkg-config-flags=\"--static\" --enable-pthreads --cc=clang"
 FF_HOST_CFLAGS="-isysroot $MACOS_SDKROOT -I"$FFBUILD_PREFIX"/include"
 FF_HOST_LDFLAGS=""
