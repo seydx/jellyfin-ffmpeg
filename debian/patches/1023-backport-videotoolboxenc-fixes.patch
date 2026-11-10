@@ -1,0 +1,293 @@
+Backport of FFmpeg master commits:
+  f3b1386707 avcodec/videotoolboxenc: check PTS validity before timestamp conversion
+  6f82db5ad5 avcodec/videotoolboxenc: respect CMTime.timescale when computing timestamps
+  23aea13745 avcodec/videotoolboxenc: fix use-after-free of strings
+  04ff86d035 avcodec/videotoolboxenc: free the buffer node when a frame is dropped
+  34b2175e80 avcodec/videotoolboxenc: fail when no frame is encoded for extradata
+  f3ae2936e8 avcodec/videotoolboxenc: free the extradata buffer node on error paths
+  12461b43d5 avcodec/videotoolboxenc: fix leak when constant bitrate is not supported
+  c0f6ae570f avcodec/videotoolboxenc: fix double free when frame submission fails
+
+Index: FFmpeg/libavcodec/videotoolboxenc.c
+===================================================================
+--- FFmpeg.orig/libavcodec/videotoolboxenc.c
++++ FFmpeg/libavcodec/videotoolboxenc.c
+@@ -259,6 +259,9 @@ typedef struct VTEncContext {
+     BufNode *q_head;
+     BufNode *q_tail;
+ 
++    /* Nodes handed to VideoToolbox and not reported back yet. */
++    BufNode *submitted_head;
++
+     int64_t frame_ct_out;
+     int64_t frame_ct_in;
+ 
+@@ -382,32 +385,47 @@ static void clear_frame_queue(VTEncConte
+     set_async_error(vtctx, 0);
+ }
+ 
++static void vtenc_submitted_clear(VTEncContext *vtctx)
++{
++    BufNode *info;
++
++    pthread_mutex_lock(&vtctx->lock);
++
++    while (vtctx->submitted_head) {
++        info = vtctx->submitted_head->next;
++        vtenc_free_buf_node(vtctx->submitted_head);
++        vtctx->submitted_head = info;
++    }
++
++    pthread_mutex_unlock(&vtctx->lock);
++}
++
+ static void vtenc_reset(VTEncContext *vtctx)
+ {
+     if (vtctx->session) {
++        /* The session may be retained elsewhere; invalidate before
++         * release so teardown is deterministic.
++         */
++        VTCompressionSessionInvalidate(vtctx->session);
+         CFRelease(vtctx->session);
+         vtctx->session = NULL;
+     }
+ 
++    vtenc_submitted_clear(vtctx);
++
+     if (vtctx->supported_props) {
+         CFRelease(vtctx->supported_props);
+         vtctx->supported_props = NULL;
+     }
+ 
+-    if (vtctx->color_primaries) {
+-        CFRelease(vtctx->color_primaries);
+-        vtctx->color_primaries = NULL;
+-    }
+-
+-    if (vtctx->transfer_function) {
+-        CFRelease(vtctx->transfer_function);
+-        vtctx->transfer_function = NULL;
+-    }
+-
+-    if (vtctx->ycbcr_matrix) {
+-        CFRelease(vtctx->ycbcr_matrix);
+-        vtctx->ycbcr_matrix = NULL;
+-    }
++    /* The colorimetry fields hold references borrowed from CoreVideo (Get
++     * semantics). Releasing them would free CoreVideo's cached string for
++     * codepoints without a constant name, and later lookups of the same
++     * codepoint would hand out a dangling pointer.
++     */
++    vtctx->color_primaries = NULL;
++    vtctx->transfer_function = NULL;
++    vtctx->ycbcr_matrix = NULL;
+ }
+ 
+ static int vtenc_q_pop(VTEncContext *vtctx, bool wait, CMSampleBufferRef *buf, ExtraSEI *sei)
+@@ -474,6 +492,37 @@ static void vtenc_q_push(VTEncContext *v
+     pthread_mutex_unlock(&vtctx->lock);
+ }
+ 
++static void vtenc_submitted_add(VTEncContext *vtctx, BufNode *info)
++{
++    pthread_mutex_lock(&vtctx->lock);
++
++    info->next = vtctx->submitted_head;
++    vtctx->submitted_head = info;
++
++    pthread_mutex_unlock(&vtctx->lock);
++}
++
++static BufNode *vtenc_submitted_remove(VTEncContext *vtctx, void *refcon)
++{
++    BufNode **link;
++    BufNode *info;
++
++    pthread_mutex_lock(&vtctx->lock);
++
++    link = &vtctx->submitted_head;
++    while (*link && *link != refcon)
++        link = &(*link)->next;
++    info = *link;
++    if (info) {
++        *link = info->next;
++        info->next = NULL;
++    }
++
++    pthread_mutex_unlock(&vtctx->lock);
++
++    return info;
++}
++
+ static int count_nalus(size_t length_code_size,
+                        CMSampleBufferRef sample_buffer,
+                        int *count)
+@@ -745,7 +794,12 @@ static void vtenc_output_callback(
+ {
+     AVCodecContext *avctx = ctx;
+     VTEncContext   *vtctx = avctx->priv_data;
+-    BufNode *info = sourceFrameCtx;
++    BufNode *info;
++
++    info = vtenc_submitted_remove(vtctx, sourceFrameCtx);
++    /* The node may already be gone if the session was reset. */
++    if (!info)
++        return;
+ 
+     av_buffer_unref(&info->frame_buf);
+     if (vtctx->async_error) {
+@@ -761,6 +815,7 @@ static void vtenc_output_callback(
+     }
+ 
+     if (!sample_buffer) {
++        vtenc_free_buf_node(info);
+         return;
+     }
+ 
+@@ -1272,6 +1327,7 @@ static int vtenc_create_encoder(AVCodecC
+                                           bit_rate_num);
+             if (status == kVTPropertyNotSupportedErr) {
+                 av_log(avctx, AV_LOG_ERROR, "-constant_bit_rate true is not supported by the encoder.\n");
++                CFRelease(bit_rate_num);
+                 return AVERROR_EXTERNAL;
+             }
+         } else {
+@@ -2131,7 +2187,6 @@ static int vtenc_cm_to_avpacket(
+     size_t  out_buf_size;
+     size_t  sei_nalu_size = 0;
+     int64_t dts_delta;
+-    int64_t time_base_num;
+     int nalu_count;
+     CMTime  pts;
+     CMTime  dts;
+@@ -2223,6 +2278,11 @@ static int vtenc_cm_to_avpacket(
+     pts = CMSampleBufferGetPresentationTimeStamp(sample_buffer);
+     dts = CMSampleBufferGetDecodeTimeStamp      (sample_buffer);
+ 
++    if (CMTIME_IS_INVALID(pts)) {
++        av_log(avctx, AV_LOG_ERROR, "PTS is invalid.\n");
++        return AVERROR_EXTERNAL;
++    }
++
+     if (CMTIME_IS_INVALID(dts)) {
+         if (!vtctx->has_b_frames) {
+             dts = pts;
+@@ -2233,9 +2293,9 @@ static int vtenc_cm_to_avpacket(
+     }
+ 
+     dts_delta = vtctx->dts_delta >= 0 ? vtctx->dts_delta : 0;
+-    time_base_num = avctx->time_base.num;
+-    pkt->pts = pts.value / time_base_num;
+-    pkt->dts = dts.value / time_base_num - dts_delta;
++    pkt->pts = av_rescale_q(pts.value, (AVRational){1, pts.timescale}, avctx->time_base);
++    pkt->dts = av_rescale_q(dts.value, (AVRational){1, dts.timescale}, avctx->time_base)
++               - dts_delta;
+ 
+     return 0;
+ }
+@@ -2414,6 +2474,9 @@ static int vtenc_send_frame(AVCodecConte
+ #endif
+ 
+     time = CMTimeMake(frame->pts * avctx->time_base.num, avctx->time_base.den);
++
++    vtenc_submitted_add(vtctx, node);
++
+     status = VTCompressionSessionEncodeFrame(
+         vtctx->session,
+         cv_img,
+@@ -2423,11 +2486,12 @@ static int vtenc_send_frame(AVCodecConte
+         node,
+         NULL
+     );
++    /* The submitted list owns the node even when EncodeFrame() fails. */
++    node = NULL;
+ 
+     if (status) {
+         av_log(avctx, AV_LOG_ERROR, "Cannot encode frame: %d\n", status);
+         status = AVERROR_EXTERNAL;
+-        // Not necessary, just in case new code put after here
+         goto out;
+     }
+ 
+@@ -2553,6 +2617,9 @@ static int vtenc_populate_extradata(AVCo
+     }
+ 
+     time = CMTimeMake(0, avctx->time_base.den);
++
++    vtenc_submitted_add(vtctx, node);
++
+     status = VTCompressionSessionEncodeFrame(vtctx->session,
+                                              pix_buf,
+                                              time,
+@@ -2560,6 +2627,7 @@ static int vtenc_populate_extradata(AVCo
+                                              NULL,
+                                              node,
+                                              NULL);
++    node = NULL;
+ 
+     if (status) {
+         av_log(avctx,
+@@ -2569,7 +2637,6 @@ static int vtenc_populate_extradata(AVCo
+         status = AVERROR_EXTERNAL;
+         goto pe_cleanup;
+     }
+-    node = NULL;
+ 
+     //Populates extradata - output frames are flushed and param sets are available.
+     status = VTCompressionSessionCompleteFrames(vtctx->session,
+@@ -2586,9 +2653,14 @@ static int vtenc_populate_extradata(AVCo
+         goto pe_cleanup;
+     }
+ 
+-    CFRelease(buf);
+-
++    if (!buf) {
++        // VideoToolbox reports a dropped frame as success with no buffer.
++        av_log(avctx, AV_LOG_ERROR, "Extradata frame dropped, no param sets\n");
++        status = AVERROR_EXTERNAL;
++        goto pe_cleanup;
++    }
+ 
++    CFRelease(buf);
+ 
+ pe_cleanup:
+     CVPixelBufferRelease(pix_buf);
+@@ -2603,8 +2675,8 @@ pe_cleanup:
+     vtctx->frame_ct_out = 0;
+ 
+     av_assert0(status != 0 || (avctx->extradata && avctx->extradata_size > 0));
+-    if (!status)
+-        vtenc_free_buf_node(node);
++    // NULL once the node was submitted, so a set node must be freed.
++    vtenc_free_buf_node(node);
+ 
+     return status;
+ }
+@@ -2613,20 +2685,19 @@ static av_cold int vtenc_close(AVCodecCo
+ {
+     VTEncContext *vtctx = avctx->priv_data;
+ 
+-    if(!vtctx->session) {
+-        pthread_cond_destroy(&vtctx->cv_sample_sent);
+-        pthread_mutex_destroy(&vtctx->lock);
+-        return 0;
++    if (vtctx->session) {
++        /* Drain pending frames before reset discards their nodes. */
++        VTCompressionSessionCompleteFrames(vtctx->session,
++                                           kCMTimeIndefinite);
+     }
+ 
+-    VTCompressionSessionCompleteFrames(vtctx->session,
+-                                       kCMTimeIndefinite);
++    vtenc_reset(vtctx);
++
+     clear_frame_queue(vtctx);
++
+     pthread_cond_destroy(&vtctx->cv_sample_sent);
+     pthread_mutex_destroy(&vtctx->lock);
+ 
+-    vtenc_reset(vtctx);
+-
+     return 0;
+ }
+ 

@@ -123,3 +123,4 @@
 1020-backport-h264-frame-num-gap-hwaccel.patch
 1021-backport-hwframe-transfer-buffer-pool.patch
 1022-backport-hevc-decoder-speedups.patch
+1023-backport-videotoolboxenc-fixes.patch
