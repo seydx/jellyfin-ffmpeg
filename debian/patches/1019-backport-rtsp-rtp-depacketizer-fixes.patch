@@ -1,0 +1,204 @@
+Backport of FFmpeg master commits:
+  2501954d49 avformat/rtpdec: fix RTCP RR cumulative packet loss clamping
+  b4d11dffbf avformat/rtpdec_av1: fix operator precedence in packet allocation
+  9cf34b031f avformat/rtpdec: propagate SRTP setup errors to the caller
+  f5d4fd186c avformat/rtsp: limit the number of redirects
+  e5fe2cbebc avformat/rtpdec_h264: Ignore framesize attributes without a height
+  8d8616a510 avformat/rtpdec_opus: Reject empty payloads
+  a7b20ee103 avformat/rtsp: Validate the SampleRate SDP attribute
+  97801e53f0 avformat/rtpdec: fix dropped payload after reordering-queue delivery
+  5af7de7e3d avformat/rtpdec_av1: Read the OBU header byte after the size checks
+
+Index: FFmpeg/libavformat/rtpdec.c
+===================================================================
+--- FFmpeg.orig/libavformat/rtpdec.c
++++ FFmpeg/libavformat/rtpdec.c
+@@ -355,8 +355,7 @@ int ff_rtp_check_and_send_back_rr(RTPDem
+     // RFC 1889/p64
+     extended_max          = stats->cycles + stats->max_seq;
+     expected              = extended_max - stats->base_seq;
+-    lost                  = expected - stats->received;
+-    lost                  = FFMIN(lost, 0xffffff); // clamp it since it's only 24 bits...
++    lost                  = av_zero_extend(av_clip_intp2(expected - stats->received, 23), 24);
+     expected_interval     = expected - stats->expected_prior;
+     stats->expected_prior = expected;
+     received_interval     = stats->received - stats->received_prior;
+@@ -585,11 +584,14 @@ void ff_rtp_parse_set_dynamic_protocol(R
+     s->handler                  = handler;
+ }
+ 
+-void ff_rtp_parse_set_crypto(RTPDemuxContext *s, const char *suite,
+-                             const char *params)
++int ff_rtp_parse_set_crypto(RTPDemuxContext *s, const char *suite,
++                            const char *params)
+ {
+-    if (!ff_srtp_set_crypto(&s->srtp, suite, params))
+-        s->srtp_enabled = 1;
++    int ret = ff_srtp_set_crypto(&s->srtp, suite, params);
++    if (ret < 0)
++        return ret;
++    s->srtp_enabled = 1;
++    return 0;
+ }
+ 
+ static int rtp_set_prft(RTPDemuxContext *s, AVPacket *pkt, uint32_t timestamp) {
+@@ -939,8 +941,10 @@ int ff_rtp_parse_packet(RTPDemuxContext
+         return -1;
+     rv = rtp_parse_one_packet(s, pkt, bufptr, len);
+     s->prev_ret = rv;
+-    while (rv < 0 && has_next_packet(s))
++    while (rv < 0 && has_next_packet(s)) {
+         rv = rtp_parse_queued_packet(s, pkt);
++        s->prev_ret = rv;
++    }
+     return rv ? rv : has_next_packet(s);
+ }
+ 
+Index: FFmpeg/libavformat/rtpdec.h
+===================================================================
+--- FFmpeg.orig/libavformat/rtpdec.h
++++ FFmpeg/libavformat/rtpdec.h
+@@ -45,8 +45,8 @@ RTPDemuxContext *ff_rtp_parse_open(AVFor
+                                    int payload_type, int queue_size);
+ void ff_rtp_parse_set_dynamic_protocol(RTPDemuxContext *s, PayloadContext *ctx,
+                                        const RTPDynamicProtocolHandler *handler);
+-void ff_rtp_parse_set_crypto(RTPDemuxContext *s, const char *suite,
+-                             const char *params);
++int ff_rtp_parse_set_crypto(RTPDemuxContext *s, const char *suite,
++                            const char *params);
+ int ff_rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
+                         uint8_t **buf, int len);
+ void ff_rtp_parse_close(RTPDemuxContext *s);
+Index: FFmpeg/libavformat/rtpdec_av1.c
+===================================================================
+--- FFmpeg.orig/libavformat/rtpdec_av1.c
++++ FFmpeg/libavformat/rtpdec_av1.c
+@@ -228,8 +228,6 @@ static int av1_handle_packet(AVFormatCon
+             rem_pkt_size -= num_lebs;
+             buf_ptr += num_lebs;
+         }
+-        // read first byte (which is the header byte only for non-fragmented elements)
+-        obu_hdr = *buf_ptr;
+         if (obu_size > rem_pkt_size) {
+             av_log(ctx, AV_LOG_ERROR, "AV1 OBU size %u larger than remaining pkt size %d\n", obu_size, rem_pkt_size);
+             return AVERROR_INVALIDDATA;
+@@ -240,6 +238,8 @@ static int av1_handle_packet(AVFormatCon
+             return AVERROR_INVALIDDATA;
+         }
+ 
++        // read first byte (which is the header byte only for non-fragmented elements)
++        obu_hdr = *buf_ptr;
+         if (!is_frag_cont) {
+             uint8_t obu_type = (obu_hdr >> AV1S_OBU_TYPE) & AV1M_OBU_TYPE;
+             if (obu_hdr & AV1F_OBU_FORBIDDEN) {
+@@ -278,13 +278,9 @@ static int av1_handle_packet(AVFormatCon
+             if (data->needs_td) {
+                 output_size += 2; // for Temporal Delimiter (TD)
+             }
+-            if (pkt->data) {
+-                if ((result = av_grow_packet(pkt, output_size)) < 0)
+-                    return result;
+-            } else {
+-                if ((result = av_new_packet(pkt, output_size) < 0))
+-                    return result;
+-            }
++            result = av_grow_packet(pkt, output_size);
++            if (result < 0)
++                return result;
+ 
+             if (data->needs_td) {
+                 // restore TD
+Index: FFmpeg/libavformat/rtpdec_h264.c
+===================================================================
+--- FFmpeg.orig/libavformat/rtpdec_h264.c
++++ FFmpeg/libavformat/rtpdec_h264.c
+@@ -198,6 +198,9 @@ void ff_h264_parse_framesize(AVCodecPara
+         *dst++ = *p++;
+     *dst = '\0';
+ 
++    if (*p != '-')
++        return;
++
+     // a='framesize:96 320-240'
+     // set our parameters
+     par->width   = atoi(buf1);
+Index: FFmpeg/libavformat/rtpdec_opus.c
+===================================================================
+--- FFmpeg.orig/libavformat/rtpdec_opus.c
++++ FFmpeg/libavformat/rtpdec_opus.c
+@@ -96,6 +96,9 @@ static int opus_parse_packet(AVFormatCon
+     int rv;
+     int duration;
+ 
++    if (!len)
++        return AVERROR_INVALIDDATA;
++
+     if ((rv = av_new_packet(pkt, len)) < 0)
+         return rv;
+ 
+Index: FFmpeg/libavformat/rtsp.c
+===================================================================
+--- FFmpeg.orig/libavformat/rtsp.c
++++ FFmpeg/libavformat/rtsp.c
+@@ -736,8 +736,17 @@ static void sdp_parse_line(AVFormatConte
+                 rt->transport = RTSP_TRANSPORT_RDT;
+         } else if (av_strstart(p, "SampleRate:integer;", &p) &&
+                    s->nb_streams > 0) {
+-            st = s->streams[s->nb_streams - 1];
+-            st->codecpar->sample_rate = atoi(p);
++            long sample_rate;
++
++            errno = 0;
++            sample_rate = strtol(p, NULL, 10);
++            if (errno == ERANGE || sample_rate <= 0 || sample_rate > INT_MAX) {
++                av_log(s, AV_LOG_WARNING,
++                       "Invalid SampleRate %ld in SDP, ignoring\n", sample_rate);
++            } else {
++                st = s->streams[s->nb_streams - 1];
++                st->codecpar->sample_rate = sample_rate;
++            }
+         } else if (av_strstart(p, "crypto:", &p) && s->nb_streams > 0) {
+             // RFC 4568
+             rtsp_st = rt->rtsp_streams[rt->nb_rtsp_streams - 1];
+@@ -971,10 +980,17 @@ int ff_rtsp_open_transport_ctx(AVFormatC
+                                               rtsp_st->dynamic_protocol_context,
+                                               rtsp_st->dynamic_handler);
+         }
+-        if (rtsp_st->crypto_suite[0])
+-            ff_rtp_parse_set_crypto(rtsp_st->transport_priv,
+-                                    rtsp_st->crypto_suite,
+-                                    rtsp_st->crypto_params);
++        if (rtsp_st->crypto_suite[0]) {
++            int ret = ff_rtp_parse_set_crypto(rtsp_st->transport_priv,
++                                              rtsp_st->crypto_suite,
++                                              rtsp_st->crypto_params);
++            if (ret < 0) {
++                av_log(s, AV_LOG_ERROR,
++                       "SRTP setup failed for suite '%s'\n",
++                       rtsp_st->crypto_suite);
++                return ret;
++            }
++        }
+     }
+ 
+     return 0;
+@@ -1983,6 +1999,7 @@ int ff_rtsp_connect(AVFormatContext *s)
+     int port, err, tcp_fd;
+     RTSPMessageHeader reply1, *reply = &reply1;
+     int lower_transport_mask = 0;
++    int redirects = 0;
+     int default_port = RTSP_DEFAULT_PORT;
+     int https_tunnel = 0;
+     char real_challenge[64] = "";
+@@ -2291,6 +2308,11 @@ redirect:
+     if (reply->status_code >=300 && reply->status_code < 400 && s->iformat) {
+         int ret;
+ 
++        if (redirects++ >= 8 /* MAX_RTSP_REDIRECTS */) {
++            av_log(s, AV_LOG_ERROR, "Too many RTSP redirects\n");
++            err = AVERROR(EIO);
++            goto fail2;
++        }
+         if (!rtsp_url_same_origin(s->url, reply->location)) {
+             memset(rt->auth, 0, sizeof(rt->auth));
+             memset(&rt->auth_state, 0, sizeof(rt->auth_state));

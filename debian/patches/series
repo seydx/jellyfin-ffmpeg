@@ -118,3 +118,5 @@
 1015-add-passthrough-option-to-vaapi-scale.patch
 1016-clear-consumed-crop-metadata-on-hw-scaler-output.patch
 1017-export-rtp-timestamp-side-data.patch
+1018-backport-rtsp-teardown-on-close.patch
+1019-backport-rtsp-rtp-depacketizer-fixes.patch
