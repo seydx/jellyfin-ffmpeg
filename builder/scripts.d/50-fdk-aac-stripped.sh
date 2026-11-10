@@ -4,8 +4,7 @@ SCRIPT_REPO="https://gitlab.freedesktop.org/wtaymans/fdk-aac-stripped.git"
 SCRIPT_COMMIT="529b87452cd33d45e1d0a5066d20b64f10b38845"
 
 ffbuild_enabled() {
-    # Prefer AudioToolbox's AAC encoder on macOS
-    [[ $TARGET == mac* ]] && return -1
+    # Built on macOS too, so node-av has libfdk_aac (AAC-ELD for HomeKit) on every platform
     return 0
 }
 
