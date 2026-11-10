@@ -61,8 +61,11 @@ cat <<EOF >"$BUILD_SCRIPT"
     cd ffmpeg
 
     if [[ -f "debian/patches/series" ]]; then
-        ln -s /ffbuild/ffmpeg/debian/patches patches
-        quilt push -a
+        # rsync copies the host tree as is, which may already carry the patches link and
+        # an applied series (node-av's patch:ffmpeg). -n replaces the link instead of
+        # nesting one inside it, and quilt exits 2 when there is nothing left to push.
+        ln -sfn /ffbuild/ffmpeg/debian/patches patches
+        quilt push -a || [[ \$? == 2 ]]
     fi
 
     ./configure --prefix=/ffbuild/prefix \
@@ -101,7 +104,8 @@ else
 fi
 cd -
 
-rm -rf ffbuild
+# Keep ffbuild: node-av's CI takes the static libraries from ffbuild/prefix and the
+# config*.h headers from ffbuild/ffmpeg. The next run clears it before building.
 
 if [[ -n "$GITHUB_ACTIONS" ]]; then
     echo "build_name=${BUILD_NAME}" >> "$GITHUB_OUTPUT"
