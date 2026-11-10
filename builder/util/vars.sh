@@ -30,7 +30,7 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-REPO="${GITHUB_REPOSITORY:-jellyfin/jellyfin-ffmpeg}"
+REPO="${GITHUB_REPOSITORY:-seydx/jellyfin-ffmpeg}"
 REPO="${REPO,,}"
 REGISTRY="${REGISTRY_OVERRIDE:-ghcr.io}"
 BASE_IMAGE="${REGISTRY}/${REPO}/base:latest"
