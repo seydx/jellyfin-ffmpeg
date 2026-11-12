@@ -22,6 +22,18 @@ ffbuild_dockerbuild() {
     }' ggml/src/ggml-vulkan/ggml-vulkan.cpp
     grep -q 'Vulkan loader not available' ggml/src/ggml-vulkan/ggml-vulkan.cpp
 
+    # ggml's OpenCL backend exits the process when a kernel fails to compile (e.g. Alpine's
+    # intel-compute-runtime without intel-graphics-compiler). The kernels compile while the backend
+    # registry probes devices, so this hits every whisper init, even with use_gpu off. Throwing
+    # instead makes ggml_cl2_init return NULL, the probe drops the device and whisper falls back
+    # to another backend or the CPU.
+    sed -i '/^static cl_program build_program_from_source(/,/^}/ s/exit(1);/throw std::runtime_error("ggml_opencl: failed to build program");/' \
+        ggml/src/ggml-opencl/ggml-opencl.cpp
+    sed -i 's/^\(\s*\)load_cl_kernels(backend_ctx.get(), opencl_c_version);/\1try {\n\1    load_cl_kernels(backend_ctx.get(), opencl_c_version);\n\1} catch (const std::exception \&) {\n\1    return nullptr;\n\1}/' \
+        ggml/src/ggml-opencl/ggml-opencl.cpp
+    grep -c 'ggml_opencl: failed to build program' ggml/src/ggml-opencl/ggml-opencl.cpp | grep -qx 2
+    grep -q 'catch (const std::exception &) {' ggml/src/ggml-opencl/ggml-opencl.cpp
+
     mkdir build && cd build
 
     local myconf=(
