@@ -15,13 +15,32 @@ ffbuild_dockerbuild() {
 
     sed -i 's/shared_library/library/g' meson.build
 
+    local cpp_args="-fpermissive"
+
+    # musl has no <sys/cdefs.h>. The installed drmrga.h includes it without needing it outside
+    # Android, the Android HAL headers built into the library need its __BEGIN_DECLS (glibc's
+    # stdio.h pulls it in). musl 1.2.4+ also hides mmap64 without _LARGEFILE64_SOURCE.
+    if [[ $TARGET == linuxmusl* ]]; then
+        sed -i '/#include <sys\/cdefs.h>/d' include/drmrga.h
+        printf '%s\n' \
+            '#pragma once' \
+            '#ifdef __cplusplus' \
+            '#define __BEGIN_DECLS extern "C" {' \
+            '#define __END_DECLS }' \
+            '#else' \
+            '#define __BEGIN_DECLS' \
+            '#define __END_DECLS' \
+            '#endif' > "$PWD"/musl-cdefs.h
+        cpp_args+=" -include $PWD/musl-cdefs.h -D_LARGEFILE64_SOURCE"
+    fi
+
     mkdir rkrga_build && cd rkrga_build
 
     local myconf=(
         --prefix="$FFBUILD_PREFIX"
         --buildtype=release
         --default-library=static
-        -Dcpp_args=-fpermissive
+        -Dcpp_args="$cpp_args"
         -Dlibdrm=false
         -Dlibrga_demo=false
     )

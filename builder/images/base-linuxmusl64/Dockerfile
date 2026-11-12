@@ -1,0 +1,59 @@
+ARG GH_REPO=ghcr.io/jellyfin/jellyfin-ffmpeg
+FROM $GH_REPO/base:latest
+
+RUN --mount=src=ct-ng-config,dst=/.config \
+    git clone --filter=blob:none https://github.com/crosstool-ng/crosstool-ng.git /ct-ng && cd /ct-ng && \
+    rm -rf packages/linux/*/chksum && \
+    ./bootstrap && \
+    ./configure --enable-local && \
+    make -j$(nproc) && \
+    cp /.config .config && \
+    ./ct-ng build && \
+    cd / && \
+    rm -rf ct-ng
+
+# Prepare cross environment to heavily favour static builds. musl ships libm, libpthread,
+# librt and libdl as empty archives next to libc.so, so only libc.a goes; removing the
+# stubs would break every -lm.
+RUN \
+    find /opt/ct-ng -type l \
+        -and -name '*.so' \
+        -and -not -ipath '*plugin*' \
+        -and -not -name 'libc.*' \
+        -delete && \
+    find /opt/ct-ng -name 'libc.a' -delete && \
+    mkdir /opt/ffbuild
+
+ADD toolchain.cmake /toolchain.cmake
+ADD cross.meson /cross.meson
+
+ADD gen-implib.sh /usr/bin/gen-implib
+ADD implib-graceful-callback.c /usr/bin/implib-graceful-callback.c
+# The stubs return instead of aborting when a library is missing, node-av runs FFmpeg
+# inside the host process. Pinned so the patch keeps matching Implib.so's template.
+RUN --mount=src=implib-graceful.patch,dst=/implib-graceful.patch \
+    git clone --filter=blob:none https://github.com/yugr/Implib.so /opt/implib && \
+    git -C /opt/implib checkout -q a3e167cf978a5b8a38ec0f710d8c4331e8dcdd9a && \
+    git -C /opt/implib apply /implib-graceful.patch
+
+ENV FFBUILD_TOOLCHAIN=x86_64-ffbuild-linux-musl
+ENV PATH="/opt/ct-ng/bin:${PATH}" \
+    FFBUILD_TARGET_FLAGS="--pkg-config=pkg-config --pkg-config-flags=--static --cross-prefix=${FFBUILD_TOOLCHAIN}- --arch=x86_64 --target-os=linux" \
+    FFBUILD_CROSS_PREFIX="${FFBUILD_TOOLCHAIN}-" \
+    FFBUILD_RUST_TARGET="x86_64-unknown-linux-musl" \
+    FFBUILD_PREFIX=/opt/ffbuild \
+    FFBUILD_CMAKE_TOOLCHAIN=/toolchain.cmake \
+    PKG_CONFIG=pkg-config \
+    PKG_CONFIG_LIBDIR=/opt/ffbuild/lib/pkgconfig:/opt/ffbuild/share/pkgconfig \
+    CC="${FFBUILD_TOOLCHAIN}-gcc" \
+    CXX="${FFBUILD_TOOLCHAIN}-g++" \
+    LD="${FFBUILD_TOOLCHAIN}-ld" \
+    AR="${FFBUILD_TOOLCHAIN}-gcc-ar" \
+    RANLIB="${FFBUILD_TOOLCHAIN}-gcc-ranlib" \
+    NM="${FFBUILD_TOOLCHAIN}-gcc-nm" \
+    CFLAGS="-static-libgcc -static-libstdc++ -I/opt/ffbuild/include -O2 -pipe -fPIC -DPIC -D_FORTIFY_SOURCE=2 -fstack-protector-strong -pthread" \
+    CXXFLAGS="-static-libgcc -static-libstdc++ -I/opt/ffbuild/include -O2 -pipe -fPIC -DPIC -D_FORTIFY_SOURCE=2 -fstack-protector-strong -pthread" \
+    LDFLAGS="-static-libgcc -static-libstdc++ -L/opt/ffbuild/lib -O2 -pipe -fstack-protector-strong -Wl,-z,relro,-z,now -pthread -lm" \
+    STAGE_CFLAGS="-fvisibility=hidden -fno-semantic-interposition" \
+    STAGE_CXXFLAGS="-fvisibility=hidden -fno-semantic-interposition" \
+    CMAKE_POLICY_VERSION_MINIMUM="3.5"

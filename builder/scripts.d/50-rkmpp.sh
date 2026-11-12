@@ -13,6 +13,11 @@ ffbuild_dockerbuild() {
     git-mini-clone "$SCRIPT_REPO" "$SCRIPT_COMMIT" rkmpp
     cd rkmpp
 
+    # kmpp.h uses struct timeval without <sys/time.h>, which glibc pulls in indirectly but musl doesn't
+    if [[ $TARGET == linuxmusl* ]]; then
+        sed -i 's|#include <unistd.h>|#include <sys/time.h>\n#include <unistd.h>|' kmpp/inc/kmpp.h
+    fi
+
     mkdir rkmpp_build && cd rkmpp_build
 
     cmake -GNinja \

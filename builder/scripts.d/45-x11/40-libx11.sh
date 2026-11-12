@@ -27,7 +27,7 @@ ffbuild_dockerbuild() {
         --enable-ipv6
     )
 
-    if [[ $TARGET == linuxarm64 ]]; then
+    if [[ $TARGET == linux*arm64 ]]; then
         myconf+=(
             --disable-malloc0returnsnull
         )

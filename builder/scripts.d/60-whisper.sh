@@ -12,6 +12,16 @@ ffbuild_dockerbuild() {
     git-mini-clone "$SCRIPT_REPO" "$SCRIPT_COMMIT" whisper
     cd whisper
 
+    # Without a system Vulkan loader (e.g. containers without a GPU stack) the shim loader resolves
+    # every entry point to NULL and ggml calls vkEnumerateInstanceVersion unchecked, which crashes
+    # the whole process. Throwing lets ggml_backend_vk_reg skip the backend, so whisper runs on the
+    # CPU. Vulkan 1.0 loaders lack the function as well and are rejected right after anyway.
+    sed -i '/ggml_vk_default_dispatcher_instance.init(vkGetInstanceProcAddr);/a\
+    if (!ggml_vk_default_dispatcher_instance.vkEnumerateInstanceVersion) {\
+        throw vk::SystemError(vk::Result::eErrorInitializationFailed, "Vulkan loader not available");\
+    }' ggml/src/ggml-vulkan/ggml-vulkan.cpp
+    grep -q 'Vulkan loader not available' ggml/src/ggml-vulkan/ggml-vulkan.cpp
+
     mkdir build && cd build
 
     local myconf=(
@@ -45,6 +55,14 @@ ffbuild_dockerbuild() {
             -DGGML_METAL=ON
             -DGGML_OPENCL=OFF
             -DGGML_VULKAN=OFF
+        )
+    fi
+
+    # CMake finds OpenMP in the musl toolchain, but whisper.pc doesn't link libgomp. ggml then
+    # uses its own thread pool, as in the glibc builds where OpenMP isn't picked up.
+    if [[ $TARGET == linuxmusl* ]]; then
+        myconf+=(
+            -DGGML_OPENMP=OFF
         )
     fi
 

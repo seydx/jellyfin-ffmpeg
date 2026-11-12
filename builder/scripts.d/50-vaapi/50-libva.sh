@@ -32,7 +32,7 @@ ffbuild_dockerbuild() {
         -Denable_docs=false
     )
 
-    if [[ $TARGET == linux64 ]]; then
+    if [[ $TARGET == linux64 || $TARGET == linuxmusl64 ]]; then
         myconf+=(
             --cross-file=/cross.meson
             --default-library=shared
@@ -43,7 +43,7 @@ ffbuild_dockerbuild() {
             -Dwith_glx=no
             -Dwith_wayland=no
         )
-    elif [[ $TARGET == linuxarm64 ]]; then
+    elif [[ $TARGET == linux*arm64 ]]; then
         myconf+=(
             --cross-file=/cross.meson
             --default-library=shared

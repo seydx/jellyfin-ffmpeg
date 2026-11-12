@@ -20,7 +20,8 @@ jobs:
       contents: read
       packages: write
     strategy:
-      fail-fast: true
+      # The images are independent, a failing musl build shouldn't cancel the glibc ones
+      fail-fast: false
       matrix:
         include:
           - target: linux64
@@ -28,6 +29,14 @@ jobs:
             platform: linux/amd64
             runner: ubuntu-latest
           - target: linuxarm64
+            variant: gpl
+            platform: linux/arm64
+            runner: ubuntu-24.04-arm
+          - target: linuxmusl64
+            variant: gpl
+            platform: linux/amd64
+            runner: ubuntu-latest
+          - target: linuxmuslarm64
             variant: gpl
             platform: linux/arm64
             runner: ubuntu-24.04-arm

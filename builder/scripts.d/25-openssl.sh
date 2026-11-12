@@ -38,13 +38,13 @@ ffbuild_dockerbuild() {
             --cross-compile-prefix="$FFBUILD_CROSS_PREFIX"
             mingw
         )
-    elif [[ $TARGET == linux64 ]]; then
+    elif [[ $TARGET == linux64 || $TARGET == linuxmusl64 ]]; then
         myconf+=(
             --openssldir=/etc/ssl
             --cross-compile-prefix="$FFBUILD_CROSS_PREFIX"
             linux-x86_64
         )
-    elif [[ $TARGET == linuxarm64 ]]; then
+    elif [[ $TARGET == linux*arm64 ]]; then
         myconf+=(
             --openssldir=/etc/ssl
             --cross-compile-prefix="$FFBUILD_CROSS_PREFIX"

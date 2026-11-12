@@ -37,6 +37,15 @@ ffbuild_dockerbuild() {
         return -1
     fi
 
+    # Cross-compiling, autoconf can't run its malloc(0) test and only trusts glibc hosts, so
+    # for musl it maps malloc to an rpl_malloc that zvbi doesn't ship. musl's malloc(0) is fine.
+    if [[ $TARGET == linuxmusl* ]]; then
+        myconf+=(
+            ac_cv_func_malloc_0_nonnull=yes
+            ac_cv_func_realloc_0_nonnull=yes
+        )
+    fi
+
     ./configure "${myconf[@]}"
     make -C src -j$(nproc)
     make -C src install
