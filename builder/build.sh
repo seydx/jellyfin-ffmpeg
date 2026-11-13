@@ -8,7 +8,7 @@ get_output() {
     (
         SELF="$1"
         source $1
-        if ffbuild_enabled; then
+        if script_enabled "$1"; then
             ffbuild_$2 || exit 0
         else
             ffbuild_un$2 || exit 0

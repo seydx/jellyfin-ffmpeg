@@ -3,6 +3,11 @@ set -xe
 cd "$(dirname "$0")"
 source util/vars.sh
 
+if [[ "$IMAGE_VARIANT" != "$VARIANT" ]]; then
+    echo "The ${VARIANT} variant builds in the ${IMAGE_VARIANT} image, create that one: $0 ${TARGET} ${IMAGE_VARIANT}" >&2
+    exit 1
+fi
+
 TMPCFG="$(mktemp --suffix=.toml)"
 cat <<EOF >"$TMPCFG"
 [worker.oci]

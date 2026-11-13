@@ -4,6 +4,9 @@ SCRIPT_REPO="https://github.com/acoustid/chromaprint.git"
 SCRIPT_COMMIT="6b13ce3a81ae931e7477c4856a86bece99157cd8"
 
 ffbuild_enabled() {
+    # Links fftw3f (GPL) on Linux. Left out of lgpl on macOS too, so the variant has
+    # the same components on every platform.
+    [[ $VARIANT == lgpl* ]] && return -1
     return 0
 }
 

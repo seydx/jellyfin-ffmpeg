@@ -3,12 +3,13 @@ set -xe
 cd "$(dirname "$0")"
 export BUILDER_ROOT="$(pwd)"
 export FFBUILD_PREFIX="/opt/ffbuild/prefix"
+source util/variant.sh
 
 get_output() {
     (
         SELF="$1"
         source $1
-        if ffbuild_enabled; then
+        if script_enabled "$1"; then
             ffbuild_$2 || exit 0
         else
             ffbuild_un$2 || exit 0
@@ -19,6 +20,7 @@ get_output() {
 # Parse arguments
 SKIP_BUILD=false
 arch=""
+VARIANT="gpl"
 
 for arg in "$@"; do
     case "$arg" in
@@ -28,9 +30,12 @@ for arg in "$@"; do
         arm64|x86_64)
             arch="$arg"
             ;;
+        gpl|lgpl|light)
+            VARIANT="$arg"
+            ;;
         *)
             echo "Unknown argument: $arg"
-            echo "Usage: $0 [arm64|x86_64] [--skip-build]"
+            echo "Usage: $0 [arm64|x86_64] [gpl|lgpl|light] [--skip-build]"
             exit 1
             ;;
     esac
@@ -42,7 +47,6 @@ if [ -z "$arch" ]; then
 fi
 
 TARGET="macarm64"
-VARIANT="gpl"
 if [ "$arch" = "arm64" ]; then
     TARGET="macarm64"
 elif [ "$arch" = "x86_64" ]; then
@@ -60,7 +64,7 @@ if ! xcrun -sdk macosx metal -v >/dev/null 2>&1; then
     exit 1
 fi
 
-source "variants/${TARGET}-gpl.sh"
+source "variants/${TARGET}-${VARIANT}.sh"
 
 for addin in ${ADDINS[*]}; do
     source "addins/${addin}.sh"
@@ -97,7 +101,7 @@ if [ "$SKIP_BUILD" = false ]; then
     for lib in scripts.d/*.sh; do
         cd "$BUILDER_ROOT"/build
         source "$BUILDER_ROOT"/"$lib"
-        ffbuild_enabled || continue
+        script_enabled "$lib" || continue
         ffbuild_dockerbuild || exit $?
     done
 fi

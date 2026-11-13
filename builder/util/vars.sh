@@ -35,7 +35,14 @@ REPO="${REPO,,}"
 REGISTRY="${REGISTRY_OVERRIDE:-ghcr.io}"
 BASE_IMAGE="${REGISTRY}/${REPO}/base:latest"
 TARGET_IMAGE="${REGISTRY}/${REPO}/base-${TARGET}:latest"
-IMAGE="${REGISTRY}/${REPO}/${TARGET}-${VARIANT}${ADDINS_STR:+-}${ADDINS_STR}:latest"
+
+# lgpl and light build in the gpl image. They only configure FFmpeg differently, and a
+# library FFmpeg is configured without is not linked, even when the image carries it.
+IMAGE_VARIANT="$VARIANT"
+[[ $VARIANT == lgpl || $VARIANT == light ]] && IMAGE_VARIANT="gpl"
+IMAGE="${REGISTRY}/${REPO}/${TARGET}-${IMAGE_VARIANT}${ADDINS_STR:+-}${ADDINS_STR}:latest"
+
+source util/variant.sh
 
 ffbuild_dockerstage() {
     to_df "RUN --mount=src=${SELF},dst=/stage.sh run_stage /stage.sh"
